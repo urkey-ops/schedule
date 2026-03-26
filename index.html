@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScheduleMaker Pro v2</title>
+<title>ScheduleMaker Pro v3</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -19,7 +19,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* ── TOP NAV ── */
 .topbar{background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .topbar h1{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.topbar h1 .v2{font-size:10px;background:#3B82F6;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.5px}
+.topbar h1 .v3{font-size:10px;background:#3B82F6;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.5px}
 .nav-tabs{display:flex;gap:2px}
 .nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#94A3B8;transition:all .2s;border:none;background:none;white-space:nowrap}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
@@ -77,6 +77,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-warn{background:#FEF3C7;color:#92400E}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{background:#F8FAFC}
 .btn-leave{background:#EDE9FE;color:#5B21B6}.btn-leave:hover{background:#DDD6FE}
+.btn-plan{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}.btn-plan:hover{background:#DBEAFE}
 
 /* ── INPUTS ── */
 input[type=text],input[type=password],input[type=date],select,textarea{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;transition:border .15s;width:100%}
@@ -90,13 +91,18 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 
 /* ── SCHEDULE GRID ── */
 .sched-grid{width:100%;border-collapse:collapse;font-size:11px}
-.sched-grid th{background:var(--navy);color:#fff;padding:7px 10px;text-align:center;font-size:10px;font-weight:600;white-space:nowrap;position:sticky;top:120px}
-.sched-grid .slot-label{background:#F8FAFC;border-right:2px solid var(--border);padding:6px 10px;font-size:10px;color:#64748B;white-space:nowrap;font-family:'DM Mono',monospace;text-align:right;min-width:155px}
+.sched-grid th{background:var(--navy);color:#fff;padding:7px 6px;text-align:center;font-size:10px;font-weight:600;white-space:nowrap;position:sticky;top:120px}
+.sched-grid th.compact-mode{padding:4px 4px}
+/* v3: sticky first column */
+.sched-grid .slot-label{background:#F8FAFC;border-right:2px solid var(--border);padding:6px 10px;font-size:10px;color:#64748B;white-space:nowrap;font-family:'DM Mono',monospace;text-align:right;min-width:145px;position:sticky;left:0;z-index:2}
+.sched-grid th:first-child{position:sticky;left:0;z-index:3;background:var(--navy)}
 .sched-grid .slot-label.lunch-slot{background:#FFFBEB;color:#92400E;font-weight:600}
 .sched-grid .slot-label.current-slot{background:#EFF6FF;color:#1D4ED8;font-weight:700}
 .sched-grid td{border-bottom:1px solid #F1F5F9;border-right:1px solid #F1F5F9;padding:3px}
+.sched-grid td.compact-mode{padding:1px 2px}
 .sched-grid tr.current-row td{background:#F0F9FF!important}
 .loc-select{width:100%;border:none;border-radius:5px;padding:4px 6px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;outline:none;background:#F1F5F9;color:#374151}
+.loc-select.compact-mode{padding:2px 4px;font-size:10px}
 .loc-gate{background:#DBEAFE!important;color:#1D4ED8!important}
 .loc-podium{background:#DCFCE7!important;color:#15803D!important}
 .loc-mandir{background:#FED7AA!important;color:#C2410C!important}
@@ -177,6 +183,29 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 .loc-toggle{padding:6px 12px;border-radius:6px;border:2px solid #CBD5E1;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;background:#fff;font-family:'Inter',sans-serif}
 .loc-toggle.blocked{border-color:#EF4444;background:#FEE2E2;color:#991B1B}
 
+/* ── PLAN SCHEDULE MODAL ── */
+.plan-modal{max-width:480px}
+.plan-day-block{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.plan-day-hdr{background:#F8FAFC;padding:8px 12px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border)}
+.plan-slot-row{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid #F8FAFC}
+.plan-slot-row:last-child{border-bottom:none}
+.plan-slot-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:130px;flex-shrink:0}
+.plan-slot-select{flex:1;border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;outline:none}
+
+/* ── ADVANCED TOOLS (collapsed) ── */
+.adv-tools-bar{background:#F8FAFC;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.adv-tools-toggle{width:100%;padding:9px 14px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--muted);font-family:'Inter',sans-serif;text-align:left}
+.adv-tools-toggle:hover{color:var(--navy)}
+.adv-tools-toggle .arrow{transition:transform .2s;font-size:10px}
+.adv-tools-toggle.open .arrow{transform:rotate(180deg)}
+.adv-tools-body{display:none;padding:10px 14px;border-top:1px solid var(--border)}
+.adv-tools-body.open{display:block}
+
+/* ── DENSITY SWITCH ── */
+.density-switch{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted)}
+.density-btn{padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.density-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
 /* ── PIN SCREEN ── */
 .pin-screen{position:fixed;inset:0;background:#1B2A4A;z-index:999;display:flex;align-items:center;justify-content:center}
 .pin-box{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
@@ -200,9 +229,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 .undo-btn{background:#93C5FD;color:#1E3A5F;border:none;border-radius:12px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer}
 
 /* ── COPY DAY ── */
-.copy-day-toggle{font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:underline;padding:4px 0}
-.copy-day-toggle:hover{color:var(--navy)}
-.copy-day-panel{display:none;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.copy-day-panel{display:none;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
 .copy-day-panel.open{display:flex}
 
 /* ── FIREBASE CONFIG MODAL ── */
@@ -224,16 +251,15 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 @media(max-width:600px){
-  .topbar h1 .v2{display:none}
+  .topbar h1 .v3{display:none}
   .nav-tab{padding:6px 8px;font-size:11px}
   .live-board{grid-template-columns:1fr}
   .week-nav-bar{gap:6px}
 }
 </style>
 </head>
-<body>
 
-<!-- ══ PIN SCREEN ══ -->
+  <!-- ══ PIN SCREEN ══ -->
 <div id="pin-screen" class="pin-screen">
   <div class="pin-box">
     <div style="font-size:40px;margin-bottom:8px">🏢</div>
@@ -253,7 +279,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 
 <!-- TOP NAV -->
 <div class="topbar">
-  <h1>🏢 ScheduleMaker Pro <span class="v2">v2</span></h1>
+  <h1>🏢 ScheduleMaker Pro <span class="v3">v3</span></h1>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-live" onclick="showPage('live',this)">🟢 Live Board</button>
     <button class="nav-tab admin-only" id="tab-staff" onclick="showPage('staff',this)">👥 Staff</button>
@@ -261,10 +287,10 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">📅 Schedule</button>
   </div>
   <div id="sync-indicator" style="margin-left:auto">⬤ local</div>
-  <div id="mode-badge" class="mode-live" style="margin-left:8px">LIVE VIEW</div>
+  <div id="mode-badge" class="mode-live" style="margin-left:8px">VIEW-ONLY</div>
 </div>
 
-<!-- WEEK NAVIGATOR (shown on schedule page) -->
+<!-- WEEK NAVIGATOR -->
 <div class="week-nav-bar hidden" id="week-nav-bar">
   <button class="week-arrow" onclick="shiftWeek(-1)">‹</button>
   <span class="week-label" id="week-label">Week of ...</span>
@@ -299,7 +325,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
     <span class="section-title">👔 Employees</span>
     <button class="btn btn-primary ml-auto btn-sm" onclick="openAddEmployee()">+ Add Employee</button>
   </div>
-  <div class="alert alert-info">💡 All employees can work all locations by default. Use "Edit" to block specific locations.</div>
+  <div class="alert alert-info">💡 All 20 employees are core. Use "Edit" to block specific locations or "📅 Plan Schedule" to fill one person's whole week.</div>
   <div class="card" style="margin-bottom:20px">
     <div class="card-body" style="padding:0">
       <table class="roster-table" id="roster-table">
@@ -340,7 +366,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
     <button class="btn btn-leave ml-auto btn-sm" onclick="openAddLeave()">+ New Leave Request</button>
   </div>
   <div class="alert alert-info">
-    💡 <strong>Approved</strong> leave locks those employee slots to VACATION and shows them in purple. <strong>Pending</strong> leave shows a warning in the schedule but doesn't lock slots yet.
+    💡 <strong>Approved</strong> leave locks those slots to VACATION (purple). <strong>Pending</strong> shows a warning but doesn't lock slots yet.
   </div>
   <div class="card">
     <div class="card-body" style="padding:0">
@@ -356,18 +382,32 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 
 <!-- ══ PAGE: SCHEDULE ══ -->
 <div class="page" id="page-schedule">
-  <div style="margin-bottom:12px">
-    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Weekly Schedule</h2>
-    <p style="color:#64748B;font-size:12px">① Pick a week & day &nbsp;·&nbsp; ② Fill slots &nbsp;·&nbsp; ③ Fix red ❌ cells</p>
-  </div>
-  <div class="alert alert-warn hidden" id="coverage-alert"></div>
-  <div style="margin-bottom:12px">
-    <span class="copy-day-toggle" onclick="toggleCopyPanel(this)">📋 Copy this day to other days ▾</span>
-    <div class="copy-day-panel" id="copy-day-panel">
-      <span style="font-size:11px;font-weight:600;color:#64748B">Copy to →</span>
-      <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Weekly Schedule</h2>
+      <p style="color:#64748B;font-size:12px">① Pick a week &amp; day &nbsp;·&nbsp; ② Fill slots &nbsp;·&nbsp; ③ Fix red ❌ cells</p>
+    </div>
+    <div class="density-switch ml-auto">
+      <span>Density:</span>
+      <button class="density-btn active" id="density-normal" onclick="setDensity('normal')">Normal</button>
+      <button class="density-btn" id="density-compact" onclick="setDensity('compact')">Compact</button>
     </div>
   </div>
+  <div class="alert alert-warn hidden" id="coverage-alert"></div>
+
+  <!-- Advanced Tools (collapsed by default) -->
+  <div class="adv-tools-bar">
+    <button class="adv-tools-toggle" id="adv-toggle" onclick="toggleAdvTools()">
+      ⚙️ Advanced tools <span class="arrow">▾</span>
+    </button>
+    <div class="adv-tools-body" id="adv-tools-body">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:600;color:#64748B">📋 Copy this day to:</span>
+        <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+      </div>
+    </div>
+  </div>
+
   <div style="overflow-x:auto">
     <div class="card">
       <div id="sched-legend" style="padding:10px 16px;border-bottom:1px solid #CBD5E1;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -420,6 +460,26 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
       <button class="btn btn-danger" onclick="closeModal('emp-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLAN SCHEDULE MODAL (v3 NEW) ══ -->
+<div class="modal-overlay hidden" id="plan-modal">
+  <div class="modal plan-modal">
+    <h3 id="plan-modal-title">📅 Plan Schedule</h3>
+    <div class="form-row">
+      <label>Week</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="week-arrow" onclick="planShiftWeek(-1)">‹</button>
+        <span id="plan-week-label" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--navy)"></span>
+        <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
+      </div>
+    </div>
+    <div id="plan-days-container"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn btn-ghost" onclick="closeModal('plan-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePlanSchedule()">💾 Save Week</button>
     </div>
   </div>
 </div>
@@ -516,7 +576,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
   <button class="undo-btn" onclick="undoLastChange()">↩ Undo</button>
 </div>
 
-<script>
+  <script>
 // ══════════════════════════════════════════════════
 // CONSTANTS
 // ══════════════════════════════════════════════════
@@ -535,6 +595,7 @@ const TIME_SLOTS   = [
 const SLOT_HRS     = [1,1,1,1,1,1,.5,.5,.5,1,1,1,1,1,1,1];
 const LUNCH_SLOTS  = [6,7,8];
 const SLOT_START_MINS = [360,420,480,540,600,660,720,750,780,810,870,930,990,1050,1110,1170];
+const LOC_OPTIONS  = ['Gate','Podium','Mandir','Field Work','Gift Shop','LUNCH','OFF','VACATION'];
 const LOC_CLASS    = {
   'Gate':'gate','Podium':'podium','Mandir':'mandir',
   'Field Work':'field','Gift Shop':'giftshop',
@@ -543,1137 +604,562 @@ const LOC_CLASS    = {
 const DEFAULT_PIN  = '1234';
 
 // ══════════════════════════════════════════════════
-// DATE HELPERS (v2 core)
+// DATE HELPERS
 // ══════════════════════════════════════════════════
-function toISO(date) {
-  // Returns "YYYY-MM-DD"
-  const y  = date.getFullYear();
-  const m  = String(date.getMonth()+1).padStart(2,'0');
-  const d  = String(date.getDate()).padStart(2,'0');
+function toISO(date){
+  const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');
   return `${y}-${m}-${d}`;
 }
-function fromISO(str) {
-  // Parse "YYYY-MM-DD" without timezone shift
-  const [y,m,d] = str.split('-').map(Number);
-  return new Date(y, m-1, d);
+function fromISO(str){const[y,m,d]=str.split('-').map(Number);return new Date(y,m-1,d);}
+function todayISO(){return toISO(new Date());}
+function getWeekMonday(date){
+  const d=new Date(date),dow=d.getDay(),diff=dow===0?-6:1-dow;
+  d.setDate(d.getDate()+diff);d.setHours(0,0,0,0);return d;
 }
-function todayISO() { return toISO(new Date()); }
-
-function getWeekMonday(date) {
-  // Returns the Monday of the week containing `date`
-  const d   = new Date(date);
-  const dow = d.getDay(); // 0=Sun
-  const diff = dow === 0 ? -6 : 1 - dow;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0,0,0,0);
-  return d;
+function getWeekDates(mondayDate){
+  return Array.from({length:7},(_,i)=>{const d=new Date(mondayDate);d.setDate(d.getDate()+i);return d;});
 }
-function getWeekDates(mondayDate) {
-  // Returns array of 7 Date objects Mon–Sun
-  return Array.from({length:7}, (_,i) => {
-    const d = new Date(mondayDate);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+function formatWeekLabel(monday){
+  const sun=new Date(monday);sun.setDate(sun.getDate()+6);
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(monday.getMonth()===sun.getMonth())return`${mo[monday.getMonth()]} ${monday.getDate()}–${sun.getDate()}, ${monday.getFullYear()}`;
+  return`${mo[monday.getMonth()]} ${monday.getDate()} – ${mo[sun.getMonth()]} ${sun.getDate()}, ${monday.getFullYear()}`;
 }
-function formatWeekLabel(monday) {
-  const sun    = new Date(monday); sun.setDate(sun.getDate()+6);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  if (monday.getMonth() === sun.getMonth())
-    return `${months[monday.getMonth()]} ${monday.getDate()}–${sun.getDate()}, ${monday.getFullYear()}`;
-  return `${months[monday.getMonth()]} ${monday.getDate()} – ${months[sun.getMonth()]} ${sun.getDate()}, ${monday.getFullYear()}`;
-}
-function isoToDayIdx(iso) {
-  // Mon=0 … Sun=6
-  const d = fromISO(iso);
-  const dow = d.getDay();
-  return dow === 0 ? 6 : dow - 1;
-}
-function daysBetween(isoA, isoB) {
-  // inclusive count of calendar days
-  const a = fromISO(isoA), b = fromISO(isoB);
-  return Math.round((b - a) / 86400000) + 1;
-}
+function isoToDayIdx(iso){const d=fromISO(iso),dow=d.getDay();return dow===0?6:dow-1;}
+function daysBetween(isoA,isoB){const a=fromISO(isoA),b=fromISO(isoB);return Math.round((b-a)/86400000)+1;}
 
 // ══════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════
 let state = {
-  employees:       [],
-  volunteers:      [],
-  schedule:        {},   // key: "YYYY-MM-DD" → { slotIndex: { empId: loc } }
-  volAvailability: {},   // volId → { "YYYY-MM-DD": bool }  (also supports old day keys)
-  leaveRequests:   [],
-  currentWeekMon:  null, // ISO string of current Monday
-  currentDateISO:  null, // ISO string of selected day
-  mode:            'live',
+  employees:[],volunteers:[],schedule:{},volAvailability:{},leaveRequests:[],
+  currentWeekMon:null,currentDateISO:null,mode:'live',
 };
-let undoStack    = null;
-let fbDb         = null, fbConnected = false;
-let editingEmpId = null, editingVolId = null, editingLeaveId = null;
-let newEmpDisallowed = {gate:false,podium:false,mandir:false,field:false,giftshop:false};
+let undoStack=null,fbDb=null,fbConnected=false;
+let editingEmpId=null,editingVolId=null,editingLeaveId=null;
+let newEmpDisallowed={gate:false,podium:false,mandir:false,field:false,giftshop:false};
+let densityMode='normal';
+// Plan Schedule modal state
+let planEmpId=null,planWeekMon=null,planDraft={};
 
 // ══════════════════════════════════════════════════
 // PERSISTENCE
 // ══════════════════════════════════════════════════
-function loadLocal() {
-  try {
-    const s = localStorage.getItem('smPro_v3');
-    if (s) {
-      const saved = JSON.parse(s);
-      Object.assign(state, saved);
-    }
-    // Migrate v1/v2 schedule keys (MON/TUE/... → YYYY-MM-DD using current week)
+function loadLocal(){
+  try{
+    const s=localStorage.getItem('smPro_v3');
+    if(s){const saved=JSON.parse(s);Object.assign(state,saved);}
     migrateScheduleKeys();
-    // Ensure employees have disallowedLocs
-    state.employees.forEach(emp => {
-      if (emp.locs && !emp.disallowedLocs) {
-        emp.disallowedLocs = {
-          gate:!emp.locs.gate, podium:!emp.locs.podium, mandir:!emp.locs.mandir,
-          field:!emp.locs.field, giftshop:false
-        };
+    state.employees.forEach(emp=>{
+      if(emp.locs&&!emp.disallowedLocs){
+        emp.disallowedLocs={gate:!emp.locs.gate,podium:!emp.locs.podium,mandir:!emp.locs.mandir,field:!emp.locs.field,giftshop:false};
         delete emp.locs;
       }
-      if (!emp.disallowedLocs)  emp.disallowedLocs  = {gate:false,podium:false,mandir:false,field:false,giftshop:false};
-      if (!emp.leaveBalance)    emp.leaveBalance     = {annual:20, sick:10};
+      if(!emp.disallowedLocs)emp.disallowedLocs={gate:false,podium:false,mandir:false,field:false,giftshop:false};
+      if(!emp.leaveBalance)emp.leaveBalance={annual:20,sick:10};
     });
-    if (!state.leaveRequests) state.leaveRequests = [];
-    if (!state.volAvailability) state.volAvailability = {};
-  } catch(e) { console.warn('Load failed:', e); }
+    if(!state.leaveRequests)state.leaveRequests=[];
+    if(!state.volAvailability)state.volAvailability={};
+  }catch(e){console.warn('Load failed:',e);}
 }
-
-function migrateScheduleKeys() {
-  // If schedule has old keys like "MON", migrate to current week ISO dates
-  const oldKeys = Object.keys(state.schedule).filter(k => DAYS_SHORT.includes(k));
-  if (!oldKeys.length) return;
-  const monday = getWeekMonday(new Date());
-  const weekDates = getWeekDates(monday);
-  const newSched = {...state.schedule};
-  oldKeys.forEach((dayKey, _) => {
-    const idx = DAYS_SHORT.indexOf(dayKey);
-    const iso = toISO(weekDates[idx]);
-    if (!newSched[iso]) newSched[iso] = state.schedule[dayKey];
+function migrateScheduleKeys(){
+  const oldKeys=Object.keys(state.schedule).filter(k=>DAYS_SHORT.includes(k));
+  if(!oldKeys.length)return;
+  const monday=getWeekMonday(new Date()),weekDates=getWeekDates(monday),newSched={...state.schedule};
+  oldKeys.forEach(dayKey=>{
+    const idx=DAYS_SHORT.indexOf(dayKey),iso=toISO(weekDates[idx]);
+    if(!newSched[iso])newSched[iso]=state.schedule[dayKey];
     delete newSched[dayKey];
   });
-  state.schedule = newSched;
+  state.schedule=newSched;
 }
-
-function saveLocal() {
-  localStorage.setItem('smPro_v3', JSON.stringify({
-    employees:       state.employees,
-    volunteers:      state.volunteers,
-    schedule:        state.schedule,
-    volAvailability: state.volAvailability,
-    leaveRequests:   state.leaveRequests,
+function saveLocal(){
+  localStorage.setItem('smPro_v3',JSON.stringify({
+    employees:state.employees,volunteers:state.volunteers,
+    schedule:state.schedule,volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
   }));
 }
-function persistAll() { saveLocal(); pushToFirebase(); }
-
-// ══════════════════════════════════════════════════
-// WEEK NAVIGATION
-// ══════════════════════════════════════════════════
-function initWeekState() {
-  const today  = new Date();
-  const monday = getWeekMonday(today);
-  state.currentWeekMon  = toISO(monday);
-  state.currentDateISO  = todayISO();
-}
-function shiftWeek(delta) {
-  const mon = fromISO(state.currentWeekMon);
-  mon.setDate(mon.getDate() + delta * 7);
-  state.currentWeekMon = toISO(mon);
-  // Set selected day to Monday of new week
-  state.currentDateISO = state.currentWeekMon;
-  renderWeekNav();
-  renderSchedule();
-}
-function goToToday() {
-  const monday = getWeekMonday(new Date());
-  state.currentWeekMon = toISO(monday);
-  state.currentDateISO = todayISO();
-  renderWeekNav();
-  renderSchedule();
-}
-function switchDay(iso) {
-  state.currentDateISO = iso;
-  renderWeekNav();
-  renderSchedule();
-}
-function renderWeekNav() {
-  const monday    = fromISO(state.currentWeekMon);
-  const weekDates = getWeekDates(monday);
-  const todayStr  = todayISO();
-
-  document.getElementById('week-label').textContent = 'Week of ' + formatWeekLabel(monday);
-
-  const pillsEl = document.getElementById('day-pills');
-  pillsEl.innerHTML = weekDates.map((d, i) => {
-    const iso     = toISO(d);
-    const dayName = DAYS_SHORT[i];
-    const isToday = iso === todayStr;
-    const isSel   = iso === state.currentDateISO;
-    const issues  = countDayIssues(iso);
-    return `<button class="day-pill ${isSel?'active':''} ${isToday?'today':''} ${issues>0?'has-issue':''}"
-      onclick="switchDay('${iso}')" title="${issues>0?issues+' coverage gap(s)':'No gaps'}">
-      ${dayName}<br><span style="font-size:9px;font-weight:400">${d.getDate()}</span>
-      <span class="issue-dot"></span>
-    </button>`;
-  }).join('');
-
-  // Copy day buttons
-  const copyBtns = document.getElementById('copy-day-btns');
-  if (copyBtns) {
-    copyBtns.innerHTML = weekDates.map((d, i) => {
-      const iso = toISO(d);
-      return `<button class="btn btn-sm btn-ghost" onclick="copyDayTo('${iso}')">${DAYS_SHORT[i]} ${d.getDate()}</button>`;
-    }).join('');
-  }
-}
-
-// ══════════════════════════════════════════════════
-// LEAVE HELPERS
-// ══════════════════════════════════════════════════
-function getApprovedLeaveForDate(empId, isoDate) {
-  return state.leaveRequests.find(lr =>
-    lr.empId === empId &&
-    lr.status === 'approved' &&
-    isoDate >= lr.from &&
-    isoDate <= lr.to
-  ) || null;
-}
-function getPendingLeaveForDate(empId, isoDate) {
-  return state.leaveRequests.find(lr =>
-    lr.empId === empId &&
-    lr.status === 'pending' &&
-    isoDate >= lr.from &&
-    isoDate <= lr.to
-  ) || null;
-}
-function isOnLeave(empId, isoDate) {
-  return !!getApprovedLeaveForDate(empId, isoDate);
-}
-function leaveTypeBadge(type) {
-  const map = {
-    annual: '<span class="badge badge-annual">Annual</span>',
-    sick:   '<span class="badge badge-sick">Sick</span>',
-    comp:   '<span class="badge badge-comp">Comp Off</span>',
-    other:  '<span class="badge badge-other">Other</span>',
-  };
-  return map[type] || '<span class="badge badge-other">Other</span>';
-}
-
-// ══════════════════════════════════════════════════
-// EXPORT / IMPORT / RESET
-// ══════════════════════════════════════════════════
-function exportData() {
-  const data = {
-    _version:'smPro_v3', _exported:new Date().toISOString(),
-    employees:state.employees, volunteers:state.volunteers,
-    schedule:state.schedule, volAvailability:state.volAvailability,
-    leaveRequests:state.leaveRequests,
-  };
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href=url; a.download=`schedulemaker-backup-${new Date().toISOString().split('T')[0]}.json`;
-  a.click(); URL.revokeObjectURL(url);
-  showToast('✅ Backup exported');
-}
-function importData() { document.getElementById('import-file').click(); }
-function handleImportFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.employees || !data.schedule) { alert('Invalid backup file.'); return; }
-      if (!confirm(`Import backup from ${data._exported?new Date(data._exported).toLocaleString():'unknown date'}?\nThis will REPLACE all current data.`)) return;
-      if (data.employees)       state.employees       = data.employees;
-      if (data.volunteers)      state.volunteers      = data.volunteers;
-      if (data.schedule)        state.schedule        = data.schedule;
-      if (data.volAvailability) state.volAvailability = data.volAvailability;
-      if (data.leaveRequests)   state.leaveRequests   = data.leaveRequests;
-      state.employees.forEach(emp => {
-        if (!emp.disallowedLocs) emp.disallowedLocs = {gate:false,podium:false,mandir:false,field:false,giftshop:false};
-        if (!emp.leaveBalance)   emp.leaveBalance   = {annual:20,sick:10};
-      });
-      persistAll(); renderAll();
-      showToast('✅ Data imported successfully');
-    } catch(err) { alert('Failed to parse backup file.'); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-function resetAllData() {
-  document.getElementById('reset-pin').value='';
-  document.getElementById('reset-error').textContent='';
-  document.getElementById('reset-modal').classList.remove('hidden');
-}
-async function confirmReset() {
-  const pin = document.getElementById('reset-pin').value;
-  if (pin !== getPin()) { document.getElementById('reset-error').textContent='❌ Incorrect PIN'; return; }
-  closeModal('reset-modal');
-  if (fbConnected && fbDb) {
-    try {
-      const {ref,remove} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-      await remove(ref(fbDb,'appState'));
-    } catch(e){}
-  }
-  state.employees=[]; state.volunteers=[]; state.schedule={}; state.volAvailability={}; state.leaveRequests=[];
-  localStorage.removeItem('smPro_v3');
-  seedData(); renderAll();
-  showToast('🗑️ All data reset');
-}
+function persistAll(){saveLocal();pushToFirebase();}
 
 // ══════════════════════════════════════════════════
 // FIREBASE
 // ══════════════════════════════════════════════════
-function getFirebaseCfg() {
-  try { return JSON.parse(localStorage.getItem('smPro_fbCfg')||'null'); } catch(e){ return null; }
-}
-function showFirebaseConfig() {
-  const cfg = getFirebaseCfg();
-  if (cfg) {
-    ['apiKey','authDomain','databaseURL','projectId','appId'].forEach(k=>{
-      const el = document.getElementById('fb-'+k);
-      if (el) el.value = cfg[k]||'';
-    });
-    document.getElementById('fb-pin').value = cfg.pin||'';
-  }
-  document.getElementById('firebase-modal').classList.remove('hidden');
-}
-function saveFirebaseConfig() {
-  const cfg = {
-    apiKey:      document.getElementById('fb-apiKey').value.trim(),
-    authDomain:  document.getElementById('fb-authDomain').value.trim(),
-    databaseURL: document.getElementById('fb-databaseURL').value.trim(),
-    projectId:   document.getElementById('fb-projectId').value.trim(),
-    appId:       document.getElementById('fb-appId').value.trim(),
-    pin:         document.getElementById('fb-pin').value.trim()||DEFAULT_PIN,
-  };
-  if (!cfg.databaseURL) { alert('Database URL is required'); return; }
-  localStorage.setItem('smPro_fbCfg', JSON.stringify(cfg));
-  closeModal('firebase-modal'); initFirebase(cfg);
-}
-async function initFirebase(cfg) {
-  if (!cfg||!cfg.databaseURL) { setSyncStatus('local'); return; }
-  try {
-    setSyncStatus('syncing');
-    const {initializeApp,getApps} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const {getDatabase,ref,onValue} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-    const existing = getApps();
-    const app = existing.length ? existing[0] : initializeApp(cfg);
-    fbDb = getDatabase(app); fbConnected = true;
-    onValue(ref(fbDb,'appState'), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        if (data.employees)       state.employees       = data.employees;
-        if (data.volunteers)      state.volunteers      = data.volunteers;
-        if (data.schedule)        state.schedule        = data.schedule;
-        if (data.volAvailability) state.volAvailability = data.volAvailability;
-        if (data.leaveRequests)   state.leaveRequests   = data.leaveRequests;
-        saveLocal(); renderAll();
-      }
+function initFirebase(){
+  try{
+    const cfg=JSON.parse(localStorage.getItem('smPro_fbConfig')||'null');
+    if(!cfg||!cfg.databaseURL)return;
+    if(typeof firebase==='undefined')return;
+    if(!firebase.apps.length)firebase.initializeApp(cfg);
+    fbDb=firebase.database();fbConnected=true;
+    fbDb.ref('smPro').on('value',snap=>{
+      const d=snap.val();
+      if(d){Object.assign(state,d);renderAll();}
       setSyncStatus('synced');
     });
-  } catch(e) { console.warn('Firebase init failed:',e); setSyncStatus('error'); fbConnected=false; }
-}
-async function pushToFirebase() {
-  if (!fbConnected||!fbDb) return;
-  try {
-    setSyncStatus('syncing');
-    const {ref,set} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
-    await set(ref(fbDb,'appState'),{
-      employees:state.employees, volunteers:state.volunteers,
-      schedule:state.schedule, volAvailability:state.volAvailability,
-      leaveRequests:state.leaveRequests,
-    });
     setSyncStatus('synced');
-  } catch(e) { setSyncStatus('error'); }
+  }catch(e){console.warn('Firebase init failed:',e);setSyncStatus('error');}
 }
-function setSyncStatus(status) {
-  const el = document.getElementById('sync-indicator');
-  const map = {synced:'⬤ synced',syncing:'⬤ syncing…',error:'⬤ offline',local:'⬤ local'};
-  el.textContent = map[status]||'⬤ local';
-  el.className   = status==='synced'?'synced':status==='syncing'?'syncing':status==='error'?'error':'';
+function pushToFirebase(){
+  if(!fbConnected||!fbDb)return;
+  setSyncStatus('syncing');
+  fbDb.ref('smPro').set({
+    employees:state.employees,volunteers:state.volunteers,
+    schedule:state.schedule,volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
+  }).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('error'));
+}
+function setSyncStatus(s){
+  const el=document.getElementById('sync-indicator');
+  el.className='';el.classList.add(s);
+  el.textContent=s==='synced'?'⬤ synced':s==='syncing'?'⬤ saving…':'⬤ local';
+}
+function showFirebaseConfig(){
+  const cfg=JSON.parse(localStorage.getItem('smPro_fbConfig')||'{}');
+  ['apiKey','authDomain','databaseURL','projectId','appId'].forEach(k=>{
+    const el=document.getElementById('fb-'+k);if(el)el.value=cfg[k]||'';
+  });
+  const pin=localStorage.getItem('smPro_pin')||'';
+  document.getElementById('fb-pin').value=pin;
+  openModal('firebase-modal');
+}
+function saveFirebaseConfig(){
+  const cfg={
+    apiKey:document.getElementById('fb-apiKey').value.trim(),
+    authDomain:document.getElementById('fb-authDomain').value.trim(),
+    databaseURL:document.getElementById('fb-databaseURL').value.trim(),
+    projectId:document.getElementById('fb-projectId').value.trim(),
+    appId:document.getElementById('fb-appId').value.trim(),
+  };
+  const pin=document.getElementById('fb-pin').value.trim();
+  if(pin)localStorage.setItem('smPro_pin',pin);
+  localStorage.setItem('smPro_fbConfig',JSON.stringify(cfg));
+  closeModal('firebase-modal');
+  alert('Config saved! Reload the page to connect Firebase.');
 }
 
 // ══════════════════════════════════════════════════
-// PIN / MODE
+// MODE: ADMIN vs VIEWER
 // ══════════════════════════════════════════════════
-function getPin() {
-  const cfg = getFirebaseCfg();
-  return (cfg&&cfg.pin) ? cfg.pin : DEFAULT_PIN;
+function checkPin(e){if(e.key==='Enter')submitPin();}
+function submitPin(){
+  const entered=document.getElementById('pin-input').value;
+  const stored=localStorage.getItem('smPro_pin')||DEFAULT_PIN;
+  if(entered===stored){enterAdminMode();}
+  else{document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';}
 }
-function checkPin(e) { if (e.key==='Enter') submitPin(); }
-function submitPin() {
-  const val = document.getElementById('pin-input').value;
-  if (val===getPin()) { enterAdminMode(); }
-  else {
-    document.getElementById('pin-error').textContent='❌ Incorrect PIN';
-    document.getElementById('pin-input').value='';
-  }
-}
-function enterAdminMode() {
+function enterAdminMode(){
   state.mode='admin';
   document.getElementById('pin-screen').style.display='none';
-  document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block');
-  document.getElementById('mode-badge').textContent='ADMIN';
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');
+  document.getElementById('mode-badge').textContent='ADMIN MODE';
   document.getElementById('mode-badge').className='mode-admin';
   renderAll();
 }
-function enterLiveMode() {
+function enterLiveMode(){
   state.mode='live';
   document.getElementById('pin-screen').style.display='none';
-  document.getElementById('mode-badge').textContent='LIVE VIEW';
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');
+  document.getElementById('mode-badge').textContent='VIEW-ONLY';
   document.getElementById('mode-badge').className='mode-live';
-  showPage('live', document.getElementById('tab-live'));
-}
-if (new URLSearchParams(location.search).get('view')==='live') {
-  window.addEventListener('load', ()=>enterLiveMode());
+  showPage('live',document.getElementById('tab-live'));
+  renderAll();
 }
 
 // ══════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════
-function showPage(page, tabEl) {
+function showPage(name,tabEl){
+  if(name!=='live'&&state.mode!=='admin')return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  if (tabEl) tabEl.classList.add('active');
-
-  const navBar = document.getElementById('week-nav-bar');
-  navBar.classList.toggle('hidden', page!=='schedule');
-
-  if (page==='live')     renderLiveBoard();
-  if (page==='staff')    { renderRoster(); renderVolunteers(); }
-  if (page==='leave')    renderLeaveTable();
-  if (page==='schedule') { renderWeekNav(); renderSchedule(); }
+  document.getElementById('page-'+name).classList.add('active');
+  if(tabEl)tabEl.classList.add('active');
+  const wnb=document.getElementById('week-nav-bar');
+  if(name==='schedule'){wnb.classList.remove('hidden');renderWeekNav();renderSchedule();}
+  else wnb.classList.add('hidden');
+  if(name==='staff')renderRoster();
+  if(name==='leave')renderLeave();
+  if(name==='live')renderLiveBoard();
 }
 
 // ══════════════════════════════════════════════════
-// CLOCK
+// WEEK NAVIGATION
 // ══════════════════════════════════════════════════
-function getCurrentSlotIndex() {
-  const now  = new Date();
-  const mins = now.getHours()*60 + now.getMinutes();
-  for (let i=SLOT_START_MINS.length-1; i>=0; i--) {
-    if (mins >= SLOT_START_MINS[i]) return i;
-  }
-  return 0;
+function initWeekState(){
+  const today=new Date(),monday=getWeekMonday(today);
+  state.currentWeekMon=toISO(monday);state.currentDateISO=todayISO();
 }
-function startClock() {
-  function tick() {
-    const now = new Date();
-    const h=now.getHours(), m=now.getMinutes();
-    const ampm=h>=12?'PM':'AM', hh=h%12||12, mm=String(m).padStart(2,'0');
-    document.getElementById('live-clock').textContent=`${hh}:${mm} ${ampm}`;
-    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    document.getElementById('live-date-label').textContent=
-      `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()} — current slot highlighted`;
-  }
-  tick(); setInterval(tick, 1000);
+function shiftWeek(delta){
+  const mon=fromISO(state.currentWeekMon);mon.setDate(mon.getDate()+delta*7);
+  state.currentWeekMon=toISO(mon);state.currentDateISO=state.currentWeekMon;
+  renderWeekNav();renderSchedule();
 }
-
-// ══════════════════════════════════════════════════
-// LIVE BOARD
-// ══════════════════════════════════════════════════
-function renderLiveBoard() {
-  const board    = document.getElementById('live-board');
-  const todayISO_v = todayISO();
-  const si       = getCurrentSlotIndex();
-  const slotData = state.schedule[todayISO_v]?.[si] || {};
-
-  const nextSlots = [];
-  for (let i=si+1; i<=si+3 && i<TIME_SLOTS.length; i++) nextSlots.push(i);
-
-  board.innerHTML = REQUIRED.map(loc => {
-    const assigned = state.employees.filter(emp => slotData[emp.id]===loc && !isOnLeave(emp.id, todayISO_v));
-    const covered  = assigned.length > 0;
-    const hdrBg    = loc==='Gate'?'#1D4ED8':loc==='Podium'?'#15803D':'#C2410C';
-
-    const nextRows = nextSlots.map(ni => {
-      const nd  = state.schedule[todayISO_v]?.[ni] || {};
-      const nes = state.employees.filter(e => nd[e.id]===loc && !isOnLeave(e.id, todayISO_v));
-      return `<div class="live-next-slot">
-        <span style="font-family:'DM Mono',monospace">${TIME_SLOTS[ni].split('–')[0].trim()}</span>
-        <span style="font-weight:600;color:${nes.length?'#1B2A4A':'#EF4444'}">${nes.length ? nes.map(e=>e.name.split(' ')[0]).join(', ') : '❌ OPEN'}</span>
-      </div>`;
+function goToToday(){
+  const monday=getWeekMonday(new Date());
+  state.currentWeekMon=toISO(monday);state.currentDateISO=todayISO();
+  renderWeekNav();renderSchedule();
+}
+function switchDay(iso){state.currentDateISO=iso;renderWeekNav();renderSchedule();}
+function renderWeekNav(){
+  const monday=fromISO(state.currentWeekMon),weekDates=getWeekDates(monday),todayStr=todayISO();
+  document.getElementById('week-label').textContent='Week of '+formatWeekLabel(monday);
+  const pillsEl=document.getElementById('day-pills');
+  pillsEl.innerHTML=weekDates.map((d,i)=>{
+    const iso=toISO(d),dayName=DAYS_SHORT[i],isToday=iso===todayStr,isSel=iso===state.currentDateISO,issues=countDayIssues(iso);
+    return`<button class="day-pill ${isSel?'active':''} ${isToday?'today':''} ${issues>0?'has-issue':''}"
+      onclick="switchDay('${iso}')" title="${issues>0?issues+' coverage gap(s)':'No gaps'}">
+      ${dayName}<br><span style="font-size:9px;font-weight:400">${d.getDate()}</span>
+      <span class="issue-dot"></span>
+    </button>`;
+  }).join('');
+  // Copy day buttons inside advanced tools
+  const copyBtns=document.getElementById('copy-day-btns');
+  if(copyBtns){
+    copyBtns.innerHTML=weekDates.map((d,i)=>{
+      const iso=toISO(d);if(iso===state.currentDateISO)return'';
+      return`<button class="btn btn-sm btn-ghost" onclick="copyDayTo('${iso}')">${DAYS_SHORT[i]} ${d.getDate()}</button>`;
     }).join('');
-
-    return `<div class="live-card">
-      <div class="live-card-hdr" style="background:${hdrBg}">
-        <h3>${loc}</h3>
-        <span style="font-size:11px;color:rgba(255,255,255,.7)">${TIME_SLOTS[si]}</span>
-      </div>
-      <div class="live-card-body">
-        ${covered
-          ? assigned.map(e=>`<div class="live-name">${e.name}</div><div class="live-sub">${e.status}</div>`).join('')
-          : `<div class="live-uncovered">❌ UNCOVERED</div><div class="live-sub">Nobody assigned right now</div>`}
-        ${nextSlots.length ? `<div class="live-next"><div class="live-next-title">Coming Up</div>${nextRows}</div>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-
-  // Volunteers
-  const volDiv    = document.getElementById('live-volunteers');
-  const todayStr  = todayISO_v;
-  const availVols = state.volunteers.filter(v => {
-    const avail = state.volAvailability?.[v.id] || {};
-    // Support both ISO key and old day-name key
-    const todayDow = DAYS_SHORT[new Date().getDay()===0?6:new Date().getDay()-1];
-    return avail[todayStr] || avail[todayDow];
-  });
-  volDiv.innerHTML = availVols.length
-    ? `<div class="live-volunteer-row">${availVols.map(v=>`<span class="vol-chip">🙋 ${v.name}${v.note?' · '+v.note:''}</span>`).join('')}</div>`
-    : '<span style="color:#64748B;font-size:12px">No volunteers marked available today.</span>';
-}
-
-// ══════════════════════════════════════════════════
-// LOCATION HELPERS
-// ══════════════════════════════════════════════════
-function empCanWork(emp, locKey) {
-  if (!emp.disallowedLocs) return true;
-  return !emp.disallowedLocs[locKey];
-}
-function locKeyForLabel(label) {
-  return {Gate:'gate',Podium:'podium',Mandir:'mandir','Field Work':'field','Gift Shop':'giftshop'}[label]||null;
-}
-function locSummary(emp) {
-  const blocked = ALL_LOCS.filter(l => emp.disallowedLocs?.[l]);
-  if (!blocked.length) return '<span class="loc-all-chip">Everywhere</span>';
-  const labels = {gate:'Gate',podium:'Podium',mandir:'Mandir',field:'Field',giftshop:'Gift Shop'};
-  return blocked.map(l=>`<span class="loc-blocked-chip">No ${labels[l]}</span>`).join(' ');
-}
-
-// ══════════════════════════════════════════════════
-// EMPLOYEES
-// ══════════════════════════════════════════════════
-function genId() { return '_'+Math.random().toString(36).slice(2,9); }
-
-function addEmployeeObj(name, disallowedLocs, status, leaveBalance) {
-  const emp = {
-    id: genId(), name,
-    disallowedLocs: disallowedLocs||{gate:false,podium:false,mandir:false,field:false,giftshop:false},
-    status,
-    leaveBalance: leaveBalance||{annual:20,sick:10}
-  };
-  state.employees.push(emp);
-  return emp;
-}
-function openAddEmployee() {
-  editingEmpId = null;
-  newEmpDisallowed = {gate:false,podium:false,mandir:false,field:false,giftshop:false};
-  document.getElementById('emp-name').value   = '';
-  document.getElementById('emp-status').value = 'Active';
-  document.getElementById('emp-annual').value = '20';
-  document.getElementById('emp-sick').value   = '10';
-  document.getElementById('modal-title').textContent = 'Add Employee';
-  document.getElementById('emp-hrs-summary').textContent = '';
-  updateLocToggles();
-  document.getElementById('emp-modal').classList.remove('hidden');
-}
-function editEmployee(id) {
-  const emp = state.employees.find(e=>e.id===id);
-  editingEmpId = id;
-  newEmpDisallowed = {...(emp.disallowedLocs||{gate:false,podium:false,mandir:false,field:false,giftshop:false})};
-  document.getElementById('emp-name').value   = emp.name;
-  document.getElementById('emp-status').value = emp.status;
-  document.getElementById('emp-annual').value = emp.leaveBalance?.annual ?? 20;
-  document.getElementById('emp-sick').value   = emp.leaveBalance?.sick   ?? 10;
-  document.getElementById('modal-title').textContent = 'Edit Employee';
-  const hrs = calcEmpWeekHrs(id, state.currentWeekMon ? getWeekDates(fromISO(state.currentWeekMon)) : null);
-  document.getElementById('emp-hrs-summary').textContent = `This week: ${hrs.toFixed(1)}h / 40h`;
-  updateLocToggles();
-  document.getElementById('emp-modal').classList.remove('hidden');
-}
-function toggleLoc(loc) {
-  newEmpDisallowed[loc] = !newEmpDisallowed[loc];
-  updateLocToggles();
-}
-function updateLocToggles() {
-  ALL_LOCS.forEach(loc => {
-    const btn = document.getElementById('tog-'+loc);
-    if (!btn) return;
-    btn.className = 'loc-toggle' + (newEmpDisallowed[loc] ? ' blocked' : '');
-  });
-}
-function saveEmployee() {
-  const name = document.getElementById('emp-name').value.trim();
-  if (!name) { alert('Please enter a name'); return; }
-  const status  = document.getElementById('emp-status').value;
-  const annual  = parseInt(document.getElementById('emp-annual').value)||20;
-  const sick    = parseInt(document.getElementById('emp-sick').value)||10;
-  if (editingEmpId) {
-    const emp = state.employees.find(e=>e.id===editingEmpId);
-    emp.name = name; emp.disallowedLocs = {...newEmpDisallowed}; emp.status = status;
-    emp.leaveBalance = {annual, sick};
-  } else {
-    addEmployeeObj(name, {...newEmpDisallowed}, status, {annual, sick});
   }
-  closeModal('emp-modal');
-  persistAll(); renderRoster(); renderSchedule(); renderLiveBoard();
 }
-function deleteEmployee(id) {
-  if (!confirm('Remove this employee from all schedules?')) return;
-  state.employees = state.employees.filter(e=>e.id!==id);
-  Object.keys(state.schedule).forEach(dateKey => {
-    Object.keys(state.schedule[dateKey]||{}).forEach(si => {
-      if (state.schedule[dateKey][si]) delete state.schedule[dateKey][si][id];
+
+// ══════════════════════════════════════════════════
+// DENSITY SWITCH
+// ══════════════════════════════════════════════════
+function setDensity(mode){
+  densityMode=mode;
+  document.getElementById('density-normal').classList.toggle('active',mode==='normal');
+  document.getElementById('density-compact').classList.toggle('active',mode==='compact');
+  renderSchedule();
+}
+
+// ══════════════════════════════════════════════════
+// ADVANCED TOOLS TOGGLE
+// ══════════════════════════════════════════════════
+function toggleAdvTools(){
+  const btn=document.getElementById('adv-toggle'),body=document.getElementById('adv-tools-body');
+  btn.classList.toggle('open');body.classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════
+// COVERAGE HELPERS
+// ══════════════════════════════════════════════════
+function getSlotData(iso,slotIdx){return(state.schedule[iso]||{})[slotIdx]||{};}
+function setSlotData(iso,slotIdx,empId,loc){
+  if(!state.schedule[iso])state.schedule[iso]={};
+  if(!state.schedule[iso][slotIdx])state.schedule[iso][slotIdx]={};
+  state.schedule[iso][slotIdx][empId]=loc;
+}
+function isLocCovered(iso,slotIdx,loc){
+  const slotData=getSlotData(iso,slotIdx);
+  return Object.values(slotData).includes(loc);
+}
+function countDayIssues(iso){
+  let issues=0;
+  TIME_SLOTS.forEach((_,si)=>{
+    REQUIRED.forEach(loc=>{if(!isLocCovered(iso,si,loc))issues++;});
+  });
+  return issues;
+}
+function isOnLeave(empId,iso){
+  return state.leaveRequests.some(lr=>
+    lr.empId===empId&&lr.status==='approved'&&lr.from<=iso&&lr.to>=iso
+  );
+}
+
+// ══════════════════════════════════════════════════
+// SCHEDULE RENDER
+// ══════════════════════════════════════════════════
+function renderSchedule(){
+  const iso=state.currentDateISO;
+  const emps=state.employees;
+  const isAdmin=state.mode==='admin';
+  const cm=densityMode==='compact';
+  const now=new Date(),nowMins=now.getHours()*60+now.getMinutes(),isToday=iso===todayISO();
+
+  // Build coverage alert
+  let totalIssues=0;
+  TIME_SLOTS.forEach((_,si)=>REQUIRED.forEach(loc=>{if(!isLocCovered(iso,si,loc))totalIssues++;}));
+  const alertEl=document.getElementById('coverage-alert');
+  if(totalIssues>0){
+    alertEl.classList.remove('hidden');
+    alertEl.textContent=`⚠️ ${totalIssues} coverage gap${totalIssues>1?'s':''} on this day — fix the red ❌ cells below.`;
+  }else{alertEl.classList.add('hidden');}
+
+  // THEAD: Time Slot | emp1 | emp2 | ... | Gate | Podium | Mandir
+  const thead=document.getElementById('sched-head');
+  let hRow=`<tr><th class="${cm?'compact-mode':''}">Time Slot</th>`;
+  emps.forEach(emp=>{
+    const firstName=emp.name.split(' ')[0];
+    const hrs=calcEmpHours(emp.id,iso);
+    hRow+=`<th class="${cm?'compact-mode':''}" title="${emp.name}">
+      ${firstName}<br><span style="font-size:9px;opacity:.8">${hrs.toFixed(1)}h left</span>
+    </th>`;
+  });
+  REQUIRED.forEach(loc=>{hRow+=`<th class="${cm?'compact-mode':''}">${loc}</th>`;});
+  hRow+='</tr>';
+  thead.innerHTML=hRow;
+
+  // TBODY
+  const tbody=document.getElementById('sched-body');
+  let rows='';
+  const slotData=state.schedule[iso]||{};
+
+  TIME_SLOTS.forEach((slot,si)=>{
+    const isLunch=LUNCH_SLOTS.includes(si);
+    const isCurrent=isToday&&nowMins>=SLOT_START_MINS[si]&&(si===TIME_SLOTS.length-1||nowMins<SLOT_START_MINS[si+1]);
+    let row=`<tr class="${isCurrent?'current-row':''}">`;
+    // Time label (sticky)
+    row+=`<td class="slot-label${isLunch?' lunch-slot':''}${isCurrent?' current-slot':''}">${slot}</td>`;
+
+    // Employee cells
+    emps.forEach(emp=>{
+      const onLeave=isOnLeave(emp.id,iso);
+      if(onLeave){
+        row+=`<td class="${cm?'compact-mode':''}"><div class="leave-lock-cell" title="${emp.name} is on approved leave">🔒</div></td>`;
+        return;
+      }
+      const curLoc=(slotData[si]||{})[emp.id]||'OFF';
+      const locCls=LOC_CLASS[curLoc]||'off';
+      if(isAdmin){
+        let opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curLoc?'selected':''}>${o}</option>`).join('');
+        row+=`<td class="${cm?'compact-mode':''}">
+          <select class="loc-select loc-${locCls} ${cm?'compact-mode':''}"
+            onchange="handleLocChange('${iso}',${si},'${emp.id}',this)"
+            ${emp.disallowedLocs&&emp.disallowedLocs[curLoc.toLowerCase().replace(' ','')]?'':''}
+          >${opts}</select></td>`;
+      }else{
+        row+=`<td class="${cm?'compact-mode':''}"><div class="loc-select loc-${locCls}" style="padding:4px 6px;border-radius:5px;font-size:11px;font-weight:600">${curLoc}</div></td>`;
+      }
     });
+
+    // Coverage summary columns
+    REQUIRED.forEach(loc=>{
+      const covered=isLocCovered(iso,si,loc);
+      row+=`<td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✅':'❌'}</td>`;
+    });
+    row+='</tr>';
+    rows+=row;
   });
-  state.leaveRequests = state.leaveRequests.filter(lr=>lr.empId!==id);
-  persistAll(); renderRoster(); renderSchedule(); renderLiveBoard();
-}
-function renderRoster() {
-  const tbody = document.getElementById('roster-body');
-  if (!state.employees.length) {
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748B">No employees — click "Add Employee"</td></tr>';
-    return;
-  }
-  const weekDates = state.currentWeekMon ? getWeekDates(fromISO(state.currentWeekMon)) : null;
-  tbody.innerHTML = state.employees.map((emp,i) => {
-    const total    = calcEmpWeekHrs(emp.id, weekDates);
-    const pct      = Math.min(100,(total/40)*100);
-    const barColor = total>40?'#EF4444':total>=38?'#F59E0B':'#22C55E';
-    const badgeTxt = total>40?'⚠️ Over':total>=38?'⚡ Near':'✅ OK';
-    const badgeBg  = total>40?'#FEE2E2':total>=38?'#FEF3C7':'#DCFCE7';
-    const badgeTx  = total>40?'#991B1B':total>=38?'#92400E':'#166534';
-    const sBg  = {Active:'#DCFCE7','Day Off':'#F1F5F9',Vacation:'#F3E8FF',Sick:'#FEE2E2'}[emp.status]||'#F1F5F9';
-    const sTx  = {Active:'#166534','Day Off':'#374151',Vacation:'#7E22CE',Sick:'#991B1B'}[emp.status]||'#374151';
-    const pendingLeaves = state.leaveRequests.filter(lr=>lr.empId===emp.id&&lr.status==='pending').length;
-    return `<tr>
-      <td style="font-weight:700;color:#64748B">${i+1}</td>
-      <td style="font-weight:600">${emp.name}${pendingLeaves?`<span class="conflict-chip">⏳ ${pendingLeaves} pending</span>`:''}</td>
-      <td>${locSummary(emp)}</td>
-      <td><span style="padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:${sBg};color:${sTx}">${emp.status}</span></td>
-      <td>
-        <div class="hrs-inline">
-          <div class="hrs-bar-sm"><div class="hrs-bar-sm-fill" style="width:${pct}%;background:${barColor}"></div></div>
-          <span style="font-weight:700;font-size:12px;color:${barColor}">${total.toFixed(1)}h</span>
-          <span style="font-size:10px;padding:1px 5px;border-radius:6px;font-weight:700;background:${badgeBg};color:${badgeTx}">${badgeTxt}</span>
-        </div>
-      </td>
-      <td style="font-size:11px;color:#64748B">
-        <span title="Annual">📅 ${emp.leaveBalance?.annual??20}d</span>
-        &nbsp;
-        <span title="Sick">🤒 ${emp.leaveBalance?.sick??10}d</span>
-      </td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8" onclick="editEmployee('${emp.id}')">✏️ Edit</button>
-          <button class="btn btn-sm btn-leave" onclick="openAddLeaveFor('${emp.id}')">📋 Leave</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${emp.id}')">🗑️</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
+  tbody.innerHTML=rows;
+
+  // Suggestions
+  if(isAdmin)renderSuggestions(iso);
 }
 
-// ══════════════════════════════════════════════════
-// VOLUNTEERS
-// ══════════════════════════════════════════════════
-function addVolunteerObj(name, note) {
-  const vol = {id:genId(), name, note:note||''};
-  state.volunteers.push(vol);
-  if (!state.volAvailability) state.volAvailability={};
-  state.volAvailability[vol.id]={};
+function calcEmpHours(empId,iso){
+  const slotData=state.schedule[iso]||{};
+  let total=0;
+  TIME_SLOTS.forEach((_,si)=>{
+    const loc=(slotData[si]||{})[empId];
+    if(loc&&loc!=='OFF'&&loc!=='VACATION')total+=SLOT_HRS[si];
+  });
+  const maxHrs=8;
+  return Math.max(0,maxHrs-total);
 }
-function openAddVolunteer() {
+
+function handleLocChange(iso,si,empId,selectEl){
+  const newLoc=selectEl.value;
+  const prev=((state.schedule[iso]||{})[si]||{})[empId]||'OFF';
+  undoStack={iso,si,empId,prev};
+  setSlotData(iso,si,empId,newLoc);
+  const locCls=LOC_CLASS[newLoc]||'off';
+  selectEl.className=`loc-select loc-${locCls} ${densityMode==='compact'?'compact-mode':''}`;
+  persistAll();
+  // Re-render coverage cells only
+  renderSchedule();
+  showUndo(`${empId} → ${newLoc}`);
+}
+
+    function openAddVolunteer(){
   editingVolId=null;
+  document.getElementById('vol-modal-title').textContent='Add Volunteer';
   document.getElementById('vol-name').value='';
   document.getElementById('vol-note').value='';
-  document.getElementById('vol-modal-title').textContent='Add Volunteer';
-  document.getElementById('vol-modal').classList.remove('hidden');
+  openModal('vol-modal');
 }
-function saveVolunteer() {
+function saveVolunteer(){
   const name=document.getElementById('vol-name').value.trim();
-  if (!name) { alert('Please enter a name'); return; }
+  if(!name){alert('Please enter a name.');return;}
   const note=document.getElementById('vol-note').value.trim();
-  if (editingVolId) {
-    const vol=state.volunteers.find(v=>v.id===editingVolId);
-    vol.name=name; vol.note=note;
-  } else { addVolunteerObj(name,note); }
-  closeModal('vol-modal');
-  persistAll(); renderVolunteers(); renderLiveBoard();
-}
-function deleteVolunteer(id) {
-  if (!confirm('Remove this volunteer?')) return;
-  state.volunteers=state.volunteers.filter(v=>v.id!==id);
-  if (state.volAvailability) delete state.volAvailability[id];
-  persistAll(); renderVolunteers(); renderLiveBoard();
-}
-function toggleVolAvail(volId, iso) {
-  if (!state.volAvailability[volId]) state.volAvailability[volId]={};
-  state.volAvailability[volId][iso] = !state.volAvailability[volId][iso];
-  persistAll(); renderVolunteers(); renderLiveBoard();
-}
-function renderVolunteers() {
-  const div = document.getElementById('volunteer-list');
-  if (!state.volunteers.length) {
-    div.innerHTML='<div class="card" style="padding:24px;text-align:center;color:#64748B">No volunteers yet — click "Add Volunteer"</div>';
-    return;
+  if(editingVolId){
+    const v=state.volunteers.find(v=>v.id===editingVolId);
+    v.name=name;v.note=note;
+  }else{
+    state.volunteers.push({id:'vol_'+Date.now(),name,note});
   }
-  // Show current week's dates for the toggle
-  const monday = state.currentWeekMon ? fromISO(state.currentWeekMon) : getWeekMonday(new Date());
-  const weekDates = getWeekDates(monday);
-
-  div.innerHTML = state.volunteers.map(vol => {
-    const avail = state.volAvailability?.[vol.id] || {};
-    const dayChips = weekDates.map((d, i) => {
-      const iso = toISO(d);
-      const on  = !!(avail[iso]);
-      return `<div class="vol-day-chip" onclick="toggleVolAvail('${vol.id}','${iso}')">
-        <span>${DAYS_SHORT[i]}</span>
-        <div class="vol-day-toggle ${on?'on':''}"></div>
-      </div>`;
-    }).join('');
-    const safeNote = (vol.note||'').replace(/'/g,"\\'");
-    const safeName = vol.name.replace(/'/g,"\\'");
-    return `<div class="card" style="margin-bottom:10px">
-      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="flex:1;min-width:140px">
-          <span style="font-weight:600;font-size:13px">${vol.name}</span>
-          ${vol.note?`<span style="font-size:11px;color:#64748B;margin-left:8px">${vol.note}</span>`:''}
-        </div>
-        <div class="vol-avail-chips">${dayChips}</div>
-        <div style="display:flex;gap:6px;margin-left:auto">
-          <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8"
-            onclick="editingVolId='${vol.id}';document.getElementById('vol-name').value='${safeName}';document.getElementById('vol-note').value='${safeNote}';document.getElementById('vol-modal-title').textContent='Edit Volunteer';document.getElementById('vol-modal').classList.remove('hidden')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${vol.id}')">🗑️</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  persistAll();closeModal('vol-modal');renderVolunteers();
+}
+function deleteVolunteer(volId){
+  if(!confirm('Delete this volunteer?'))return;
+  state.volunteers=state.volunteers.filter(v=>v.id!==volId);
+  persistAll();renderVolunteers();
+}
+function toggleVolDay(volId,iso){
+  if(!state.volAvailability[volId])state.volAvailability[volId]={};
+  state.volAvailability[volId][iso]=!state.volAvailability[volId][iso];
+  persistAll();renderVolunteers();
 }
 
 // ══════════════════════════════════════════════════
-// LEAVE REQUESTS
+// LEAVE CRUD
 // ══════════════════════════════════════════════════
-function openAddLeave() {
-  editingLeaveId = null;
-  document.getElementById('leave-modal-title').textContent = 'New Leave Request';
+function renderLeave(){
+  const tbody=document.getElementById('leave-body');
   // Populate employee dropdown
-  const sel = document.getElementById('leave-emp-id');
-  sel.innerHTML = state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  document.getElementById('leave-from').value   = '';
-  document.getElementById('leave-to').value     = '';
-  document.getElementById('leave-type').value   = 'annual';
-  document.getElementById('leave-note').value   = '';
-  document.getElementById('leave-status').value = 'pending';
-  document.getElementById('leave-conflict-info').innerHTML = '';
-  document.getElementById('leave-modal').classList.remove('hidden');
-}
-function openAddLeaveFor(empId) {
-  openAddLeave();
-  document.getElementById('leave-emp-id').value = empId;
-}
-function saveLeave() {
-  const empId  = document.getElementById('leave-emp-id').value;
-  const from   = document.getElementById('leave-from').value;
-  const to     = document.getElementById('leave-to').value;
-  const type   = document.getElementById('leave-type').value;
-  const note   = document.getElementById('leave-note').value.trim();
-  const status = document.getElementById('leave-status').value;
-  if (!empId || !from || !to) { alert('Please fill in employee, from date, and to date.'); return; }
-  if (to < from) { alert('To date must be on or after From date.'); return; }
+  const sel=document.getElementById('leave-emp-id');
+  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
 
-  if (editingLeaveId) {
-    const lr = state.leaveRequests.find(l=>l.id===editingLeaveId);
-    Object.assign(lr, {empId, from, to, type, note, status});
-  } else {
-    state.leaveRequests.push({id:genId(), empId, from, to, type, note, status});
-  }
-  closeModal('leave-modal');
-  persistAll(); renderLeaveTable(); renderSchedule(); renderLiveBoard();
-  showToast('✅ Leave request saved');
-}
-function editLeave(id) {
-  editingLeaveId = id;
-  const lr = state.leaveRequests.find(l=>l.id===id);
-  document.getElementById('leave-modal-title').textContent = 'Edit Leave Request';
-  const sel = document.getElementById('leave-emp-id');
-  sel.innerHTML = state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  sel.value = lr.empId;
-  document.getElementById('leave-from').value   = lr.from;
-  document.getElementById('leave-to').value     = lr.to;
-  document.getElementById('leave-type').value   = lr.type;
-  document.getElementById('leave-note').value   = lr.note||'';
-  document.getElementById('leave-status').value = lr.status;
-  document.getElementById('leave-conflict-info').innerHTML = '';
-  document.getElementById('leave-modal').classList.remove('hidden');
-}
-function deleteLeave(id) {
-  if (!confirm('Delete this leave request?')) return;
-  state.leaveRequests = state.leaveRequests.filter(l=>l.id!==id);
-  persistAll(); renderLeaveTable(); renderSchedule();
-  showToast('🗑️ Leave request deleted');
-}
-function approveLeave(id) {
-  const lr = state.leaveRequests.find(l=>l.id===id);
-  if (lr) { lr.status='approved'; persistAll(); renderLeaveTable(); renderSchedule(); showToast('✅ Leave approved'); }
-}
-function renderLeaveTable() {
-  const tbody = document.getElementById('leave-body');
-  if (!state.leaveRequests.length) {
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748B">No leave requests — click "New Leave Request"</td></tr>';
+  if(!state.leaveRequests.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:20px">No leave requests yet.</td></tr>';
     return;
   }
-  // Sort: pending first, then by date
-  const sorted = [...state.leaveRequests].sort((a,b)=>{
-    if (a.status==='pending' && b.status!=='pending') return -1;
-    if (b.status==='pending' && a.status!=='pending') return 1;
-    return a.from.localeCompare(b.from);
-  });
-  tbody.innerHTML = sorted.map(lr => {
-    const emp  = state.employees.find(e=>e.id===lr.empId);
-    const days = daysBetween(lr.from, lr.to);
-    const stHtml = lr.status==='pending'
-      ? `<span class="leave-status-pending">⏳ Pending</span>`
-      : lr.status==='approved'
-        ? `<span class="leave-status-approved">✅ Approved</span>`
-        : `<span class="leave-status-denied">❌ Denied</span>`;
-    const approveBtns = lr.status==='pending'
-      ? `<button class="btn btn-sm btn-success" onclick="approveLeave('${lr.id}')">✓ Approve</button>`
-      : '';
-    return `<tr>
-      <td style="font-weight:600">${emp?emp.name:'Unknown'}</td>
-      <td>${leaveTypeBadge(lr.type)}</td>
+  tbody.innerHTML=state.leaveRequests.map(lr=>{
+    const emp=state.employees.find(e=>e.id===lr.empId);
+    const days=daysBetween(lr.from,lr.to);
+    return`<tr>
+      <td><strong>${emp?emp.name:'Unknown'}</strong></td>
+      <td><span class="badge badge-${lr.type}">${lr.type}</span></td>
       <td style="font-family:'DM Mono',monospace;font-size:11px">${lr.from}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11px">${lr.to}</td>
-      <td style="font-weight:600;text-align:center">${days}</td>
-      <td style="color:#64748B;font-size:11px">${lr.note||'—'}</td>
-      <td>${stHtml}</td>
+      <td>${days}</td>
+      <td style="color:#64748B">${lr.note||'—'}</td>
+      <td><span class="leave-status-${lr.status}">${lr.status}</span></td>
       <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${approveBtns}
-          <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8" onclick="editLeave('${lr.id}')">✏️</button>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-ghost" onclick="openEditLeave('${lr.id}')">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="deleteLeave('${lr.id}')">🗑️</button>
         </div>
       </td>
     </tr>`;
   }).join('');
 }
-
-// ══════════════════════════════════════════════════
-// SCHEDULE (v2: date-keyed)
-// ══════════════════════════════════════════════════
-function getSlotData(isoDate, si) {
-  return state.schedule[isoDate]?.[si] || {};
+function openAddLeave(){
+  editingLeaveId=null;
+  document.getElementById('leave-modal-title').textContent='New Leave Request';
+  const sel=document.getElementById('leave-emp-id');
+  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  document.getElementById('leave-from').value='';
+  document.getElementById('leave-to').value='';
+  document.getElementById('leave-type').value='annual';
+  document.getElementById('leave-note').value='';
+  document.getElementById('leave-status').value='pending';
+  document.getElementById('leave-conflict-info').innerHTML='';
+  openModal('leave-modal');
 }
-function ensureSlot(isoDate, si) {
-  if (!state.schedule[isoDate])     state.schedule[isoDate]     = {};
-  if (!state.schedule[isoDate][si]) state.schedule[isoDate][si] = {};
+function openEditLeave(leaveId){
+  const lr=state.leaveRequests.find(l=>l.id===leaveId);if(!lr)return;
+  editingLeaveId=leaveId;
+  document.getElementById('leave-modal-title').textContent='Edit Leave Request';
+  const sel=document.getElementById('leave-emp-id');
+  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}"${e.id===lr.empId?'selected':''}>${e.name}</option>`).join('');
+  document.getElementById('leave-from').value=lr.from;
+  document.getElementById('leave-to').value=lr.to;
+  document.getElementById('leave-type').value=lr.type;
+  document.getElementById('leave-note').value=lr.note||'';
+  document.getElementById('leave-status').value=lr.status;
+  document.getElementById('leave-conflict-info').innerHTML='';
+  openModal('leave-modal');
 }
-
-function countDayIssues(isoDate) {
-  let count = 0;
-  TIME_SLOTS.forEach((_,si) => {
-    const sd = state.schedule[isoDate]?.[si] || {};
-    REQUIRED.forEach(req => {
-      const covered = state.employees.some(emp => {
-        if (isOnLeave(emp.id, isoDate)) return false;
-        return sd[emp.id] === req;
-      });
-      if (!covered) count++;
-    });
-  });
-  return count;
-}
-
-function renderSchedule() {
-  const iso = state.currentDateISO;
-  if (!iso) return;
-  if (!state.schedule[iso]) state.schedule[iso] = {};
-
-  const todayStr  = todayISO();
-  const isToday   = iso === todayStr;
-  const todaySlot = isToday ? getCurrentSlotIndex() : -1;
-
-  // Header
-  const empCols = state.employees.map(emp => {
-    const weekDates = state.currentWeekMon ? getWeekDates(fromISO(state.currentWeekMon)) : null;
-    const rem       = Math.max(0, 40-calcEmpWeekHrs(emp.id, weekDates));
-    const remColor  = rem<=0?'#EF4444':rem<=4?'#F59E0B':'#22C55E';
-    const onLeaveToday = isOnLeave(emp.id, iso);
-    const pendingToday = !!getPendingLeaveForDate(emp.id, iso);
-    const leaveBanner  = onLeaveToday
-      ? `<br><span style="font-size:8px;background:#F3E8FF;color:#7E22CE;padding:1px 4px;border-radius:3px">🔒 ON LEAVE</span>`
-      : pendingToday
-        ? `<br><span style="font-size:8px;background:#FEF3C7;color:#92400E;padding:1px 4px;border-radius:3px">⏳ PENDING</span>`
-        : '';
-    return `<th style="min-width:110px;${onLeaveToday?'opacity:.6':''}">
-      ${emp.name.split(' ')[0]}<br>
-      <span style="font-weight:400;font-size:9px;opacity:.7">${emp.name.split(' ').slice(1).join(' ')}</span>
-      ${leaveBanner}
-      <br><span style="font-size:9px;font-weight:700;color:${remColor}">${rem.toFixed(1)}h left</span>
-    </th>`;
-  }).join('');
-  document.getElementById('sched-head').innerHTML = `<tr>
-    <th style="min-width:155px;text-align:left">Time Slot</th>
-    ${empCols}
-    <th style="background:#1D4ED8;min-width:60px">Gate</th>
-    <th style="background:#15803D;min-width:60px">Podium</th>
-    <th style="background:#C2410C;min-width:60px">Mandir</th>
-  </tr>`;
-
-  let issueCount = 0;
-  const gapList  = [];
-
-  document.getElementById('sched-body').innerHTML = TIME_SLOTS.map((slot, si) => {
-    const isLunch   = LUNCH_SLOTS.includes(si);
-    const isCurrent = si === todaySlot;
-    const slotData  = getSlotData(iso, si);
-
-    const empCells = state.employees.map(emp => {
-      const onLeave = isOnLeave(emp.id, iso);
-      if (onLeave) {
-        // Locked vacation cell
-        return `<td><div class="leave-lock-cell" title="On approved leave">🔒 LEAVE</div></td>`;
-      }
-      const pending = !!getPendingLeaveForDate(emp.id, iso);
-      const val     = slotData[emp.id] || 'OFF';
-      const cls     = LOC_CLASS[val] || 'off';
-      const pendingNote = pending ? ' title="Pending leave — not yet locked"' : '';
-      return `<td><select class="loc-select loc-${cls}${pending?' '  : ''}" ${pendingNote}
-        onchange="setSlot('${iso}',${si},'${emp.id}',this.value,this)">${buildOpts(emp,val)}</select></td>`;
-    }).join('');
-
-    const covCells = REQUIRED.map(req => {
-      const covered = state.employees.some(emp => {
-        if (isOnLeave(emp.id, iso)) return false;
-        return (slotData[emp.id] || 'OFF') === req;
-      });
-      if (!covered) { issueCount++; gapList.push({iso,si,req}); }
-      return `<td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✅':'❌'}</td>`;
-    }).join('');
-
-    return `<tr class="${isCurrent?'current-row':''}">
-      <td class="slot-label ${isLunch?'lunch-slot':''} ${isCurrent?'current-slot':''}">${isLunch?'🍽️ ':isCurrent?'▶ ':''} ${slot}</td>
-      ${empCells}${covCells}
-    </tr>`;
-  }).join('');
-
-  // Alert banner
-  const alertEl = document.getElementById('coverage-alert');
-  if (issueCount > 0) {
-    alertEl.classList.remove('hidden');
-    alertEl.className='alert alert-danger';
-    alertEl.textContent=`⚠️ ${issueCount} coverage gap${issueCount>1?'s':''} on ${iso} — fix the ❌ cells below`;
-  } else {
-    alertEl.classList.add('hidden');
+function saveLeave(){
+  const empId=document.getElementById('leave-emp-id').value;
+  const from=document.getElementById('leave-from').value;
+  const to=document.getElementById('leave-to').value;
+  const type=document.getElementById('leave-type').value;
+  const note=document.getElementById('leave-note').value.trim();
+  const status=document.getElementById('leave-status').value;
+  if(!empId||!from||!to){alert('Please fill in employee, from date, and to date.');return;}
+  if(from>to){alert('From date must be before or equal to To date.');return;}
+  if(editingLeaveId){
+    const lr=state.leaveRequests.find(l=>l.id===editingLeaveId);
+    Object.assign(lr,{empId,from,to,type,note,status});
+  }else{
+    state.leaveRequests.push({id:'lr_'+Date.now(),empId,from,to,type,note,status});
   }
-
-  renderSuggestArea(gapList, iso);
-  renderWeekNav(); // refresh dots
+  persistAll();closeModal('leave-modal');renderLeave();
 }
-
-function buildOpts(emp, selected) {
-  const approved = [];
-  if (empCanWork(emp,'gate'))     approved.push('Gate');
-  if (empCanWork(emp,'podium'))   approved.push('Podium');
-  if (empCanWork(emp,'mandir'))   approved.push('Mandir');
-  if (empCanWork(emp,'field'))    approved.push('Field Work');
-  if (empCanWork(emp,'giftshop')) approved.push('Gift Shop');
-  const all = [...approved, 'LUNCH','OFF','VACATION'];
-  if (!all.includes(selected)) all.unshift(selected);
-  return all.map(o=>`<option value="${o}" ${o===selected?'selected':''}>${o}</option>`).join('');
-}
-
-function setSlot(iso, si, empId, value, sel) {
-  const emp        = state.employees.find(e=>e.id===empId);
-  const currentVal = state.schedule[iso]?.[si]?.[empId] || 'OFF';
-  const isWorking  = v => v && v!=='OFF' && v!=='LUNCH' && v!=='VACATION';
-
-  if (isWorking(value) && !isWorking(currentVal)) {
-    const weekDates = state.currentWeekMon ? getWeekDates(fromISO(state.currentWeekMon)) : null;
-    const hrs = calcEmpWeekHrs(empId, weekDates);
-    if (hrs+SLOT_HRS[si] > 40) {
-      if (!confirm(`⚠️ This will put ${emp.name} over 40hrs (currently ${hrs.toFixed(1)}h). Continue?`)) {
-        sel.value=currentVal; sel.className=`loc-select loc-${LOC_CLASS[currentVal]||'off'}`;
-        return;
-      }
-    }
-  }
-
-  undoStack = {iso, si, empId, oldVal:currentVal};
-  ensureSlot(iso, si);
-  state.schedule[iso][si][empId] = value;
-  sel.className = `loc-select loc-${LOC_CLASS[value]||'off'}`;
-
-  persistAll(); renderSchedule();
-  showUndoToast(`${emp.name} → ${value}`);
+function deleteLeave(leaveId){
+  if(!confirm('Delete this leave request?'))return;
+  state.leaveRequests=state.leaveRequests.filter(l=>l.id!==leaveId);
+  persistAll();renderLeave();
 }
 
 // ══════════════════════════════════════════════════
-// COPY DAY
+// EXPORT / IMPORT / RESET
 // ══════════════════════════════════════════════════
-function toggleCopyPanel(el) {
-  const panel = document.getElementById('copy-day-panel');
-  const open  = panel.classList.toggle('open');
-  el.textContent = open ? '📋 Copy this day to other days ▴' : '📋 Copy this day to other days ▾';
+function exportData(){
+  const blob=new Blob([JSON.stringify({
+    employees:state.employees,volunteers:state.volunteers,
+    schedule:state.schedule,volAvailability:state.volAvailability,
+    leaveRequests:state.leaveRequests,
+  },null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`schedulemaker_v3_${todayISO()}.json`;
+  a.click();
 }
-function copyDayTo(targetISO) {
-  const srcISO = state.currentDateISO;
-  if (targetISO===srcISO) { showToast('Already on this day'); return; }
-  const srcDate = fromISO(srcISO), tgtDate = fromISO(targetISO);
-  const fmt = d => `${DAYS_SHORT[d.getDay()===0?6:d.getDay()-1]} ${d.getDate()}`;
-  if (!confirm(`Copy all assignments from ${fmt(srcDate)} to ${fmt(tgtDate)}? This will overwrite ${fmt(tgtDate)}.`)) return;
-  const src = state.schedule[srcISO] || {};
-  state.schedule[targetISO] = {};
-  TIME_SLOTS.forEach((_,si) => { state.schedule[targetISO][si] = {...(src[si]||{})}; });
-  persistAll(); renderWeekNav();
-  showToast(`✅ Copied ${fmt(srcDate)} → ${fmt(tgtDate)}`);
+function importData(){document.getElementById('import-file').click();}
+function handleImportFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const d=JSON.parse(evt.target.result);
+      if(d.employees)state.employees=d.employees;
+      if(d.volunteers)state.volunteers=d.volunteers;
+      if(d.schedule)state.schedule=d.schedule;
+      if(d.volAvailability)state.volAvailability=d.volAvailability;
+      if(d.leaveRequests)state.leaveRequests=d.leaveRequests;
+      persistAll();renderAll();
+      alert('Import successful!');
+    }catch(err){alert('Import failed: invalid JSON file.');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
 }
-
-// ══════════════════════════════════════════════════
-// SUGGEST
-// ══════════════════════════════════════════════════
-function renderSuggestArea(gaps, iso) {
-  const area = document.getElementById('suggest-area');
-  if (!gaps.length || state.mode!=='admin') { area.innerHTML=''; return; }
-  const seen   = new Set();
-  const panels = gaps
-    .filter(g => { if (seen.has(g.req)) return false; seen.add(g.req); return true; })
-    .map(({iso:d, si, req}) => {
-      const key        = locKeyForLabel(req);
-      const weekDates  = state.currentWeekMon ? getWeekDates(fromISO(state.currentWeekMon)) : null;
-      // Candidates: can work location, not on approved leave today, under 40hrs
-      const candidates = state.employees.filter(emp =>
-        empCanWork(emp, key) &&
-        !isOnLeave(emp.id, d) &&
-        calcEmpWeekHrs(emp.id, weekDates) < 40
-      );
-      if (!candidates.length) return `<div class="suggest-panel"><strong>💡 ${req} needs coverage — no eligible staff available this week.</strong></div>`;
-      return `<div class="suggest-panel">
-        <strong>💡 ${req} needs coverage — click to fill:</strong><br><br>
-        ${candidates.map(c => {
-          const rem = (40-calcEmpWeekHrs(c.id, weekDates)).toFixed(1);
-          return `<span class="suggest-chip" onclick="quickFill('${d}',${si},'${c.id}','${req}')">${c.name} (${rem}h left)</span>`;
-        }).join('')}
-      </div>`;
-    }).join('');
-  area.innerHTML = panels;
-}
-function quickFill(iso, si, empId, loc) {
-  ensureSlot(iso, si);
-  state.schedule[iso][si][empId] = loc;
-  persistAll(); renderSchedule(); renderLiveBoard();
-  showToast(`✅ Filled ${loc} → ${state.employees.find(e=>e.id===empId)?.name}`);
+function resetAllData(){openModal('reset-modal');}
+function confirmReset(){
+  const entered=document.getElementById('reset-pin').value;
+  const stored=localStorage.getItem('smPro_pin')||DEFAULT_PIN;
+  if(entered!==stored){document.getElementById('reset-error').textContent='Incorrect PIN.';return;}
+  state.employees=[];state.volunteers=[];state.schedule={};
+  state.volAvailability={};state.leaveRequests=[];
+  persistAll();closeModal('reset-modal');renderAll();
+  alert('All data has been reset.');
 }
 
 // ══════════════════════════════════════════════════
-// HOURS (v2: date-keyed, scoped to a week)
+// MODAL HELPERS
 // ══════════════════════════════════════════════════
-function calcEmpWeekHrs(empId, weekDates) {
-  // weekDates: array of 7 Date objects for the week, or null (uses all schedule dates)
-  let total = 0;
-  if (weekDates) {
-    weekDates.forEach(d => {
-      const iso = toISO(d);
-      TIME_SLOTS.forEach((_,si) => {
-        const val = state.schedule[iso]?.[si]?.[empId];
-        if (val && val!=='OFF' && val!=='LUNCH' && val!=='VACATION') total += SLOT_HRS[si];
-      });
-    });
-  } else {
-    Object.keys(state.schedule).forEach(iso => {
-      TIME_SLOTS.forEach((_,si) => {
-        const val = state.schedule[iso]?.[si]?.[empId];
-        if (val && val!=='OFF' && val!=='LUNCH' && val!=='VACATION') total += SLOT_HRS[si];
-      });
-    });
-  }
-  return total;
-}
-
-// ══════════════════════════════════════════════════
-// UNDO
-// ══════════════════════════════════════════════════
-let undoTimer = null;
-function showUndoToast(msg) {
-  document.getElementById('undo-msg').textContent=msg;
-  const toast=document.getElementById('undo-toast');
-  toast.classList.add('show');
-  clearTimeout(undoTimer);
-  undoTimer=setTimeout(()=>{toast.classList.remove('show');undoStack=null;},5000);
-}
-function showToast(msg) {
-  document.getElementById('undo-msg').textContent=msg;
-  const toast=document.getElementById('undo-toast');
-  toast.classList.add('show');
-  clearTimeout(undoTimer);
-  undoTimer=setTimeout(()=>toast.classList.remove('show'),3000);
-}
-function undoLastChange() {
-  if (!undoStack) return;
-  const {iso,si,empId,oldVal}=undoStack;
-  ensureSlot(iso, si);
-  state.schedule[iso][si][empId]=oldVal;
-  undoStack=null;
-  document.getElementById('undo-toast').classList.remove('show');
-  persistAll(); renderSchedule(); renderLiveBoard();
-  showToast('↩ Change undone');
-}
-
-// ══════════════════════════════════════════════════
-// MODALS
-// ══════════════════════════════════════════════════
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
 
 // ══════════════════════════════════════════════════
 // RENDER ALL
 // ══════════════════════════════════════════════════
-function renderAll() {
-  renderRoster();
-  renderVolunteers();
-  renderLeaveTable();
-  renderWeekNav();
-  renderSchedule();
+function renderAll(){
   renderLiveBoard();
-}
-
-// ══════════════════════════════════════════════════
-// SEED DATA (uses date keys)
-// ══════════════════════════════════════════════════
-function seedData() {
-  [
-    {name:'Raj Patel',   disallowedLocs:{gate:false,podium:false,mandir:false,field:false,giftshop:false}, status:'Active'},
-    {name:'Meera Shah',  disallowedLocs:{gate:false,podium:true, mandir:false,field:false,giftshop:false}, status:'Active'},
-    {name:'Amit Kumar',  disallowedLocs:{gate:false,podium:false,mandir:true, field:false,giftshop:false}, status:'Active'},
-    {name:'Priya Singh', disallowedLocs:{gate:true, podium:false,mandir:false,field:false,giftshop:true},  status:'Active'},
-    {name:'Vikram Nair', disallowedLocs:{gate:false,podium:false,mandir:false,field:true, giftshop:false}, status:'Active'},
-  ].forEach(e => addEmployeeObj(e.name, e.disallowedLocs, e.status));
-  [{name:'Anita Mehta',note:''},{name:'Dev Sharma',note:'Weekends only'}]
-    .forEach(v => addVolunteerObj(v.name, v.note));
-  // Sample leave request for Meera Shah
-  if (state.employees.length >= 2) {
-    const meera = state.employees[1];
-    const today = new Date();
-    const from  = new Date(today); from.setDate(from.getDate() + 2);
-    const to    = new Date(today); to.setDate(to.getDate()   + 4);
-    state.leaveRequests.push({
-      id: genId(), empId: meera.id,
-      from: toISO(from), to: toISO(to),
-      type: 'annual', note: 'Family trip', status: 'approved'
-    });
+  if(state.mode==='admin'){
+    renderRoster();
+    renderLeave();
+    if(document.getElementById('page-schedule').classList.contains('active')){
+      renderWeekNav();renderSchedule();
+    }
   }
-  persistAll();
 }
 
 // ══════════════════════════════════════════════════
-// BOOT
+// INIT
 // ══════════════════════════════════════════════════
-loadLocal();
-initWeekState();
-if (!state.employees.length) seedData();
-const fbCfg = getFirebaseCfg();
-if (fbCfg && fbCfg.databaseURL) initFirebase(fbCfg); else setSyncStatus('local');
-startClock();
-setInterval(renderLiveBoard, 60000);
-renderAll();
+window.addEventListener('DOMContentLoaded',()=>{
+  loadLocal();
+  initWeekState();
+  initFirebase();
+  tickClock();
+  setInterval(tickClock,30000);
+  setInterval(()=>{
+    if(document.getElementById('page-live').classList.contains('active'))renderLiveBoard();
+  },60000);
+});
 </script>
 </body>
 </html>
+<body>
