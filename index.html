@@ -25,6 +25,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
 .nav-tab.active{color:#fff;background:rgba(255,255,255,.18)}
 .nav-tab.admin-only{display:none}
+  .nav-tab.admin-tab-visible{display:inline-flex;}
 #sync-indicator{font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.1);color:#94A3B8;white-space:nowrap;display:flex;align-items:center;gap:4px}
 #sync-indicator.synced{color:#86EFAC}
 #sync-indicator.syncing{color:#FCD34D}
@@ -763,7 +764,10 @@ function submitPin(){
 function enterAdminMode(){
   state.mode='admin';
   document.getElementById('pin-screen').style.display='none';
-  document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');
+  document.querySelectorAll('.admin-only').forEach(el=>{
+    el.classList.remove('admin-only');
+    el.classList.add('admin-tab-visible');
+  });
   document.getElementById('mode-badge').textContent='ADMIN MODE';
   document.getElementById('mode-badge').className='mode-admin';
   renderAll();
@@ -771,7 +775,10 @@ function enterAdminMode(){
 function enterLiveMode(){
   state.mode='live';
   document.getElementById('pin-screen').style.display='none';
-  document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.admin-tab-visible').forEach(el=>{
+    el.classList.remove('admin-tab-visible');
+    el.classList.add('admin-only');
+  });
   document.getElementById('mode-badge').textContent='VIEW-ONLY';
   document.getElementById('mode-badge').className='mode-live';
   showPage('live',document.getElementById('tab-live'));
