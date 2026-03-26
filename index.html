@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScheduleMaker Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1B2A4A;--gate:#2563EB;--podium:#16A34A;--mandir:#EA580C;--field:#6B7280;
+  --lunch:#D97706;--off:#9CA3AF;--vac:#9333EA;--red:#EF4444;--amber:#F59E0B;
+  --green:#22C55E;--bg:#F0F4F8;--card:#FFFFFF;--border:#CBD5E1;--text:#1E293B;--muted:#64748B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px}
+
+/* ── TOP NAV ── */
+.topbar{background:var(--navy);color:#fff;display:flex;align-items:center;gap:16px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.topbar h1{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;white-space:nowrap}
+.topbar h1 span{color:#93C5FD}
+.nav-tabs{display:flex;gap:2px;margin-left:auto}
+.nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#94A3B8;transition:all .2s;border:none;background:none;white-space:nowrap}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,.18)}
+.nav-tab.admin-only{display:none}
+#sync-indicator{font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.1);color:#94A3B8;white-space:nowrap;display:flex;align-items:center;gap:4px}
+#sync-indicator.synced{color:#86EFAC}
+#sync-indicator.syncing{color:#FCD34D}
+#sync-indicator.error{color:#FCA5A5}
+#mode-badge{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.mode-admin{background:#F59E0B;color:#1F2937}
+.mode-live{background:#22C55E;color:#14532D}
+
+/* ── LAYOUT ── */
+.page{display:none;padding:20px;max-width:1400px;margin:0 auto}
+.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:12px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-hdr h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy)}
+.card-body{padding:16px 18px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-gate{background:#DBEAFE;color:#1D4ED8}.badge-podium{background:#DCFCE7;color:#15803D}
+.badge-mandir{background:#FED7AA;color:#C2410C}.badge-field{background:#F3F4F6;color:#374151}
+.badge-lunch{background:#FEF3C7;color:#92400E}.badge-off{background:#F1F5F9;color:#64748B}
+.badge-vac{background:#F3E8FF;color:#7E22CE}.badge-ok{background:#DCFCE7;color:#166534}
+.badge-warn{background:#FEF3C7;color:#92400E}.badge-over{background:#FEE2E2;color:#991B1B}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#243558}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-danger{background:#FEE2E2;color:#991B1B}.btn-danger:hover{background:#FECACA}
+.btn-success{background:#DCFCE7;color:#166534}.btn-success:hover{background:#BBF7D0}
+.btn-warn{background:#FEF3C7;color:#92400E}
+
+/* ── INPUTS ── */
+input[type=text],input[type=password],select{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;transition:border .15s;width:100%}
+input[type=text]:focus,input[type=password]:focus,select:focus{border-color:var(--navy)}
+
+/* ── ROSTER TABLE ── */
+.roster-table{width:100%;border-collapse:collapse}
+.roster-table th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;letter-spacing:.3px;white-space:nowrap}
+.roster-table td{padding:8px 12px;border-bottom:1px solid #F1F5F9;font-size:12px;vertical-align:middle}
+.roster-table tr:hover td{background:#F8FAFC}
+.loc-check{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700}
+.loc-yes{background:#DCFCE7;color:#166534}.loc-no{background:#F1F5F9;color:#9CA3AF}
+.hrs-bar-wrap{background:#E2E8F0;border-radius:4px;height:8px;width:80px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
+.hrs-bar{height:100%;border-radius:4px;transition:width .4s}
+
+/* ── SCHEDULE GRID ── */
+.week-nav{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.day-btn{padding:6px 14px;border-radius:8px;border:2px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;color:#64748B;transition:all .2s}
+.day-btn.active{border-color:var(--navy);background:var(--navy);color:#fff}
+.day-btn.has-issue{border-color:#EF4444}
+.sched-grid{width:100%;border-collapse:collapse;font-size:11px}
+.sched-grid th{background:var(--navy);color:#fff;padding:7px 10px;text-align:center;font-size:10px;font-weight:600;white-space:nowrap;position:sticky;top:52px}
+.sched-grid .slot-label{background:#F8FAFC;border-right:2px solid var(--border);padding:6px 10px;font-size:10px;color:#64748B;white-space:nowrap;font-family:'DM Mono',monospace;text-align:right;min-width:150px}
+.sched-grid .slot-label.lunch-slot{background:#FFFBEB;color:#92400E;font-weight:600}
+.sched-grid .slot-label.current-slot{background:#EFF6FF;color:#1D4ED8;font-weight:700}
+.sched-grid td{border-bottom:1px solid #F1F5F9;border-right:1px solid #F1F5F9;padding:3px}
+.sched-grid tr.current-row td{background:#F0F9FF!important}
+.loc-select{width:100%;border:none;border-radius:5px;padding:4px 6px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;outline:none;background:#F1F5F9;color:#374151}
+.loc-gate{background:#DBEAFE!important;color:#1D4ED8!important}.loc-podium{background:#DCFCE7!important;color:#15803D!important}
+.loc-mandir{background:#FED7AA!important;color:#C2410C!important}.loc-field{background:#F3F4F6!important;color:#374151!important}
+.loc-lunch{background:#FEF3C7!important;color:#92400E!important}.loc-off{background:#F1F5F9!important;color:#9CA3AF!important}
+.loc-vac{background:#F3E8FF!important;color:#7E22CE!important}
+.cov-cell{text-align:center;padding:4px 6px;font-size:14px}
+.cov-ok{background:#DCFCE7}.cov-fail{background:#FEE2E2;animation:pulse .8s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.6}}
+
+/* ── LIVE BOARD ── */
+.live-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+.live-card{border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.live-card-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.live-card-hdr h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
+.live-card-body{padding:16px 18px;background:#fff}
+.live-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#1B2A4A;margin-bottom:4px}
+.live-uncovered{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#EF4444}
+.live-sub{font-size:11px;color:#64748B}
+.live-next{margin-top:10px;padding-top:10px;border-top:1px solid #CBD5E1}
+.live-next-title{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.live-next-slot{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed #F1F5F9}
+.live-time-chip{background:#1B2A4A;color:#fff;padding:6px 14px;border-radius:20px;font-family:'DM Mono',monospace;font-size:13px;font-weight:500}
+.live-volunteer-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vol-chip{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#F3E8FF;color:#7E22CE}
+.live-fullrow{grid-column:1/-1}
+
+/* ── COVERAGE DASH ── */
+.cov-grid{display:grid;gap:12px}
+.cov-day-card{border-radius:10px;overflow:hidden;border:1px solid #CBD5E1}
+.cov-day-hdr{padding:8px 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.cov-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px;padding:10px}
+.cov-slot{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:6px;background:#F8FAFC;border:1px solid #E2E8F0;font-size:11px}
+.cov-slot.issue{background:#FEF2F2;border-color:#FECACA}
+.cov-locs{display:flex;gap:4px}
+
+/* ── SUGGEST PANEL ── */
+.suggest-panel{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-top:6px;font-size:11px}
+.suggest-panel strong{color:#92400E}
+.suggest-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;background:#FEF3C7;color:#92400E;font-weight:600;cursor:pointer;border:1px solid #FCD34D;margin:2px}
+.suggest-chip:hover{background:#FCD34D}
+
+/* ── HOURS PAGE ── */
+.hrs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.emp-hrs-card{border-radius:10px;border:1px solid #CBD5E1;overflow:hidden}
+.emp-hrs-hdr{padding:10px 14px;background:#1B2A4A;color:#fff;font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.emp-hrs-body{padding:12px 14px}
+.day-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #F1F5F9;font-size:11px}
+.total-row{display:flex;justify-content:space-between;padding:6px 0;font-weight:700;font-size:13px;margin-top:4px}
+.hrs-progress{background:#E2E8F0;border-radius:6px;height:10px;margin:8px 0;overflow:hidden}
+.hrs-progress-fill{height:100%;border-radius:6px;transition:width .5s}
+.remaining-chip{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:700}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:16px;color:#1B2A4A}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:600;color:#64748B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.loc-toggles{display:flex;gap:8px;flex-wrap:wrap}
+.loc-toggle{padding:6px 12px;border-radius:6px;border:2px solid #CBD5E1;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;background:#fff;font-family:'Inter',sans-serif}
+.loc-toggle.sel-gate{border-color:#2563EB;background:#DBEAFE;color:#1D4ED8}
+.loc-toggle.sel-podium{border-color:#16A34A;background:#DCFCE7;color:#15803D}
+.loc-toggle.sel-mandir{border-color:#EA580C;background:#FED7AA;color:#C2410C}
+.loc-toggle.sel-field{border-color:#6B7280;background:#F3F4F6;color:#374151}
+
+/* ── PIN SCREEN ── */
+.pin-screen{position:fixed;inset:0;background:#1B2A4A;z-index:999;display:flex;align-items:center;justify-content:center}
+.pin-box{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.pin-box h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#1B2A4A;margin-bottom:6px}
+.pin-box p{color:#64748B;font-size:12px;margin-bottom:24px}
+.pin-input{font-size:28px;font-weight:800;text-align:center;letter-spacing:8px;border:2px solid #CBD5E1;border-radius:10px;padding:12px}
+.pin-input:focus{border-color:#1B2A4A}
+.pin-error{color:#EF4444;font-size:12px;margin-top:8px;min-height:18px}
+.pin-bypass{margin-top:16px;font-size:11px;color:#64748B;cursor:pointer;text-decoration:underline}
+
+/* ── ALERTS ── */
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.alert-info{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.alert-warn{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
+.alert-danger{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
+
+/* ── UNDO TOAST ── */
+.undo-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#1B2A4A;color:#fff;padding:10px 20px;border-radius:24px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:12px;box-shadow:0 8px 30px rgba(0,0,0,.3);transition:transform .3s;z-index:300}
+.undo-toast.show{transform:translateX(-50%) translateY(0)}
+.undo-btn{background:#93C5FD;color:#1E3A5F;border:none;border-radius:12px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer}
+
+/* ── VOLUNTEER SECTION ── */
+.vol-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px}
+.vol-day-col{border-radius:8px;border:1px solid #CBD5E1;overflow:hidden}
+.vol-day-hdr{padding:6px;background:#1B2A4A;color:#fff;font-size:11px;font-weight:700;text-align:center;font-family:'Syne',sans-serif}
+.vol-day-body{padding:6px}
+.vol-avail-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px}
+.toggle-switch{position:relative;width:32px;height:18px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#CBD5E1;border-radius:9px;transition:.2s}
+.toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.toggle-switch input:checked + .toggle-slider{background:#9333EA}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(14px)}
+
+/* ── COPY DAY ── */
+.copy-day-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── FIREBASE CONFIG MODAL ── */
+.config-section{background:#F8FAFC;border-radius:8px;padding:12px;margin-bottom:12px;font-size:11px;color:#64748B}
+
+.hidden{display:none}
+.flex{display:flex;align-items:center}
+.gap8{gap:8px}
+.ml-auto{margin-left:auto}
+.mt12{margin-top:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+@media(max-width:600px){
+  .topbar h1 span{display:none}
+  .nav-tab{padding:6px 8px;font-size:11px}
+  .live-board{grid-template-columns:1fr}
+  .vol-day-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PIN SCREEN ══ -->
+<div id="pin-screen" class="pin-screen">
+  <div class="pin-box">
+    <div style="font-size:40px;margin-bottom:8px">🏢</div>
+    <h2>ScheduleMaker Pro</h2>
+    <p>Enter admin PIN to manage schedules,<br>or view live board without a PIN.</p>
+    <div class="form-row" style="margin-bottom:8px">
+      <input type="password" class="pin-input" id="pin-input" maxlength="6" placeholder="••••" onkeyup="checkPin(event)">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="submitPin()">🔓 Enter Admin</button>
+    <div class="pin-error" id="pin-error"></div>
+    <div class="pin-bypass" onclick="enterLiveMode()">
+      👁️ View Live Board only (no PIN needed)
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #CBD5E1">
+      <button class="btn btn-sm" style="background:#F1F5F9;color:#64748B;width:100%;justify-content:center" onclick="showFirebaseConfig()">
+        ⚙️ Configure Firebase (first-time setup)
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<div class="topbar">
+  <h1>🏢 <span>Schedule</span>Maker Pro</h1>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-live" onclick="showPage('live',this)">🟢 Live Board</button>
+    <button class="nav-tab admin-only" id="tab-roster" onclick="showPage('roster',this)">👥 Roster</button>
+    <button class="nav-tab admin-only" id="tab-volunteers" onclick="showPage('volunteers',this)">🙋 Volunteers</button>
+    <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">📅 Schedule</button>
+    <button class="nav-tab admin-only" id="tab-coverage" onclick="showPage('coverage',this)">🚨 Coverage</button>
+    <button class="nav-tab admin-only" id="tab-hours" onclick="showPage('hours',this)">⏱️ Hours</button>
+  </div>
+  <div id="sync-indicator" style="margin-left:12px">⬤ local</div>
+  <div id="mode-badge" class="mode-live" style="margin-left:8px">LIVE VIEW</div>
+</div>
+
+<!-- ══ PAGE: LIVE BOARD ══ -->
+<div class="page active" id="page-live">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Live Board</h2>
+      <p style="color:#64748B;font-size:12px" id="live-date-label">Loading...</p>
+    </div>
+    <div class="live-time-chip ml-auto" id="live-clock">--:-- --</div>
+  </div>
+  <div id="live-board" class="live-board"></div>
+  <div class="card mt12">
+    <div class="card-hdr"><h2>🙋 Volunteers Available Today</h2></div>
+    <div class="card-body" id="live-volunteers"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: ROSTER ══ -->
+<div class="page" id="page-roster">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Staff Roster</h2>
+      <p style="color:#64748B;font-size:12px">Manage employees — 40hr weekly compliance tracked</p>
+    </div>
+    <button class="btn btn-primary ml-auto" onclick="openAddEmployee()">+ Add Employee</button>
+  </div>
+  <div class="alert alert-info">
+    💡 Employees have 40hr weekly targets. Set approved locations — they only appear as options for those locations in the schedule.
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <table class="roster-table" id="roster-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Name</th><th>Gate</th><th>Podium</th><th>Mandir</th><th>Field Work</th>
+            <th>Status</th><th>This Week</th><th>Remaining</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="roster-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: VOLUNTEERS ══ -->
+<div class="page" id="page-volunteers">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Volunteer Availability</h2>
+      <p style="color:#64748B;font-size:12px">Mark which days each volunteer is available this week — no hours tracking</p>
+    </div>
+    <button class="btn btn-primary ml-auto" onclick="openAddVolunteer()">+ Add Volunteer</button>
+  </div>
+  <div class="alert alert-info">
+    💡 Volunteers are bonus capacity. Toggle availability per day. They show on the Live Board and can fill coverage gaps — but aren't required for compliance.
+  </div>
+  <div id="volunteer-list"></div>
+</div>
+
+<!-- ══ PAGE: SCHEDULE ══ -->
+<div class="page" id="page-schedule">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Weekly Schedule</h2>
+      <p style="color:#64748B;font-size:12px">Assign employees to locations for each time slot</p>
+    </div>
+  </div>
+  <div class="alert alert-warn" id="coverage-alert" style="display:none"></div>
+  <div class="week-nav" id="day-nav"></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:11px;font-weight:600;color:#64748B">COPY DAY TO →</span>
+    <div class="copy-day-row" id="copy-day-btns"></div>
+  </div>
+  <div style="overflow-x:auto">
+    <div class="card">
+      <div id="sched-legend" style="padding:10px 16px;border-bottom:1px solid #CBD5E1;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;font-weight:600;color:#64748B;margin-right:4px">LOCATIONS:</span>
+        <span class="badge badge-gate">Gate</span>
+        <span class="badge badge-podium">Podium</span>
+        <span class="badge badge-mandir">Mandir</span>
+        <span class="badge badge-field">Field Work</span>
+        <span class="badge badge-lunch">Lunch</span>
+        <span class="badge badge-off">Off</span>
+        <span class="badge badge-vac">Vacation</span>
+        <span style="margin-left:auto;font-size:11px;color:#64748B">✅ = covered &nbsp;❌ = MISSING</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="sched-grid" id="sched-table">
+          <thead id="sched-head"></thead>
+          <tbody id="sched-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="suggest-area" style="margin-top:12px"></div>
+</div>
+
+<!-- ══ PAGE: COVERAGE ══ -->
+<div class="page" id="page-coverage">
+  <div style="margin-bottom:16px">
+    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Coverage Dashboard</h2>
+    <p style="color:#64748B;font-size:12px">Gate, Podium, and Mandir must have at least 1 employee every slot</p>
+  </div>
+  <div id="coverage-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:16px"></div>
+  <div id="coverage-days" class="cov-grid"></div>
+</div>
+
+<!-- ══ PAGE: HOURS ══ -->
+<div class="page" id="page-hours">
+  <div style="margin-bottom:16px">
+    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1B2A4A">Hours Summary</h2>
+    <p style="color:#64748B;font-size:12px">40hr weekly target — ⚡ warning at 38hrs, ⚠️ blocked at 40hrs</p>
+  </div>
+  <div id="hours-alert" class="alert alert-warn" style="display:none"></div>
+  <div class="hrs-grid" id="hrs-grid"></div>
+</div>
+
+<!-- ══ ADD EMPLOYEE MODAL ══ -->
+<div class="modal-overlay hidden" id="emp-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Employee</h3>
+    <div class="form-row">
+      <label>Full Name</label>
+      <input type="text" id="emp-name" placeholder="e.g. Raj Patel">
+    </div>
+    <div class="form-row">
+      <label>Approved Locations <span style="color:#64748B;font-weight:400">(click to toggle)</span></label>
+      <div class="loc-toggles">
+        <button class="loc-toggle" id="tog-gate"   onclick="toggleLoc('gate')">Gate</button>
+        <button class="loc-toggle" id="tog-podium" onclick="toggleLoc('podium')">Podium</button>
+        <button class="loc-toggle" id="tog-mandir" onclick="toggleLoc('mandir')">Mandir</button>
+        <button class="loc-toggle" id="tog-field"  onclick="toggleLoc('field')">Field Work</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Status</label>
+      <select id="emp-status">
+        <option>Active</option>
+        <option>Day Off</option>
+        <option>Vacation</option>
+        <option>Sick</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-danger" onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD VOLUNTEER MODAL ══ -->
+<div class="modal-overlay hidden" id="vol-modal">
+  <div class="modal">
+    <h3 id="vol-modal-title">Add Volunteer</h3>
+    <div class="form-row">
+      <label>Full Name</label>
+      <input type="text" id="vol-name" placeholder="e.g. Anita Mehta">
+    </div>
+    <div class="form-row">
+      <label>Note <span style="color:#64748B;font-weight:400">(optional)</span></label>
+      <input type="text" id="vol-note" placeholder="e.g. Available afternoons only">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-danger" onclick="closeModal('vol-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveVolunteer()">Save Volunteer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIREBASE CONFIG MODAL ══ -->
+<div class="modal-overlay hidden" id="firebase-modal">
+  <div class="modal">
+    <h3>⚙️ Firebase Setup</h3>
+    <div class="config-section">
+      <strong>First-time setup:</strong> Create a free Firebase project at console.firebase.google.com → Add web app → Copy config below.<br><br>
+      Enable <strong>Realtime Database</strong> and set rules to allow read/write.<br><br>
+      Without Firebase, the app works fully on <strong>localStorage</strong> (single device only).
+    </div>
+    <div class="form-row"><label>API Key</label><input type="text" id="fb-apiKey" placeholder="AIza..."></div>
+    <div class="form-row"><label>Auth Domain</label><input type="text" id="fb-authDomain" placeholder="your-app.firebaseapp.com"></div>
+    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL" placeholder="https://your-app-default-rtdb.firebaseio.com"></div>
+    <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId" placeholder="your-app"></div>
+    <div class="form-row"><label>App ID</label><input type="text" id="fb-appId" placeholder="1:xxx:web:xxx"></div>
+    <div class="form-row"><label>Admin PIN (4–6 digits)</label><input type="password" id="fb-pin" placeholder="e.g. 1234"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-danger" onclick="closeModal('firebase-modal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveFirebaseConfig()">💾 Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NO-SHOW MODAL ══ -->
+<div class="modal-overlay hidden" id="noshow-modal">
+  <div class="modal">
+    <h3>⚠️ Coverage Gap</h3>
+    <p style="color:#64748B;font-size:13px;margin-bottom:16px" id="noshow-msg"></p>
+    <div class="form-row">
+      <label>Approved employees with hours remaining:</label>
+      <div id="noshow-suggestions" style="margin-top:8px"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-danger" onclick="closeModal('noshow-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UNDO TOAST ══ -->
+<div class="undo-toast" id="undo-toast">
+  <span id="undo-msg">Slot changed</span>
+  <button class="undo-btn" onclick="undoLastChange()">↩ Undo</button>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════
+const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const REQUIRED = ['Gate','Podium','Mandir'];
+const TIME_SLOTS = [
+  '6:00 AM – 7:00 AM','7:00 AM – 8:00 AM','8:00 AM – 9:00 AM',
+  '9:00 AM – 10:00 AM','10:00 AM – 11:00 AM','11:00 AM – 12:00 PM',
+  '12:00 PM – 12:30 PM','12:30 PM – 1:00 PM','1:00 PM – 1:30 PM',
+  '1:30 PM – 2:30 PM','2:30 PM – 3:30 PM','3:30 PM – 4:30 PM',
+  '4:30 PM – 5:30 PM','5:30 PM – 6:30 PM','6:30 PM – 7:30 PM',
+  '7:30 PM – 8:30 PM'
+];
+const SLOT_HRS  = [1,1,1,1,1,1,.5,.5,.5,1,1,1,1,1,1,1];
+const LUNCH_SLOTS = [6,7,8];
+const SLOT_START_MINS = [360,420,480,540,600,660,720,750,780,810,870,930,990,1050,1110,1170];
+const LOC_CLASS = {
+  'Gate':'gate','Podium':'podium','Mandir':'mandir',
+  'Field Work':'field','LUNCH':'lunch','OFF':'off','VACATION':'vac'
+};
+const DAY_COLORS = {
+  MON:'#1B2A4A',TUE:'#1D4ED8',WED:'#065F46',
+  THU:'#7C2D12',FRI:'#4C1D95',SAT:'#831843',SUN:'#1F2937'
+};
+const DEFAULT_PIN = '1234';
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let state = {
+  employees: [],
+  volunteers: [],
+  schedule: {},
+  volAvailability: {},
+  currentDay: 'MON',
+  mode: 'live',
+};
+let undoStack = null;
+let noShowTarget = null;
+let fbDb = null, fbConnected = false;
+let editingEmpId = null;
+let editingVolId = null;
+let newEmpLocs = {gate:false,podium:false,mandir:false,field:false};
+
+// ══════════════════════════════════════════════════
+// PERSISTENCE
+// ══════════════════════════════════════════════════
+function loadLocal() {
+  try {
+    const s = localStorage.getItem('smPro_v2');
+    if (s) Object.assign(state, JSON.parse(s));
+  } catch(e){}
+}
+function saveLocal() {
+  localStorage.setItem('smPro_v2', JSON.stringify({
+    employees:       state.employees,
+    volunteers:      state.volunteers,
+    schedule:        state.schedule,
+    volAvailability: state.volAvailability,
+  }));
+}
+function persistAll() { saveLocal(); pushToFirebase(); }
+
+// ══════════════════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════════════════
+function getFirebaseCfg() {
+  try { return JSON.parse(localStorage.getItem('smPro_fbCfg') || 'null'); } catch(e){ return null; }
+}
+function showFirebaseConfig() {
+  const cfg = getFirebaseCfg();
+  if (cfg) {
+    document.getElementById('fb-apiKey').value     = cfg.apiKey     || '';
+    document.getElementById('fb-authDomain').value = cfg.authDomain || '';
+    document.getElementById('fb-databaseURL').value= cfg.databaseURL|| '';
+    document.getElementById('fb-projectId').value  = cfg.projectId  || '';
+    document.getElementById('fb-appId').value      = cfg.appId      || '';
+    document.getElementById('fb-pin').value        = cfg.pin        || '';
+  }
+  document.getElementById('firebase-modal').classList.remove('hidden');
+}
+function saveFirebaseConfig() {
+  const cfg = {
+    apiKey:      document.getElementById('fb-apiKey').value.trim(),
+    authDomain:  document.getElementById('fb-authDomain').value.trim(),
+    databaseURL: document.getElementById('fb-databaseURL').value.trim(),
+    projectId:   document.getElementById('fb-projectId').value.trim(),
+    appId:       document.getElementById('fb-appId').value.trim(),
+    pin:         document.getElementById('fb-pin').value.trim() || DEFAULT_PIN,
+  };
+  if (!cfg.databaseURL) { alert('Database URL is required'); return; }
+  localStorage.setItem('smPro_fbCfg', JSON.stringify(cfg));
+  closeModal('firebase-modal');
+  initFirebase(cfg);
+}
+async function initFirebase(cfg) {
+  if (!cfg || !cfg.databaseURL) { setSyncStatus('local'); return; }
+  try {
+    setSyncStatus('syncing');
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const existing = getApps();
+    const app = existing.length ? existing[0] : initializeApp(cfg);
+    fbDb = getDatabase(app);
+    fbConnected = true;
+    onValue(ref(fbDb, 'appState'), (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.employees)       state.employees       = data.employees;
+        if (data.volunteers)      state.volunteers      = data.volunteers;
+        if (data.schedule)        state.schedule        = data.schedule;
+        if (data.volAvailability) state.volAvailability = data.volAvailability;
+        saveLocal();
+        renderAll();
+      }
+      setSyncStatus('synced');
+    });
+  } catch(e) {
+    console.warn('Firebase init failed:', e);
+    setSyncStatus('error');
+    fbConnected = false;
+  }
+}
+async function pushToFirebase() {
+  if (!fbConnected || !fbDb) return;
+  try {
+    setSyncStatus('syncing');
+    const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    await set(ref(fbDb, 'appState'), {
+      employees:       state.employees,
+      volunteers:      state.volunteers,
+      schedule:        state.schedule,
+      volAvailability: state.volAvailability,
+    });
+    setSyncStatus('synced');
+  } catch(e) { setSyncStatus('error'); }
+}
+function setSyncStatus(status) {
+  const el = document.getElementById('sync-indicator');
+  el.id = 'sync-indicator';
+  if (status==='synced')  { el.textContent='⬤ synced';  el.className='synced'; }
+  if (status==='syncing') { el.textContent='⬤ syncing…'; el.className='syncing'; }
+  if (status==='error')   { el.textContent='⬤ offline'; el.className='error'; }
+  if (status==='local')   { el.textContent='⬤ local';   el.className=''; }
+}
+
+// ══════════════════════════════════════════════════
+// PIN / MODE
+// ══════════════════════════════════════════════════
+function getPin() {
+  const cfg = getFirebaseCfg();
+  return (cfg && cfg.pin) ? cfg.pin : DEFAULT_PIN;
+}
+function checkPin(e) { if (e.key==='Enter') submitPin(); }
+function submitPin() {
+  const val = document.getElementById('pin-input').value;
+  if (val === getPin()) {
+    enterAdminMode();
+  } else {
+    document.getElementById('pin-error').textContent = '❌ Incorrect PIN';
+    document.getElementById('pin-input').value = '';
+  }
+}
+function enterAdminMode() {
+  state.mode = 'admin';
+  document.getElementById('pin-screen').style.display = 'none';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+  document.getElementById('mode-badge').textContent = 'ADMIN';
+  document.getElementById('mode-badge').className   = 'mode-admin';
+  renderAll();
+}
+function enterLiveMode() {
+  state.mode = 'live';
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('mode-badge').textContent = 'LIVE VIEW';
+  document.getElementById('mode-badge').className   = 'mode-live';
+  showPage('live', document.getElementById('tab-live'));
+}
+
+// Auto live-mode via URL param
+if (new URLSearchParams(location.search).get('view') === 'live') {
+  window.addEventListener('load', () => enterLiveMode());
+}
+
+// ══════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════
+function showPage(page, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
+  if (page==='coverage')   renderCoverage();
+  if (page==='hours')      renderHours();
+  if (page==='live')       renderLiveBoard();
+  if (page==='volunteers') renderVolunteers();
+  if (page==='schedule')   renderSchedule();
+}
+
+// ══════════════════════════════════════════════════
+// CLOCK + LIVE BOARD
+// ══════════════════════════════════════════════════
+function getCurrentSlotIndex() {
+  const now  = new Date();
+  const mins = now.getHours()*60 + now.getMinutes();
+  for (let i = SLOT_START_MINS.length-1; i >= 0; i--) {
+    if (mins >= SLOT_START_MINS[i]) return i;
+  }
+  return 0;
+}
+function getTodayDay() {
+  return ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
+}
+function startClock() {
+  function tick() {
+    const now  = new Date();
+    const h    = now.getHours(), m = now.getMinutes();
+    const ampm = h>=12?'PM':'AM';
+    const hh   = h%12||12;
+    const mm   = String(m).padStart(2,'0');
+    document.getElementById('live-clock').textContent = `${hh}:${mm} ${ampm}`;
+    const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('live-date-label').textContent =
+      `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()} — current slot highlighted`;
+  }
+  tick(); setInterval(tick, 1000);
+}
+function renderLiveBoard() {
+  const board    = document.getElementById('live-board');
+  const todayDay = getTodayDay();
+  const si       = getCurrentSlotIndex();
+  const slotData = state.schedule[todayDay]?.[si] || {};
+
+  const nextSlots = [];
+  for (let i=si+1; i<=si+3 && i<TIME_SLOTS.length; i++) nextSlots.push(i);
+
+  board.innerHTML = REQUIRED.map(loc => {
+    const assigned = state.employees.filter(emp => slotData[emp.id]===loc);
+    const covered  = assigned.length > 0;
+    const hdrBg    = loc==='Gate'?'#1D4ED8': loc==='Podium'?'#15803D':'#C2410C';
+
+    const nextRows = nextSlots.map(ni => {
+      const nd  = state.schedule[todayDay]?.[ni] || {};
+      const nes = state.employees.filter(e => nd[e.id]===loc);
+      return `<div class="live-next-slot">
+        <span style="font-family:'DM Mono',monospace">${TIME_SLOTS[ni].split('–')[0].trim()}</span>
+        <span style="font-weight:600;color:${nes.length?'#1B2A4A':'#EF4444'}">${nes.length ? nes.map(e=>e.name.split(' ')[0]).join(', ') : '❌ OPEN'}</span>
+      </div>`;
+    }).join('');
+
+    const suggestBtn = (state.mode==='admin' && !covered)
+      ? `<button class="btn btn-sm btn-warn mt12" style="margin-top:10px" onclick="showSuggestFor('${todayDay}',${si},'${loc}')">💡 Find Coverage</button>`
+      : '';
+
+    return `<div class="live-card">
+      <div class="live-card-hdr" style="background:${hdrBg}">
+        <h3>${loc}</h3>
+        <span style="font-size:11px;color:rgba(255,255,255,.7)">${TIME_SLOTS[si]}</span>
+      </div>
+      <div class="live-card-body">
+        ${covered
+          ? assigned.map(e=>`<div class="live-name">${e.name}</div><div class="live-sub">${e.status}</div>`).join('')
+          : `<div class="live-uncovered">❌ UNCOVERED</div><div class="live-sub">Nobody assigned right now</div>`
+        }
+        ${suggestBtn}
+        ${nextSlots.length ? `<div class="live-next"><div class="live-next-title">Coming Up</div>${nextRows}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Volunteers today
+  const volDiv   = document.getElementById('live-volunteers');
+  const availVols = state.volunteers.filter(v => state.volAvailability?.[v.id]?.[todayDay]);
+  volDiv.innerHTML = availVols.length
+    ? `<div class="live-volunteer-row">${availVols.map(v=>`<span class="vol-chip">🙋 ${v.name}${v.note?' · '+v.note:''}</span>`).join('')}</div>`
+    : '<span style="color:#64748B;font-size:12px">No volunteers marked available today.</span>';
+}
+
+// ══════════════════════════════════════════════════
+// EMPLOYEES
+// ══════════════════════════════════════════════════
+function genId() { return '_'+Math.random().toString(36).slice(2,9); }
+
+function addEmployeeObj(name, locs, status) {
+  const emp = { id:genId(), name, locs, status };
+  state.employees.push(emp);
+  DAYS.forEach(day => {
+    if (!state.schedule[day]) state.schedule[day] = {};
+    TIME_SLOTS.forEach((_,si) => {
+      if (!state.schedule[day][si]) state.schedule[day][si] = {};
+      state.schedule[day][si][emp.id] = 'OFF';
+    });
+  });
+}
+function openAddEmployee() {
+  editingEmpId = null;
+  newEmpLocs   = {gate:false,podium:false,mandir:false,field:false};
+  document.getElementById('emp-name').value   = '';
+  document.getElementById('emp-status').value = 'Active';
+  document.getElementById('modal-title').textContent = 'Add Employee';
+  updateLocToggles();
+  document.getElementById('emp-modal').classList.remove('hidden');
+}
+function editEmployee(id) {
+  const emp  = state.employees.find(e=>e.id===id);
+  editingEmpId = id;
+  newEmpLocs   = {...emp.locs};
+  document.getElementById('emp-name').value   = emp.name;
+  document.getElementById('emp-status').value = emp.status;
+  document.getElementById('modal-title').textContent = 'Edit Employee';
+  updateLocToggles();
+  document.getElementById('emp-modal').classList.remove('hidden');
+}
+function toggleLoc(loc) { newEmpLocs[loc]=!newEmpLocs[loc]; updateLocToggles(); }
+function updateLocToggles() {
+  ['gate','podium','mandir','field'].forEach(loc => {
+    const btn = document.getElementById('tog-'+loc);
+    btn.className = 'loc-toggle'+(newEmpLocs[loc]?' sel-'+loc:'');
+  });
+}
+function saveEmployee() {
+  const name = document.getElementById('emp-name').value.trim();
+  if (!name) { alert('Please enter a name'); return; }
+  const status = document.getElementById('emp-status').value;
+  if (editingEmpId) {
+    const emp = state.employees.find(e=>e.id===editingEmpId);
+    emp.name=name; emp.locs={...newEmpLocs}; emp.status=status;
+  } else {
+    addEmployeeObj(name, {...newEmpLocs}, status);
+  }
+  closeModal('emp-modal');
+  persistAll(); renderRoster(); renderSchedule(); renderHours(); renderLiveBoard();
+}
+function deleteEmployee(id) {
+  if (!confirm('Remove this employee from all schedules?')) return;
+  state.employees = state.employees.filter(e=>e.id!==id);
+  DAYS.forEach(day => {
+    TIME_SLOTS.forEach((_,si) => {
+      if (state.schedule[day]?.[si]) delete state.schedule[day][si][id];
+    });
+    if (state.schedule[day] && !Object.keys(state.schedule[day]).some(si =>
+      Object.keys(state.schedule[day][si]||{}).length > 0)) {
+      delete state.schedule[day];
+    }
+  });
+  persistAll(); renderRoster(); renderSchedule(); renderHours(); renderLiveBoard();
+}
+function renderRoster() {
+  const tbody = document.getElementById('roster-body');
+  if (!state.employees.length) {
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:24px;color:#64748B">No employees — click "Add Employee"</td></tr>';
+    return;
+  }
+  tbody.innerHTML = state.employees.map((emp,i) => {
+    const total     = calcEmpWeekHrs(emp.id);
+    const remaining = Math.max(0, 40-total);
+    const pct       = Math.min(100,(total/40)*100);
+    const barColor  = total>40?'#EF4444':total>=38?'#F59E0B':'#22C55E';
+    const badge     = total>40?'badge-over':total>=38?'badge-warn':'badge-ok';
+    const badgeTxt  = total>40?'⚠️ OVER':total>=38?'⚡ NEAR':'✅ OK';
+    const sBg = {Active:'#DCFCE7','Day Off':'#F1F5F9',Vacation:'#F3E8FF',Sick:'#FEE2E2'}[emp.status]||'#F1F5F9';
+    const sTx = {Active:'#166534','Day Off':'#374151',Vacation:'#7E22CE',Sick:'#991B1B'}[emp.status]||'#374151';
+    const remColor = remaining<=2?'#EF4444':remaining<=8?'#F59E0B':'#22C55E';
+    return `<tr>
+      <td style="font-weight:700;color:#64748B">${i+1}</td>
+      <td style="font-weight:600">${emp.name}</td>
+      ${['gate','podium','mandir','field'].map(l=>
+        `<td><span class="loc-check ${emp.locs[l]?'loc-yes':'loc-no'}">${emp.locs[l]?'✓':'✗'}</span></td>`
+      ).join('')}
+      <td><span style="padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:${sBg};color:${sTx}">${emp.status}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="hrs-bar-wrap"><div class="hrs-bar" style="width:${pct}%;background:${barColor}"></div></div>
+          <span style="font-weight:700;font-size:12px">${total.toFixed(1)}h</span>
+          <span class="badge ${badge}" style="font-size:10px">${badgeTxt}</span>
+        </div>
+      </td>
+      <td><span class="remaining-chip" style="background:${remColor}22;color:${remColor}">${remaining.toFixed(1)}h left</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8" onclick="editEmployee('${emp.id}')">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${emp.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// VOLUNTEERS
+// ══════════════════════════════════════════════════
+function addVolunteerObj(name, note) {
+  const vol = { id:genId(), name, note:note||'' };
+  state.volunteers.push(vol);
+  if (!state.volAvailability) state.volAvailability = {};
+  state.volAvailability[vol.id] = {};
+  DAYS.forEach(d => state.volAvailability[vol.id][d] = false);
+}
+function openAddVolunteer() {
+  editingVolId = null;
+  document.getElementById('vol-name').value = '';
+  document.getElementById('vol-note').value = '';
+  document.getElementById('vol-modal-title').textContent = 'Add Volunteer';
+  document.getElementById('vol-modal').classList.remove('hidden');
+}
+function saveVolunteer() {
+  const name = document.getElementById('vol-name').value.trim();
+  if (!name) { alert('Please enter a name'); return; }
+  const note = document.getElementById('vol-note').value.trim();
+  if (editingVolId) {
+    const vol = state.volunteers.find(v=>v.id===editingVolId);
+    vol.name=name; vol.note=note;
+  } else {
+    addVolunteerObj(name, note);
+  }
+  closeModal('vol-modal');
+  persistAll(); renderVolunteers(); renderLiveBoard();
+}
+function deleteVolunteer(id) {
+  if (!confirm('Remove this volunteer?')) return;
+  state.volunteers = state.volunteers.filter(v=>v.id!==id);
+  delete state.volAvailability[id];
+  persistAll(); renderVolunteers(); renderLiveBoard();
+}
+function toggleVolAvail(volId, day) {
+  if (!state.volAvailability[volId]) state.volAvailability[volId] = {};
+  state.volAvailability[volId][day] = !state.volAvailability[volId][day];
+  persistAll(); renderVolunteers(); renderLiveBoard();
+}
+function renderVolunteers() {
+  const div = document.getElementById('volunteer-list');
+  if (!state.volunteers.length) {
+    div.innerHTML='<div class="card" style="padding:24px;text-align:center;color:#64748B">No volunteers — click "Add Volunteer"</div>';
+    return;
+  }
+  div.innerHTML = state.volunteers.map(vol => {
+    const avail   = state.volAvailability?.[vol.id] || {};
+    const dayCols = DAYS.map(day=>`
+      <div class="vol-day-col">
+        <div class="vol-day-hdr">${day}</div>
+        <div style="padding:8px;text-align:center">
+          <label class="toggle-switch">
+            <input type="checkbox" ${avail[day]?'checked':''} onchange="toggleVolAvail('${vol.id}','${day}')">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>`).join('');
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="card-hdr" style="justify-content:space-between">
+        <div>
+          <h2>${vol.name}</h2>
+          ${vol.note?`<span style="font-size:11px;color:#64748B">${vol.note}</span>`:''}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8"
+            onclick="editingVolId='${vol.id}';document.getElementById('vol-name').value='${vol.name.replace(/'/g,"\\\\'")}';document.getElementById('vol-note').value='${(vol.note||'').replace(/'/g,"\\\\'")}';document.getElementById('vol-modal-title').textContent='Edit Volunteer';document.getElementById('vol-modal').classList.remove('hidden')">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${vol.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="vol-day-grid">${dayCols}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// SCHEDULE
+// ══════════════════════════════════════════════════
+function initDayNav() {
+  const nav = document.getElementById('day-nav');
+  nav.innerHTML = DAYS.map(d=>
+    `<button class="day-btn ${d===state.currentDay?'active':''}" id="daybtn-${d}" onclick="switchDay('${d}',this)">${d}</button>`
+  ).join('');
+  buildCopyBtns();
+}
+function buildCopyBtns() {
+  const row = document.getElementById('copy-day-btns');
+  if (!row) return;
+  row.innerHTML = DAYS.map(d=>
+    `<button class="btn btn-sm" style="background:#F1F5F9;color:#64748B" onclick="copyDayTo('${d}')">${d}</button>`
+  ).join('');
+}
+function copyDayTo(targetDay) {
+  if (targetDay===state.currentDay) { showToast('Already on this day'); return; }
+  if (!confirm(`Copy all ${state.currentDay} assignments to ${targetDay}? This will overwrite ${targetDay}.`)) return;
+  const src = state.schedule[state.currentDay] || {};
+  if (!state.schedule[targetDay]) state.schedule[targetDay] = {};
+  TIME_SLOTS.forEach((_,si) => {
+    state.schedule[targetDay][si] = {...(src[si]||{})};
+  });
+  persistAll(); updateDayIssues();
+  showToast(`✅ Copied ${state.currentDay} → ${targetDay}`);
+}
+function switchDay(day, btn) {
+  state.currentDay = day;
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderSchedule();
+}
+function renderSchedule() {
+  const day      = state.currentDay;
+  if (!state.schedule[day]) state.schedule[day] = {};
+  const todaySlot = (getTodayDay()===day) ? getCurrentSlotIndex() : -1;
+
+  // Header with remaining hours
+  const empCols = state.employees.map(emp => {
+    const rem      = Math.max(0, 40-calcEmpWeekHrs(emp.id));
+    const remColor = rem<=0?'#EF4444':rem<=4?'#F59E0B':'#22C55E';
+    return `<th style="min-width:110px">
+      ${emp.name.split(' ')[0]}<br>
+      <span style="font-weight:400;font-size:9px;opacity:.7">${emp.name.split(' ').slice(1).join(' ')}</span><br>
+      <span style="font-size:9px;font-weight:700;color:${remColor}">${rem.toFixed(1)}h left</span>
+    </th>`;
+  }).join('');
+  document.getElementById('sched-head').innerHTML = `<tr>
+    <th style="min-width:155px;text-align:left">Time Slot</th>
+    ${empCols}
+    <th style="background:#1D4ED8;min-width:70px">Gate</th>
+    <th style="background:#15803D;min-width:70px">Podium</th>
+    <th style="background:#C2410C;min-width:70px">Mandir</th>
+  </tr>`;
+
+  let issueCount = 0;
+  const gapList  = [];
+
+  document.getElementById('sched-body').innerHTML = TIME_SLOTS.map((slot,si) => {
+    const isLunch   = LUNCH_SLOTS.includes(si);
+    const isCurrent = si===todaySlot;
+    const slotData  = state.schedule[day]?.[si] || {};
+
+    const empCells = state.employees.map(emp => {
+      const val = slotData[emp.id] || 'OFF';
+      const cls = LOC_CLASS[val] || 'off';
+      return `<td><select class="loc-select loc-${cls}" onchange="setSlot('${day}',${si},'${emp.id}',this.value,this)">${buildOpts(emp,val)}</select></td>`;
+    }).join('');
+
+    const covCells = REQUIRED.map(req => {
+      const covered = state.employees.some(emp => slotData[emp.id]===req);
+      if (!covered) { issueCount++; gapList.push({day,si,req}); }
+      return `<td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✅':'❌'}</td>`;
+    }).join('');
+
+    return `<tr class="${isCurrent?'current-row':''}">
+      <td class="slot-label ${isLunch?'lunch-slot':''} ${isCurrent?'current-slot':''}">${isLunch?'🍽️ ':isCurrent?'▶ ':''} ${slot}</td>
+      ${empCells}${covCells}
+    </tr>`;
+  }).join('');
+
+  // Alert banner
+  const alertEl = document.getElementById('coverage-alert');
+  if (issueCount>0) {
+    alertEl.style.display='flex';
+    alertEl.className='alert alert-danger';
+    alertEl.textContent=`⚠️ ${issueCount} coverage gap${issueCount>1?'s':''} on ${day} — see ❌ cells below`;
+  } else {
+    alertEl.style.display='none';
+  }
+
+  renderSuggestArea(gapList);
+  updateDayIssues();
+}
+function buildOpts(emp, selected) {
+  const approved = [];
+  if (emp.locs.gate)   approved.push('Gate');
+  if (emp.locs.podium) approved.push('Podium');
+  if (emp.locs.mandir) approved.push('Mandir');
+  if (emp.locs.field)  approved.push('Field Work');
+  const all = [...approved, 'LUNCH','OFF','VACATION'];
+  if (!all.includes(selected)) all.unshift(selected);
+  return all.map(o=>`<option value="${o}" ${o===selected?'selected':''}>${o}</option>`).join('');
+}
+function setSlot(day, si, empId, value, sel) {
+  const emp        = state.employees.find(e=>e.id===empId);
+  const currentVal = state.schedule[day]?.[si]?.[empId] || 'OFF';
+  const isWorking  = v => v && v!=='OFF' && v!=='LUNCH' && v!=='VACATION';
+
+  // 40hr guard
+  if (isWorking(value) && !isWorking(currentVal)) {
+    const hrs = calcEmpWeekHrs(empId);
+    if (hrs+SLOT_HRS[si] > 40) {
+      if (!confirm(`⚠️ This will put ${emp.name} over 40hrs (currently ${hrs.toFixed(1)}h). Continue?`)) {
+        sel.value     = currentVal;
+        sel.className = `loc-select loc-${LOC_CLASS[currentVal]||'off'}`;
+        return;
+      }
+    }
+  }
+
+  // Save for undo
+  undoStack = { day, si, empId, oldVal: currentVal };
+
+  if (!state.schedule[day])     state.schedule[day]     = {};
+  if (!state.schedule[day][si]) state.schedule[day][si] = {};
+  state.schedule[day][si][empId] = value;
+  sel.className = `loc-select loc-${LOC_CLASS[value]||'off'}`;
+
+  persistAll();
+  renderSchedule();
+  showUndoToast(`${emp.name} → ${value}`);
+}
+function updateDayIssues() {
+  DAYS.forEach(day => {
+    let issues = 0;
+    TIME_SLOTS.forEach((_,si) => {
+      const sd = state.schedule[day]?.[si] || {};
+      REQUIRED.forEach(req => {
+        if (!state.employees.some(emp => sd[emp.id]===req)) issues++;
+      });
+    });
+    const btn = document.getElementById('daybtn-'+day);
+    if (btn) { btn.classList.toggle('has-issue', issues>0); btn.title=issues>0?`${issues} gaps`:''; }
+  });
+}
+function renderSuggestArea(gaps) {
+  const area = document.getElementById('suggest-area');
+  if (!gaps.length || state.mode!=='admin') { area.innerHTML=''; return; }
+  const seen = new Set();
+  const panels = gaps.filter(g=>{ if(seen.has(g.req)) return false; seen.add(g.req); return true; })
+    .map(({day,si,req}) => {
+      const key = req==='Gate'?'gate':req==='Podium'?'podium':req==='Mandir'?'mandir':'field';
+      const candidates = state.employees.filter(emp => emp.locs[key] && calcEmpWeekHrs(emp.id)<40);
+      if (!candidates.length) return '';
+      return `<div class="suggest-panel">
+        <strong>💡 ${req} needs coverage — click to fill:</strong><br><br>
+        ${candidates.map(c=>{
+          const rem=(40-calcEmpWeekHrs(c.id)).toFixed(1);
+          return `<span class="suggest-chip" onclick="quickFill('${day}',${si},'${c.id}','${req}')">${c.name} (${rem}h left)</span>`;
+        }).join('')}
+      </div>`;
+    }).join('');
+  area.innerHTML = panels;
+}
+function showSuggestFor(day, si, req) {
+  const key = req==='Gate'?'gate':req==='Podium'?'podium':req==='Mandir'?'mandir':'field';
+  const candidates = state.employees.filter(emp => emp.locs[key] && calcEmpWeekHrs(emp.id)<40);
+  document.getElementById('noshow-msg').textContent = `${req} is uncovered at ${TIME_SLOTS[si]}`;
+  document.getElementById('noshow-suggestions').innerHTML = candidates.length
+    ? candidates.map(c=>{
+        const rem=(40-calcEmpWeekHrs(c.id)).toFixed(1);
+        return `<span class="suggest-chip" onclick="quickFill('${day}',${si},'${c.id}','${req}');closeModal('noshow-modal')">${c.name} (${rem}h left)</span>`;
+      }).join('')
+    : '<span style="color:#64748B">No approved employees with hours remaining.</span>';
+  document.getElementById('noshow-modal').classList.remove('hidden');
+}
+function quickFill(day, si, empId, loc) {
+  if (!state.schedule[day])     state.schedule[day]     = {};
+  if (!state.schedule[day][si]) state.schedule[day][si] = {};
+  state.schedule[day][si][empId] = loc;
+  persistAll(); renderSchedule(); renderLiveBoard();
+  showToast(`✅ Filled ${loc} → ${state.employees.find(e=>e.id===empId)?.name}`);
+}
+
+// ══════════════════════════════════════════════════
+// COVERAGE
+// ══════════════════════════════════════════════════
+function renderCoverage() {
+  const summary = document.getElementById('coverage-summary');
+  const daysDiv = document.getElementById('coverage-days');
+  summary.innerHTML = DAYS.map(day => {
+    let total=0, issues=0;
+    TIME_SLOTS.forEach((_,si) => {
+      const sd = state.schedule[day]?.[si] || {};
+      REQUIRED.forEach(req => { total++; if (!state.employees.some(emp=>sd[emp.id]===req)) issues++; });
+    });
+    const pct=Math.round(((total-issues)/total)*100);
+    const tc=issues===0?'#166534':issues<5?'#92400E':'#991B1B';
+    return `<div class="card" style="text-align:center;padding:14px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:${DAY_COLORS[day]}">${day}</div>
+      <div style="font-size:24px;font-weight:800;margin:6px 0;color:${tc}">${pct}%</div>
+      <div style="font-size:11px;color:#64748B">${issues===0?'✅ Fully Covered':`❌ ${issues} gap${issues>1?'s':''}`}</div>
+    </div>`;
+  }).join('');
+  daysDiv.innerHTML = DAYS.map(day => {
+    const slots = TIME_SLOTS.map((slot,si) => {
+      const sd  = state.schedule[day]?.[si] || {};
+      const cov = REQUIRED.map(req=>({req,covered:state.employees.some(emp=>sd[emp.id]===req)}));
+      const hasIssue = cov.some(c=>!c.covered);
+      return `<div class="cov-slot ${hasIssue?'issue':''}">
+        <span style="font-size:10px;color:#64748B;font-family:'DM Mono',monospace">${LUNCH_SLOTS.includes(si)?'🍽️ ':''}${slot}</span>
+        <div class="cov-locs">${cov.map(c=>`<span title="${c.req}" style="font-size:13px">${c.covered?'✅':'❌'}</span>`).join('')}</div>
+      </div>`;
+    }).join('');
+    return `<div class="cov-day-card">
+      <div class="cov-day-hdr" style="background:${DAY_COLORS[day]}">${day} &nbsp;·&nbsp; <span style="font-size:10px;opacity:.75">Gate | Podium | Mandir</span></div>
+      <div class="cov-slots">${slots}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// HOURS
+// ══════════════════════════════════════════════════
+function calcEmpWeekHrs(empId) {
+  let total=0;
+  DAYS.forEach(day => {
+    TIME_SLOTS.forEach((_,si) => {
+      const val = state.schedule[day]?.[si]?.[empId];
+      if (val && val!=='OFF' && val!=='LUNCH' && val!=='VACATION') total+=SLOT_HRS[si];
+    });
+  });
+  return total;
+}
+function calcEmpDayHrs(empId, day) {
+  let work=0, lunch=0;
+  TIME_SLOTS.forEach((_,si) => {
+    const val = state.schedule[day]?.[si]?.[empId];
+    if (!val || val==='OFF' || val==='VACATION') return;
+    if (val==='LUNCH') lunch+=SLOT_HRS[si]; else work+=SLOT_HRS[si];
+  });
+  return {work, lunch};
+}
+function renderHours() {
+  const grid    = document.getElementById('hrs-grid');
+  const alertEl = document.getElementById('hours-alert');
+  if (!state.employees.length) {
+    grid.innerHTML='<p style="color:#64748B">No employees yet</p>';
+    alertEl.style.display='none'; return;
+  }
+  let overCount=0;
+  grid.innerHTML = state.employees.map(emp => {
+    const total     = calcEmpWeekHrs(emp.id);
+    const remaining = Math.max(0, 40-total);
+    const pct       = Math.min(100,(total/40)*100);
+    const barColor  = total>40?'#EF4444':total>=38?'#F59E0B':'#22C55E';
+    const badge     = total>40?'badge-over':total>=38?'badge-warn':'badge-ok';
+    const badgeTxt  = total>40?'⚠️ Over 40hrs!':total>=38?'⚡ Near Limit':'✅ On Track';
+    if (total>40) overCount++;
+    const dayRows = DAYS.map(day => {
+      const {work,lunch} = calcEmpDayHrs(emp.id, day);
+      const locs = [...new Set(TIME_SLOTS.map((_,si)=>state.schedule[day]?.[si]?.[emp.id]).filter(v=>v&&v!=='OFF'&&v!=='VACATION'))];
+      const locsStr = locs.length
+        ? locs.map(l=>`<span class="badge badge-${LOC_CLASS[l]||'off'}" style="font-size:9px;padding:1px 5px">${l==='Field Work'?'Field':l==='LUNCH'?'🍽️':l}</span>`).join(' ')
+        : '<span style="color:#64748B;font-size:11px">OFF</span>';
+      const lNote = lunch>0?`<span style="font-size:10px;color:#64748B"> +${lunch.toFixed(1)}h lunch</span>`:'';
+      return `<div class="day-row">
+        <span style="font-weight:600;color:#64748B;width:36px">${day}</span>
+        <span style="flex:1;padding:0 8px">${locsStr}</span>
+        <span style="font-weight:700;color:#1B2A4A">${work.toFixed(1)}h${lNote}</span>
+      </div>`;
+    }).join('');
+    return `<div class="emp-hrs-card">
+      <div class="emp-hrs-hdr"><span>${emp.name}</span><span class="badge ${badge}">${badgeTxt}</span></div>
+      <div class="emp-hrs-body">
+        <div class="hrs-progress"><div class="hrs-progress-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748B;margin-bottom:10px">
+          <span>0h</span>
+          <span style="color:${barColor};font-weight:700">${total.toFixed(1)}h worked</span>
+          <span style="color:${remaining<=0?'#EF4444':'#64748B'}">📋 ${remaining.toFixed(1)}h left</span>
+          <span>40h</span>
+        </div>
+        ${dayRows}
+        <div class="total-row"><span>Total Week</span><span style="color:${barColor}">${total.toFixed(1)} / 40 hrs</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  if (overCount>0) {
+    alertEl.style.display='flex';
+    alertEl.className='alert alert-danger';
+    alertEl.textContent=`⚠️ ${overCount} employee${overCount>1?'s are':' is'} over 40 hours this week.`;
+  } else { alertEl.style.display='none'; }
+}
+
+// ══════════════════════════════════════════════════
+// UNDO
+// ══════════════════════════════════════════════════
+let undoTimer=null;
+function showUndoToast(msg) {
+  document.getElementById('undo-msg').textContent=msg;
+  const toast=document.getElementById('undo-toast');
+  toast.classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>{toast.classList.remove('show');undoStack=null;},5000);
+}
+function showToast(msg) {
+  document.getElementById('undo-msg').textContent=msg;
+  const toast=document.getElementById('undo-toast');
+  toast.classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>toast.classList.remove('show'),3000);
+}
+function undoLastChange() {
+  if (!undoStack) return;
+  const {day,si,empId,oldVal}=undoStack;
+  if (!state.schedule[day])     state.schedule[day]    ={};
+  if (!state.schedule[day][si]) state.schedule[day][si]={};
+  state.schedule[day][si][empId]=oldVal;
+  undoStack=null;
+  document.getElementById('undo-toast').classList.remove('show');
+  persistAll(); renderSchedule(); renderLiveBoard();
+  showToast('↩ Change undone');
+}
+
+// ══════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// ══════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════
+function renderAll() {
+  renderRoster(); renderSchedule(); renderCoverage();
+  renderHours(); renderVolunteers(); renderLiveBoard();
+}
+function seedData() {
+  [{name:'Raj Patel',   locs:{gate:true, podium:true, mandir:true, field:true},  status:'Active'},
+   {name:'Meera Shah',  locs:{gate:true, podium:false,mandir:true, field:true},  status:'Active'},
+   {name:'Amit Kumar',  locs:{gate:true, podium:true, mandir:false,field:true},  status:'Active'},
+   {name:'Priya Singh', locs:{gate:false,podium:true, mandir:true, field:true},  status:'Active'},
+   {name:'Vikram Nair', locs:{gate:true, podium:true, mandir:true, field:false}, status:'Active'},
+  ].forEach(e=>addEmployeeObj(e.name,e.locs,e.status));
+  [{name:'Anita Mehta',note:''},{name:'Dev Sharma',note:'Weekends only'}]
+    .forEach(v=>addVolunteerObj(v.name,v.note));
+  persistAll();
+}
+
+loadLocal();
+if (!state.employees.length) seedData();
+const fbCfg = getFirebaseCfg();
+if (fbCfg && fbCfg.databaseURL) initFirebase(fbCfg); else setSyncStatus('local');
+initDayNav();
+startClock();
+setInterval(renderLiveBoard, 60000);
+renderAll();
+</script>
+</body>
+</html>
