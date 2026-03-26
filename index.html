@@ -258,8 +258,15 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 }
 </style>
 </head>
+<body>
 
-  <!-- ══ PIN SCREEN ══ -->
+
+
+
+
+
+
+<!-- ══ PIN SCREEN ══ -->
 <div id="pin-screen" class="pin-screen">
   <div class="pin-box">
     <div style="font-size:40px;margin-bottom:8px">🏢</div>
@@ -576,6 +583,13 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
   <button class="undo-btn" onclick="undoLastChange()">↩ Undo</button>
 </div>
 
+
+
+
+
+
+
+
   <script>
 // ══════════════════════════════════════════════════
 // CONSTANTS
@@ -639,7 +653,6 @@ let undoStack=null,fbDb=null,fbConnected=false;
 let editingEmpId=null,editingVolId=null,editingLeaveId=null;
 let newEmpDisallowed={gate:false,podium:false,mandir:false,field:false,giftshop:false};
 let densityMode='normal';
-// Plan Schedule modal state
 let planEmpId=null,planWeekMon=null,planDraft={};
 
 // ══════════════════════════════════════════════════
@@ -676,7 +689,8 @@ function migrateScheduleKeys(){
 function saveLocal(){
   localStorage.setItem('smPro_v3',JSON.stringify({
     employees:state.employees,volunteers:state.volunteers,
-    schedule:state.schedule,volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
+    schedule:state.schedule,volAvailability:state.volAvailability,
+    leaveRequests:state.leaveRequests,
   }));
 }
 function persistAll(){saveLocal();pushToFirebase();}
@@ -704,7 +718,8 @@ function pushToFirebase(){
   setSyncStatus('syncing');
   fbDb.ref('smPro').set({
     employees:state.employees,volunteers:state.volunteers,
-    schedule:state.schedule,volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
+    schedule:state.schedule,volAvailability:state.volAvailability,
+    leaveRequests:state.leaveRequests,
   }).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('error'));
 }
 function setSyncStatus(s){
@@ -717,8 +732,7 @@ function showFirebaseConfig(){
   ['apiKey','authDomain','databaseURL','projectId','appId'].forEach(k=>{
     const el=document.getElementById('fb-'+k);if(el)el.value=cfg[k]||'';
   });
-  const pin=localStorage.getItem('smPro_pin')||'';
-  document.getElementById('fb-pin').value=pin;
+  document.getElementById('fb-pin').value=localStorage.getItem('smPro_pin')||'';
   openModal('firebase-modal');
 }
 function saveFirebaseConfig(){
@@ -811,7 +825,6 @@ function renderWeekNav(){
       <span class="issue-dot"></span>
     </button>`;
   }).join('');
-  // Copy day buttons inside advanced tools
   const copyBtns=document.getElementById('copy-day-btns');
   if(copyBtns){
     copyBtns.innerHTML=weekDates.map((d,i)=>{
@@ -875,7 +888,7 @@ function renderSchedule(){
   const cm=densityMode==='compact';
   const now=new Date(),nowMins=now.getHours()*60+now.getMinutes(),isToday=iso===todayISO();
 
-  // Build coverage alert
+  // Coverage alert
   let totalIssues=0;
   TIME_SLOTS.forEach((_,si)=>REQUIRED.forEach(loc=>{if(!isLocCovered(iso,si,loc))totalIssues++;}));
   const alertEl=document.getElementById('coverage-alert');
@@ -884,14 +897,14 @@ function renderSchedule(){
     alertEl.textContent=`⚠️ ${totalIssues} coverage gap${totalIssues>1?'s':''} on this day — fix the red ❌ cells below.`;
   }else{alertEl.classList.add('hidden');}
 
-  // THEAD: Time Slot | emp1 | emp2 | ... | Gate | Podium | Mandir
+  // THEAD
   const thead=document.getElementById('sched-head');
   let hRow=`<tr><th class="${cm?'compact-mode':''}">Time Slot</th>`;
   emps.forEach(emp=>{
     const firstName=emp.name.split(' ')[0];
-    const hrs=calcEmpHours(emp.id,iso);
+    const hrsLeft=calcEmpHours(emp.id,iso);
     hRow+=`<th class="${cm?'compact-mode':''}" title="${emp.name}">
-      ${firstName}<br><span style="font-size:9px;opacity:.8">${hrs.toFixed(1)}h left</span>
+      ${firstName}<br><span style="font-size:9px;opacity:.8">${hrsLeft.toFixed(1)}h left</span>
     </th>`;
   });
   REQUIRED.forEach(loc=>{hRow+=`<th class="${cm?'compact-mode':''}">${loc}</th>`;});
@@ -900,14 +913,15 @@ function renderSchedule(){
 
   // TBODY
   const tbody=document.getElementById('sched-body');
-  let rows='';
   const slotData=state.schedule[iso]||{};
+  let rows='';
 
   TIME_SLOTS.forEach((slot,si)=>{
     const isLunch=LUNCH_SLOTS.includes(si);
     const isCurrent=isToday&&nowMins>=SLOT_START_MINS[si]&&(si===TIME_SLOTS.length-1||nowMins<SLOT_START_MINS[si+1]);
     let row=`<tr class="${isCurrent?'current-row':''}">`;
-    // Time label (sticky)
+
+    // Sticky time label
     row+=`<td class="slot-label${isLunch?' lunch-slot':''}${isCurrent?' current-slot':''}">${slot}</td>`;
 
     // Employee cells
@@ -920,14 +934,16 @@ function renderSchedule(){
       const curLoc=(slotData[si]||{})[emp.id]||'OFF';
       const locCls=LOC_CLASS[curLoc]||'off';
       if(isAdmin){
-        let opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curLoc?'selected':''}>${o}</option>`).join('');
+        const opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curLoc?'selected':''}>${o}</option>`).join('');
         row+=`<td class="${cm?'compact-mode':''}">
-          <select class="loc-select loc-${locCls} ${cm?'compact-mode':''}"
+          <select class="loc-select loc-${locCls}${cm?' compact-mode':''}"
             onchange="handleLocChange('${iso}',${si},'${emp.id}',this)"
-            ${emp.disallowedLocs&&emp.disallowedLocs[curLoc.toLowerCase().replace(' ','')]?'':''}
-          >${opts}</select></td>`;
+          >${opts}</select>
+        </td>`;
       }else{
-        row+=`<td class="${cm?'compact-mode':''}"><div class="loc-select loc-${locCls}" style="padding:4px 6px;border-radius:5px;font-size:11px;font-weight:600">${curLoc}</div></td>`;
+        row+=`<td class="${cm?'compact-mode':''}">
+          <div style="padding:4px 6px;border-radius:5px;font-size:11px;font-weight:600" class="loc-select loc-${locCls}">${curLoc}</div>
+        </td>`;
       }
     });
 
@@ -941,33 +957,394 @@ function renderSchedule(){
   });
   tbody.innerHTML=rows;
 
-  // Suggestions
   if(isAdmin)renderSuggestions(iso);
 }
 
 function calcEmpHours(empId,iso){
   const slotData=state.schedule[iso]||{};
-  let total=0;
+  let worked=0;
   TIME_SLOTS.forEach((_,si)=>{
     const loc=(slotData[si]||{})[empId];
-    if(loc&&loc!=='OFF'&&loc!=='VACATION')total+=SLOT_HRS[si];
+    if(loc&&loc!=='OFF'&&loc!=='VACATION')worked+=SLOT_HRS[si];
   });
-  const maxHrs=8;
-  return Math.max(0,maxHrs-total);
+  return Math.max(0,8-worked);
 }
 
 function handleLocChange(iso,si,empId,selectEl){
   const newLoc=selectEl.value;
   const prev=((state.schedule[iso]||{})[si]||{})[empId]||'OFF';
   undoStack={iso,si,empId,prev};
-  setSlotData(iso,si,empId,newLoc);
-  const locCls=LOC_CLASS[newLoc]||'off';
-  selectEl.className=`loc-select loc-${locCls} ${densityMode==='compact'?'compact-mode':''}`;
+  setSlotData(iso,Number(si),empId,newLoc);
   persistAll();
-  // Re-render coverage cells only
   renderSchedule();
   showUndo(`${empId} → ${newLoc}`);
 }
+
+// ══════════════════════════════════════════════════
+// SUGGESTIONS
+// ══════════════════════════════════════════════════
+function renderSuggestions(iso){
+  const area=document.getElementById('suggest-area');
+  const gaps=[];
+  TIME_SLOTS.forEach((_,si)=>{
+    REQUIRED.forEach(loc=>{if(!isLocCovered(iso,si,loc))gaps.push({si,loc});});
+  });
+  if(!gaps.length){area.innerHTML='';return;}
+  let html=`<div class="suggest-panel"><strong>💡 Quick-fill suggestions:</strong><br>`;
+  gaps.slice(0,6).forEach(({si,loc})=>{
+    const candidates=state.employees.filter(emp=>{
+      if(isOnLeave(emp.id,iso))return false;
+      const curLoc=((state.schedule[iso]||{})[si]||{})[emp.id]||'OFF';
+      if(curLoc!=='OFF')return false;
+      const key=loc.toLowerCase().replace(' ','');
+      return!(emp.disallowedLocs&&emp.disallowedLocs[key]);
+    });
+    if(candidates.length){
+      const best=candidates[0];
+      html+=`<span class="suggest-chip"
+        onclick="applySuggestion('${iso}',${si},'${best.id}','${loc}')">
+        ${best.name.split(' ')[0]} → ${loc} @ ${TIME_SLOTS[si].split('–')[0].trim()}
+      </span>`;
+    }
+  });
+  html+='</div>';
+  area.innerHTML=html;
+}
+function applySuggestion(iso,si,empId,loc){
+  undoStack={iso,si,empId,prev:((state.schedule[iso]||{})[si]||{})[empId]||'OFF'};
+  setSlotData(iso,Number(si),empId,loc);
+  persistAll();renderSchedule();showUndo('Suggestion applied');
+}
+
+// ══════════════════════════════════════════════════
+// COPY DAY
+// ══════════════════════════════════════════════════
+function copyDayTo(targetIso){
+  const hasData=state.schedule[targetIso]&&Object.keys(state.schedule[targetIso]).length>0;
+  if(hasData&&!confirm(`${targetIso} already has schedule data. Overwrite?`))return;
+  state.schedule[targetIso]=JSON.parse(JSON.stringify(state.schedule[state.currentDateISO]||{}));
+  persistAll();renderWeekNav();
+  alert(`Copied to ${targetIso}`);
+}
+
+// ══════════════════════════════════════════════════
+// UNDO
+// ══════════════════════════════════════════════════
+let undoTimer=null;
+function showUndo(msg){
+  const t=document.getElementById('undo-toast');
+  document.getElementById('undo-msg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>t.classList.remove('show'),4000);
+}
+function undoLastChange(){
+  if(!undoStack)return;
+  const{iso,si,empId,prev}=undoStack;
+  setSlotData(iso,Number(si),empId,prev);
+  undoStack=null;
+  persistAll();renderSchedule();
+  document.getElementById('undo-toast').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════
+// PLAN SCHEDULE MODAL
+// ══════════════════════════════════════════════════
+function openPlanSchedule(empId){
+  planEmpId=empId;
+  planWeekMon=state.currentWeekMon;
+  buildPlanDraft();
+  renderPlanModal();
+  openModal('plan-modal');
+}
+function planShiftWeek(delta){
+  const mon=fromISO(planWeekMon);mon.setDate(mon.getDate()+delta*7);
+  planWeekMon=toISO(mon);
+  buildPlanDraft();renderPlanModal();
+}
+function buildPlanDraft(){
+  planDraft={};
+  const weekDates=getWeekDates(fromISO(planWeekMon));
+  weekDates.forEach(d=>{
+    const iso=toISO(d);
+    planDraft[iso]={};
+    TIME_SLOTS.forEach((_,si)=>{
+      planDraft[iso][si]=((state.schedule[iso]||{})[si]||{})[planEmpId]||'OFF';
+    });
+  });
+}
+function renderPlanModal(){
+  const emp=state.employees.find(e=>e.id===planEmpId);
+  if(!emp)return;
+  document.getElementById('plan-modal-title').textContent=`📅 Plan Schedule – ${emp.name}`;
+  document.getElementById('plan-week-label').textContent=formatWeekLabel(fromISO(planWeekMon));
+  const weekDates=getWeekDates(fromISO(planWeekMon));
+  let html='';
+  weekDates.forEach((d,i)=>{
+    const iso=toISO(d);
+    const onLeave=isOnLeave(emp.id,iso);
+    html+=`<div class="plan-day-block"><div class="plan-day-hdr">${DAYS_FULL[i]}, ${d.getDate()}</div>`;
+    TIME_SLOTS.forEach((slot,si)=>{
+      const curVal=(planDraft[iso]||{})[si]||'OFF';
+      if(onLeave){
+        html+=`<div class="plan-slot-row">
+          <span class="plan-slot-label">${slot}</span>
+          <span style="font-size:11px;color:#7E22CE;font-weight:700">🔒 On Leave</span>
+        </div>`;
+      }else{
+        const opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curVal?'selected':''}>${o}</option>`).join('');
+        html+=`<div class="plan-slot-row">
+          <span class="plan-slot-label">${slot}</span>
+          <select class="plan-slot-select loc-${LOC_CLASS[curVal]||'off'}"
+            onchange="planDraftChange('${iso}',${si},this)">${opts}</select>
+        </div>`;
+      }
+    });
+    html+='</div>';
+  });
+  document.getElementById('plan-days-container').innerHTML=html;
+}
+function planDraftChange(iso,si,selectEl){
+  if(!planDraft[iso])planDraft[iso]={};
+  planDraft[iso][si]=selectEl.value;
+  selectEl.className=`plan-slot-select loc-${LOC_CLASS[selectEl.value]||'off'}`;
+}
+function savePlanSchedule(){
+  Object.entries(planDraft).forEach(([iso,slots])=>{
+    Object.entries(slots).forEach(([si,loc])=>{
+      setSlotData(iso,Number(si),planEmpId,loc);
+    });
+  });
+  persistAll();
+  closeModal('plan-modal');
+  renderSchedule();
+  renderLiveBoard();
+}
+
+// ══════════════════════════════════════════════════
+// LIVE BOARD
+// ══════════════════════════════════════════════════
+function renderLiveBoard(){
+  const iso=todayISO();
+  const now=new Date();
+  const nowMins=now.getHours()*60+now.getMinutes();
+  document.getElementById('live-date-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  let currentSlot=-1;
+  SLOT_START_MINS.forEach((sm,i)=>{
+    if(nowMins>=sm&&(i===TIME_SLOTS.length-1||nowMins<SLOT_START_MINS[i+1]))currentSlot=i;
+  });
+
+  const slotData=(state.schedule[iso]||{})[currentSlot]||{};
+  const board=document.getElementById('live-board');
+  const colors={Gate:'#2563EB',Podium:'#16A34A',Mandir:'#EA580C'};
+
+  let cards='';
+  REQUIRED.forEach(loc=>{
+    const assignedEmp=state.employees.find(emp=>slotData[emp.id]===loc);
+    const bg=colors[loc]||'#64748B';
+    if(assignedEmp){
+      let nextSlots='';
+      for(let ni=currentSlot+1;ni<TIME_SLOTS.length&&ni<currentSlot+4;ni++){
+        const nLoc=((state.schedule[iso]||{})[ni]||{})[assignedEmp.id]||'OFF';
+        nextSlots+=`<div class="live-next-slot"><span>${TIME_SLOTS[ni]}</span><span class="badge badge-${LOC_CLASS[nLoc]||'off'}">${nLoc}</span></div>`;
+      }
+      cards+=`<div class="live-card">
+        <div class="live-card-hdr" style="background:${bg}">
+          <h3>${loc}</h3>
+          <span style="font-size:11px;color:rgba(255,255,255,.8)">${currentSlot>=0?TIME_SLOTS[currentSlot]:'—'}</span>
+        </div>
+        <div class="live-card-body">
+          <div class="live-name">${assignedEmp.name}</div>
+          <div class="live-sub">${assignedEmp.status||'Active'}</div>
+          ${nextSlots?`<div class="live-next"><div class="live-next-title">Up next</div>${nextSlots}</div>`:''}
+        </div>
+      </div>`;
+    }else{
+      cards+=`<div class="live-card">
+        <div class="live-card-hdr" style="background:${bg}">
+          <h3>${loc}</h3>
+          <span style="font-size:11px;color:rgba(255,255,255,.8)">${currentSlot>=0?TIME_SLOTS[currentSlot]:'—'}</span>
+        </div>
+        <div class="live-card-body">
+          <div class="live-uncovered">⚠️ UNCOVERED</div>
+          <div class="live-sub">No one assigned to ${loc}</div>
+        </div>
+      </div>`;
+    }
+  });
+  board.innerHTML=cards||'<p style="color:#64748B;font-size:13px">No schedule data for today.</p>';
+
+  const volEl=document.getElementById('live-volunteers');
+  const availVols=state.volunteers.filter(v=>(state.volAvailability[v.id]||{})[iso]);
+  volEl.innerHTML=availVols.length
+    ?`<div class="live-volunteer-row">${availVols.map(v=>`<span class="vol-chip">${v.name}</span>`).join('')}</div>`
+    :'<p style="color:#9CA3AF;font-size:12px">No volunteers marked available today.</p>';
+}
+
+function tickClock(){
+  const now=new Date();
+  let h=now.getHours(),m=now.getMinutes(),ampm=h>=12?'PM':'AM';
+  h=h%12||12;
+  document.getElementById('live-clock').textContent=`${h}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+// ══════════════════════════════════════════════════
+// ROSTER / STAFF PAGE
+// ══════════════════════════════════════════════════
+function renderRoster(){
+  const tbody=document.getElementById('roster-body');
+  if(!state.employees.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:20px">No employees yet. Click + Add Employee.</td></tr>';
+    renderVolunteers();return;
+  }
+  tbody.innerHTML=state.employees.map((emp,i)=>{
+    const blocked=Object.entries(emp.disallowedLocs||{}).filter(([,v])=>v).map(([k])=>k);
+    const blockedHtml=blocked.length
+      ?blocked.map(k=>`<span class="loc-blocked-chip">${k}</span>`).join('')
+      :`<span class="loc-all-chip">All locations</span>`;
+    const hrs=calcTotalHrsThisWeek(emp.id);
+    const pct=Math.min(100,hrs/40*100);
+    const bal=emp.leaveBalance||{annual:20,sick:10};
+    return`<tr>
+      <td style="color:#9CA3AF">${i+1}</td>
+      <td><strong>${emp.name}</strong></td>
+      <td>${blockedHtml}</td>
+      <td><span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;
+        background:${emp.status==='Active'?'#DCFCE7':'#FEF3C7'};
+        color:${emp.status==='Active'?'#166534':'#92400E'}">${emp.status||'Active'}</span></td>
+      <td>
+        <div class="hrs-inline">
+          <div class="hrs-bar-sm"><div class="hrs-bar-sm-fill" style="width:${pct}%;
+            background:${pct>80?'#22C55E':pct>50?'#F59E0B':'#EF4444'}"></div></div>
+          <span style="font-size:10px;color:#64748B">${hrs.toFixed(1)}h</span>
+        </div>
+      </td>
+      <td style="font-size:11px">🌴 ${bal.annual}d &nbsp; 🤒 ${bal.sick}d</td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-ghost" onclick="openEditEmployee('${emp.id}')">✏️ Edit</button>
+          <button class="btn btn-sm btn-plan" onclick="openPlanSchedule('${emp.id}')">📅 Plan Schedule</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${emp.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  renderVolunteers();
+}
+
+function calcTotalHrsThisWeek(empId){
+  const monday=fromISO(state.currentWeekMon),weekDates=getWeekDates(monday);
+  let total=0;
+  weekDates.forEach(d=>{
+    const iso=toISO(d),slotData=state.schedule[iso]||{};
+    TIME_SLOTS.forEach((_,si)=>{
+      const loc=(slotData[si]||{})[empId];
+      if(loc&&loc!=='OFF'&&loc!=='VACATION')total+=SLOT_HRS[si];
+    });
+  });
+  return total;
+}
+
+function renderVolunteers(){
+  const el=document.getElementById('volunteer-list');
+  if(!state.volunteers.length){
+    el.innerHTML='<p style="color:#9CA3AF;font-size:12px;margin-bottom:16px">No volunteers yet.</p>';return;
+  }
+  const monday=fromISO(state.currentWeekMon),weekDates=getWeekDates(monday);
+  el.innerHTML=`<div class="card" style="margin-bottom:20px"><div class="card-body" style="padding:0">
+    <table class="roster-table"><thead><tr>
+      <th>Name</th><th>Note</th><th>Available This Week</th><th>Actions</th>
+    </tr></thead><tbody>${state.volunteers.map(v=>{
+      const toggles=weekDates.map((d,i)=>{
+        const iso=toISO(d),on=(state.volAvailability[v.id]||{})[iso];
+        return`<div class="vol-day-chip" onclick="toggleVolDay('${v.id}','${iso}')">
+          <span>${DAYS_SHORT[i]}</span>
+          <div class="vol-day-toggle ${on?'on':''}"></div>
+        </div>`;
+      }).join('');
+      return`<tr>
+        <td><strong>${v.name}</strong></td>
+        <td style="color:#64748B">${v.note||'—'}</td>
+        <td><div class="vol-avail-chips">${toggles}</div></td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${v.id}')">🗑️</button></td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  </div></div>`;
+}
+
+// ══════════════════════════════════════════════════
+// EMPLOYEE CRUD
+// ══════════════════════════════════════════════════
+function openAddEmployee(){
+  editingEmpId=null;
+  document.getElementById('modal-title').textContent='Add Employee';
+  document.getElementById('emp-name').value='';
+  document.getElementById('emp-status').value='Active';
+  document.getElementById('emp-annual').value='20';
+  document.getElementById('emp-sick').value='10';
+  document.getElementById('emp-hrs-summary').textContent='';
+  newEmpDisallowed={gate:false,podium:false,mandir:false,field:false,giftshop:false};
+  ALL_LOCS.forEach(l=>{const el=document.getElementById('tog-'+l);if(el)el.classList.remove('blocked');});
+  openModal('emp-modal');
+}
+function openEditEmployee(empId){
+  const emp=state.employees.find(e=>e.id===empId);if(!emp)return;
+  editingEmpId=empId;
+  document.getElementById('modal-title').textContent='Edit Employee';
+  document.getElementById('emp-name').value=emp.name;
+  document.getElementById('emp-status').value=emp.status||'Active';
+  document.getElementById('emp-annual').value=(emp.leaveBalance||{}).annual||20;
+  document.getElementById('emp-sick').value=(emp.leaveBalance||{}).sick||10;
+  newEmpDisallowed={...emp.disallowedLocs};
+  ALL_LOCS.forEach(l=>{
+    const el=document.getElementById('tog-'+l);
+    if(el)el.classList.toggle('blocked',!!(emp.disallowedLocs||{})[l]);
+  });
+  document.getElementById('emp-hrs-summary').textContent=`This week: ${calcTotalHrsThisWeek(empId).toFixed(1)} hours scheduled`;
+  openModal('emp-modal');
+}
+function toggleLoc(loc){
+  newEmpDisallowed[loc]=!newEmpDisallowed[loc];
+  document.getElementById('tog-'+loc).classList.toggle('blocked',newEmpDisallowed[loc]);
+}
+function saveEmployee(){
+  const name=document.getElementById('emp-name').value.trim();
+  if(!name){alert('Please enter a name.');return;}
+  if(editingEmpId){
+    const emp=state.employees.find(e=>e.id===editingEmpId);
+    emp.name=name;emp.status=document.getElementById('emp-status').value;
+    emp.disallowedLocs={...newEmpDisallowed};
+    emp.leaveBalance={
+      annual:Number(document.getElementById('emp-annual').value)||20,
+      sick:Number(document.getElementById('emp-sick').value)||10
+    };
+  }else{
+    state.employees.push({
+      id:'emp_'+Date.now(),name,
+      status:document.getElementById('emp-status').value,
+      disallowedLocs:{...newEmpDisallowed},
+      leaveBalance:{
+        annual:Number(document.getElementById('emp-annual').value)||20,
+        sick:Number(document.getElementById('emp-sick').value)||10
+      },
+    });
+  }
+  persistAll();closeModal('emp-modal');renderRoster();
+}
+function deleteEmployee(empId){
+  if(!confirm('Delete this employee?'))return;
+  state.employees=state.employees.filter(e=>e.id!==empId);
+  persistAll();renderRoster();
+}
+
+
+
+
+
+
+
+
 
     function openAddVolunteer(){
   editingVolId=null;
@@ -1162,4 +1539,6 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-<body>
+
+
+  
