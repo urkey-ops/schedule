@@ -1,44 +1,55 @@
-// ── Hardcoded config — auto-connects on every device ─────────
-const HARDCODED_CONFIG = {
-  apiKey: "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
-  authDomain: "schedulemaker-6a571.firebaseapp.com",
+// ── firebase.js ───────────────────────────────────────────────
+
+const HARDCODEDCONFIG = {
+  apiKey:      "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
+  authDomain:  "schedulemaker-6a571.firebaseapp.com",
   databaseURL: "https://schedulemaker-6a571-default-rtdb.firebaseio.com",
-  projectId: "schedulemaker-6a571",
-  appId: "1:685602481293:web:2e5e0359b3df42f825aec4"
+  projectId:   "schedulemaker-6a571",
+  appId:       "1:685602481293:web:2e5e0359b3df42f825aec4"
 };
 
-const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.0';
-let _db = null;
-let _fbRef = null;
-let _fbInit = false;
+const FBSDK = 'https://www.gstatic.com/firebasejs/10.12.0/';
 
-// Dirty-key tracking — only push changed slices
-const _dirtyKeys = new Set();
-let _debounceTimer = null;
+let db          = null;
+let fbRef       = null;
+let fbInit      = false;
+let _hasLocalEdits = false; // track unsaved local changes
 
-// adminPinHash intentionally excluded — PIN now lives in config.js
-const FB_KEYS = [
+const dirtyKeys = new Set();
+let debounceTimer = null;
+
+const FBKEYS = [
   'employees','volunteers','defaultSchedule','schedule',
   'volAvailability','absences','leaveRequests','swapRequests',
   'holidays','empDaysOff','empHourCap'
 ];
 
-async function initFirebase(cfg) {
-  if (_fbInit) return;
-  _fbInit = true;
-  try {
-    const { initializeApp, getApps } = await import(`${FB_SDK}/firebase-app.js`);
-    const { getDatabase, ref, onValue } = await import(`${FB_SDK}/firebase-database.js`);
+async function importFBSDK(file) {
+  return import(FBSDK + file);
+}
 
+async function initFirebase(cfg) {
+  if (fbInit) return;
+  fbInit = true;
+  try {
+    const { initializeApp, getApps } = await importFBSDK('firebase-app.js');
+    const { getDatabase, ref, onValue } = await importFBSDK('firebase-database.js');
     const existing = getApps().find(a => a.name === 'smPro');
     const app = existing || initializeApp(cfg, 'smPro');
-    _db = getDatabase(app);
-    _fbRef = ref(_db, 'smPro');
+    db    = getDatabase(app);
+    fbRef = ref(db, 'smPro');
 
-    onValue(_fbRef, snap => {
+    onValue(fbRef, snap => {
       const data = snap.val();
       if (!data) { setSyncStatus('synced'); return; }
-      FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
+
+      // Fixed: if admin has local edits in progress, warn instead of overwriting
+      if (_hasLocalEdits && state.mode === 'admin') {
+        showOutOfSyncBanner();
+        return;
+      }
+
+      FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
       saveLocal();
       renderAll();
       setSyncStatus('synced');
@@ -48,31 +59,38 @@ async function initFirebase(cfg) {
   } catch(e) {
     console.error('Firebase init failed', e);
     setSyncStatus('error');
-    _fbInit = false;
+    fbInit = false;
   }
 }
 
 function markDirty(key) {
-  _dirtyKeys.add(key);
+  dirtyKeys.add(key);
+  _hasLocalEdits = true;
 }
 
 function pushToFirebase() {
-  if (!_fbRef) return;
-  clearTimeout(_debounceTimer);
-  _debounceTimer = setTimeout(_flushDirty, 400);
+  if (!fbRef) return;
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(flushDirty, 400);
 }
 
-async function _flushDirty() {
-  if (!_fbRef) return;
+async function flushDirty() {
+  if (!fbRef) return;
+  // Fixed: guard against empty dirtyKeys — never fall back to full write silently
+  if (dirtyKeys.size === 0) return;
+
   setSyncStatus('syncing');
-  const keys = _dirtyKeys.size > 0 ? [..._dirtyKeys] : FB_KEYS;
-  _dirtyKeys.clear();
+  const keys = [...dirtyKeys];
+  dirtyKeys.clear();
+  _hasLocalEdits = false;
+
   try {
-    const { ref, update } = await import(`${FB_SDK}/firebase-database.js`);
+    const { ref, update } = await importFBSDK('firebase-database.js');
     const patch = {};
     keys.forEach(k => { patch[k] = state[k] ?? null; });
-    await update(_fbRef, patch);
+    await update(fbRef, patch);
     setSyncStatus('synced');
+    hideOutOfSyncBanner();
   } catch(e) {
     console.error('Firebase write error', e);
     setSyncStatus('error');
@@ -84,7 +102,28 @@ function setSyncStatus(status) {
   const text = document.getElementById('sync-text');
   if (!chip || !text) return;
   chip.className = `sync-chip ${status}`;
-  text.textContent = status === 'synced' ? 'firebase'
-    : status === 'syncing' ? 'syncing…'
-    : 'error';
+  text.textContent = status === 'synced' ? 'firebase' : status === 'syncing' ? 'syncing…' : 'error';
+}
+
+function showOutOfSyncBanner() {
+  let banner = document.getElementById('sync-conflict-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'sync-conflict-banner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600';
+    banner.innerHTML = `⚠️ New changes available from another device. 
+      <button onclick="reloadFromFirebase()" style="margin-left:12px;padding:4px 12px;border-radius:6px;border:none;background:#fff;color:#b45309;font-weight:700;cursor:pointer">Sync Now</button>
+      <button onclick="hideOutOfSyncBanner()" style="margin-left:8px;padding:4px 12px;border-radius:6px;border:none;background:transparent;color:#fff;cursor:pointer">Ignore</button>`;
+    document.body.prepend(banner);
+  }
+}
+
+function hideOutOfSyncBanner() {
+  document.getElementById('sync-conflict-banner')?.remove();
+}
+
+function reloadFromFirebase() {
+  _hasLocalEdits = false;
+  hideOutOfSyncBanner();
+  location.reload();
 }
