@@ -13,7 +13,6 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <!-- Row 1: always visible -->
   <div class="topbar-row1">
     <button class="admin-trigger-btn" id="admin-trigger-btn" onclick="openAdminLogin()">🔑 Admin</button>
     <div class="logo">
@@ -25,13 +24,13 @@
       <div id="mode-badge" class="mode-chip mode-live">VIEW</div>
     </div>
   </div>
-  <!-- Row 2: nav tabs — scrollable -->
   <div class="nav-tabs">
-    <button class="nav-tab active" id="tab-live" onclick="showPage('live',this)">Live Board</button>
-    <button class="nav-tab admin-only" id="tab-default" onclick="showPage('default',this)">Default Schedule</button>
+    <button class="nav-tab active"  id="tab-live"     onclick="showPage('live',this)">Live Board</button>
+    <button class="nav-tab admin-only" id="tab-default"  onclick="showPage('default',this)">Default Schedule</button>
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
-    <button class="nav-tab admin-only" id="tab-staff" onclick="showPage('staff',this)">Staff</button>
-    <button class="nav-tab admin-only" id="tab-leave" onclick="showPage('leave',this)">Leave &amp; Swaps</button>
+    <button class="nav-tab admin-only" id="tab-staff"    onclick="showPage('staff',this)">Staff</button>
+    <button class="nav-tab admin-only" id="tab-leave"    onclick="showPage('leave',this)">Leave &amp; Swaps</button>
+    <button class="nav-tab admin-only" id="tab-holidays" onclick="showPage('holidays',this)">Holidays</button>
   </div>
 </div>
 
@@ -43,12 +42,12 @@
   <button class="today-btn" onclick="goToToday()">Today</button>
   <div class="day-pills" id="day-pills"></div>
   <div class="density-sw">
-    <button class="density-btn active" id="density-normal" onclick="setDensity('normal')">Normal</button>
-    <button class="density-btn" id="density-compact" onclick="setDensity('compact')">Compact</button>
+    <button class="density-btn active" id="density-normal"  onclick="setDensity('normal')">Normal</button>
+    <button class="density-btn"        id="density-compact" onclick="setDensity('compact')">Compact</button>
   </div>
 </div>
 
-<!-- PAGE: LIVE BOARD -->
+<!-- ═══════════════ PAGE: LIVE BOARD ═══════════════ -->
 <div class="page active" id="page-live">
   <div class="live-top">
     <div>
@@ -57,12 +56,13 @@
     </div>
     <div class="live-view-toggle ml-auto">
       <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">Locations</button>
-      <button class="lvt-btn" id="lvt-my" onclick="setLiveView('my')">My Schedule</button>
-      <button class="lvt-btn" id="lvt-history" onclick="setLiveView('history')">History</button>
+      <button class="lvt-btn"        id="lvt-my"        onclick="setLiveView('my')">My Schedule</button>
+      <button class="lvt-btn"        id="lvt-history"   onclick="setLiveView('history')">History</button>
     </div>
     <div class="live-clock" id="live-clock">-- : --</div>
   </div>
 
+  <div id="live-holiday-banner" class="hidden" style="margin-bottom:12px"></div>
   <div id="live-alert-area" class="alert-area"></div>
 
   <!-- Locations view -->
@@ -86,7 +86,7 @@
         <div class="emp-selector" id="emp-selector"></div>
       </div>
       <div id="my-sched-body" class="my-sched-body">
-        <p style="color:var(--muted);font-size:12px">Select your name above to see your schedule.</p>
+        <p style="color:var(--muted);font-size:13px">Select your name above to see your schedule.</p>
       </div>
     </div>
   </div>
@@ -101,11 +101,14 @@
       <div class="card-hdr" style="flex-wrap:wrap;gap:8px">
         <h2>Deep Lookup</h2>
         <div class="lookup-controls">
-          <input type="date" id="lookup-date" style="width:140px" onchange="renderDeepLookup()">
-          <select id="lookup-loc" style="width:130px" onchange="renderDeepLookup()">
+          <input type="date" id="lookup-date" style="width:150px" onchange="renderDeepLookup()">
+          <select id="lookup-loc" style="width:140px" onchange="renderDeepLookup()">
             <option value="">All locations</option>
-            <option>Gate</option><option>Podium</option><option>Mandir</option>
-            <option>Field Work</option><option>Gift Shop</option>
+            <option>Gate</option>
+            <option>Podium</option>
+            <option>Mandir</option>
+            <option>Field Work</option>
+            <option>Gift Shop</option>
           </select>
         </div>
       </div>
@@ -114,16 +117,17 @@
   </div>
 </div>
 
-<!-- PAGE: DEFAULT SCHEDULE -->
+<!-- ═══════════════ PAGE: DEFAULT SCHEDULE ═══════════════ -->
 <div class="page" id="page-default">
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Default Schedule</h2>
-      <p>Set the baseline for each day of week — unset slots use each employee's fallback location</p>
+      <p>Baseline per day of week · day off employees locked · unset slots use fallback location</p>
     </div>
     <button class="btn btn-success ml-auto" onclick="saveDefault()">Save Default</button>
   </div>
-  <div class="inline-alert info">Changes here affect all future weeks. Field Work fallback per employee is set in Staff › Edit.</div>
+  <div class="inline-alert info">Changes here affect all future weeks unless overridden in Weekly Schedule.</div>
+  <div id="range-fill-default"></div>
   <div class="dow-pills" id="dow-pills"></div>
   <div class="card">
     <div class="sched-legend" id="default-legend">
@@ -132,9 +136,10 @@
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp; ✖ missing</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp;✖ missing</span>
     </div>
     <div class="sched-wrap">
+      <div class="scroll-hint">swipe table to scroll →</div>
       <table class="sched-grid" id="default-table">
         <thead id="default-head"></thead>
         <tbody id="default-body"></tbody>
@@ -143,29 +148,34 @@
   </div>
 </div>
 
-<!-- PAGE: WEEKLY SCHEDULE -->
+<!-- ═══════════════ PAGE: WEEKLY SCHEDULE ═══════════════ -->
 <div class="page" id="page-schedule">
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Weekly Schedule</h2>
-      <p>Overrides layer on top of defaults · orange border = changed · 🔒 = on leave · ✖ = absent</p>
+      <p>Overrides layer on top of defaults · orange border = changed · 🔒 leave · ✖ absent · striped = day off</p>
     </div>
   </div>
+  <div id="sched-holiday-banner" class="hidden" style="margin-bottom:10px"></div>
   <div id="sched-alert-area" class="alert-area"></div>
   <div class="inline-alert warn hidden" id="coverage-alert"></div>
+  <div id="range-fill-weekly"></div>
   <div class="adv-bar">
-    <button class="adv-toggle" id="adv-toggle" onclick="toggleAdv()">Advanced tools <span class="arr">▼</span></button>
+    <button class="adv-toggle" id="adv-toggle" onclick="toggleAdv()">
+      Advanced tools <span class="arr">▼</span>
+    </button>
     <div class="adv-body" id="adv-body">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;font-weight:600;color:var(--muted)">Copy day to</span>
+        <span style="font-size:12px;font-weight:600;color:var(--muted)">Copy day to</span>
         <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
-        <span style="margin-left:10px;font-size:11px;font-weight:600;color:var(--muted)">Apply default</span>
-        <button class="btn btn-sm btn-warn" onclick="applyDefaultToDay()">Apply Default to This Day</button>
+        <span style="margin-left:10px;font-size:12px;font-weight:600;color:var(--muted)">Apply default</span>
+        <button class="btn btn-sm btn-warn"  onclick="applyDefaultToDay()">Apply Default to This Day</button>
         <button class="btn btn-sm btn-ghost" onclick="clearOverridesForDay()">Clear Overrides</button>
       </div>
     </div>
   </div>
   <div class="card">
+    <div id="sched-hrs-row"></div>
     <div class="sched-legend">
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
@@ -175,9 +185,10 @@
       <span class="legend-item" style="margin-left:6px">
         <span style="display:inline-block;width:9px;height:9px;border-left:2px solid var(--orange);margin-right:3px"></span>Override
       </span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp; ✖ missing &nbsp; 🔒 leave &nbsp; ✖ absent</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ ok &nbsp;✖ gap &nbsp;🔒 leave &nbsp;striped = day off</span>
     </div>
     <div class="sched-wrap">
+      <div class="scroll-hint">swipe table to scroll →</div>
       <table class="sched-grid" id="sched-table">
         <thead id="sched-head"></thead>
         <tbody id="sched-body"></tbody>
@@ -187,10 +198,13 @@
   <div id="suggest-area" style="margin-top:10px"></div>
 </div>
 
-<!-- PAGE: STAFF -->
+<!-- ═══════════════ PAGE: STAFF ═══════════════ -->
 <div class="page" id="page-staff">
   <div class="page-hdr">
-    <div class="page-hdr-text"><h2>Staff</h2><p>Manage employees, fallback locations, and volunteers</p></div>
+    <div class="page-hdr-text">
+      <h2>Staff</h2>
+      <p>Manage employees, regular day offs, hour caps and volunteers</p>
+    </div>
   </div>
   <div class="section-hdr">
     <span class="section-title">Employees</span>
@@ -199,7 +213,19 @@
   <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
       <table class="data-table" id="roster-table">
-        <thead><tr><th>#</th><th>Name</th><th>Fallback</th><th>Locations</th><th>Status</th><th>This Week</th><th>Leave</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Fallback</th>
+            <th>Blocked</th>
+            <th>Status</th>
+            <th>This Week</th>
+            <th>Day Off</th>
+            <th>Leave</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
         <tbody id="roster-body"></tbody>
       </table>
     </div>
@@ -213,19 +239,22 @@
   <div class="admin-tools">
     <h3>Admin Tools</h3>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-ghost" onclick="showFirebaseConfig()">Firebase</button>
+      <button class="btn btn-sm btn-ghost"   onclick="showFirebaseConfig()">Firebase</button>
       <button class="btn btn-sm btn-success" onclick="exportData()">Export JSON</button>
-      <button class="btn btn-sm btn-ghost" onclick="importData()">Import JSON</button>
-      <button class="btn btn-sm btn-danger" onclick="resetAllData()">Delete All</button>
+      <button class="btn btn-sm btn-ghost"   onclick="importData()">Import JSON</button>
+      <button class="btn btn-sm btn-danger"  onclick="resetAllData()">Delete All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
   </div>
 </div>
 
-<!-- PAGE: LEAVE & SWAPS -->
+<!-- ═══════════════ PAGE: LEAVE & SWAPS ═══════════════ -->
 <div class="page" id="page-leave">
   <div class="page-hdr">
-    <div class="page-hdr-text"><h2>Leave &amp; Day-Off Swaps</h2><p>Active leave locks slots to VACATION · swaps are logged reminders</p></div>
+    <div class="page-hdr-text">
+      <h2>Leave &amp; Day-Off Swaps</h2>
+      <p>Active leave locks slots to VACATION · swaps temporarily unlock regular day offs</p>
+    </div>
   </div>
   <div class="section-hdr">
     <span class="section-title">Leave Records</span>
@@ -234,7 +263,12 @@
   <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
       <table class="data-table" id="leave-table">
-        <thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Note</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Employee</th><th>Type</th><th>From</th><th>To</th>
+            <th>Days</th><th>Note</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
         <tbody id="leave-body"></tbody>
       </table>
     </div>
@@ -247,6 +281,64 @@
   <div class="card"><div id="swap-list"></div></div>
 </div>
 
+<!-- ═══════════════ PAGE: HOLIDAYS ═══════════════ -->
+<div class="page" id="page-holidays">
+  <div class="page-hdr">
+    <div class="page-hdr-text">
+      <h2>Holidays &amp; Festivals</h2>
+      <p>US Federal + Hindu festivals pre-loaded · edit dates if needed · markers shown on schedule &amp; live board</p>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hdr"><h2>Add Custom Holiday / Festival</h2></div>
+    <div class="card-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="form-row" style="margin:0;flex:1;min-width:140px">
+          <label>Date</label>
+          <input type="date" id="new-holiday-date">
+        </div>
+        <div class="form-row" style="margin:0;flex:2;min-width:160px">
+          <label>Name</label>
+          <input type="text" id="new-holiday-name" placeholder="e.g. Raksha Bandhan">
+        </div>
+        <div class="form-row" style="margin:0;min-width:80px">
+          <label>Emoji</label>
+          <input type="text" id="new-holiday-emoji" placeholder="🪔" style="width:70px;text-align:center;font-size:18px;padding:8px">
+        </div>
+        <div class="form-row" style="margin:0">
+          <label>Color</label>
+          <select id="new-holiday-color" style="width:auto">
+            <option value="#4F8EF7">Blue (Federal)</option>
+            <option value="#EA580C" selected>Saffron (Hindu)</option>
+            <option value="#D97706">Amber (Diwali)</option>
+            <option value="#059669">Green</option>
+            <option value="#7C3AED">Purple</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="addHoliday()">+ Add</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><h2>All Holidays &amp; Festivals</h2></div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date (editable)</th>
+            <th>Formatted</th>
+            <th>Name</th>
+            <th>Emoji</th>
+            <th>Color</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="holidays-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ MODALS ═══════════════ -->
 
 <!-- Admin Login Modal -->
@@ -257,10 +349,10 @@
       <h3>Admin Login</h3>
       <p>Enter your PIN to unlock admin controls and edit schedules.</p>
       <input type="password" class="pin-input-field" id="admin-pin-input"
-        maxlength="6" placeholder="••••••"
+        maxlength="6" placeholder="••••"
         onkeyup="checkAdminPin(event)">
       <div class="pin-error" id="admin-pin-error"></div>
-      <button class="btn btn-warn" style="width:100%;justify-content:center;margin-top:14px"
+      <button class="btn btn-warn" style="width:100%;justify-content:center;margin-top:16px"
         onclick="submitAdminPin()">Unlock Admin</button>
       <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px"
         onclick="closeModal('admin-login-modal')">Cancel</button>
@@ -276,9 +368,12 @@
 <div class="modal-overlay hidden" id="emp-modal">
   <div class="modal">
     <h3 id="modal-title">Add Employee</h3>
-    <div class="form-row"><label>Full Name</label><input type="text" id="emp-name" placeholder="e.g. Raj Patel"></div>
     <div class="form-row">
-      <label>Fallback Location <span style="color:var(--subtle);font-weight:400;text-transform:none">when slot is unscheduled</span></label>
+      <label>Full Name</label>
+      <input type="text" id="emp-name" placeholder="e.g. Raj Patel">
+    </div>
+    <div class="form-row">
+      <label>Fallback Location <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">— when slot is unscheduled</span></label>
       <select id="emp-fallback">
         <option value="Field Work">Field Work</option>
         <option value="OFF">OFF</option>
@@ -299,18 +394,59 @@
       </div>
     </div>
     <div class="form-row">
-      <label>Status</label>
-      <select id="emp-status">
-        <option>Active</option><option>Day Off</option><option>Vacation</option><option>Sick</option>
-      </select>
+      <label>Regular Day Off <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">— select all that apply</span></label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-MON" style="width:16px;height:16px;cursor:pointer"> MON
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-TUE" style="width:16px;height:16px;cursor:pointer"> TUE
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-WED" style="width:16px;height:16px;cursor:pointer"> WED
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-THU" style="width:16px;height:16px;cursor:pointer"> THU
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-FRI" style="width:16px;height:16px;cursor:pointer"> FRI
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-SAT" style="width:16px;height:16px;cursor:pointer"> SAT
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-SUN" style="width:16px;height:16px;cursor:pointer"> SUN
+        </label>
+      </div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
-      <div class="form-row" style="margin:0"><label>Annual Leave days</label><input type="text" id="emp-annual" placeholder="20"></div>
-      <div class="form-row" style="margin:0"><label>Sick Leave days</label><input type="text" id="emp-sick" placeholder="10"></div>
+      <div class="form-row" style="margin:0">
+        <label>Weekly Hour Cap <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">(max 60)</span></label>
+        <input type="number" id="emp-hour-cap" placeholder="40" min="1" max="60">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label>Status</label>
+        <select id="emp-status">
+          <option>Active</option>
+          <option>Day Off</option>
+          <option>Vacation</option>
+          <option>Sick</option>
+        </select>
+      </div>
     </div>
-    <div id="emp-hrs-summary" style="font-size:11px;color:var(--muted);margin-bottom:12px"></div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="form-row" style="margin:0">
+        <label>Annual Leave days</label>
+        <input type="text" id="emp-annual" placeholder="20">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label>Sick Leave days</label>
+        <input type="text" id="emp-sick" placeholder="10">
+      </div>
+    </div>
+    <div id="emp-hrs-summary" style="font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);min-height:20px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeModal('emp-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
     </div>
   </div>
@@ -322,15 +458,15 @@
     <h3 id="plan-modal-title">Plan Schedule</h3>
     <div class="form-row">
       <label>Week</label>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
         <button class="week-arrow" onclick="planShiftWeek(-1)">‹</button>
-        <span id="plan-week-label" style="font-size:12px;font-weight:600;color:var(--text)"></span>
+        <span id="plan-week-label" style="font-size:13px;font-weight:600;color:var(--text)"></span>
         <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
       </div>
     </div>
     <div id="plan-days-container" style="max-height:55vh;overflow-y:auto"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button class="btn btn-ghost" onclick="closeModal('plan-modal')">Cancel</button>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-ghost"   onclick="closeModal('plan-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="savePlanSchedule()">Save Week</button>
     </div>
   </div>
@@ -340,10 +476,16 @@
 <div class="modal-overlay hidden" id="vol-modal">
   <div class="modal">
     <h3 id="vol-modal-title">Add Volunteer</h3>
-    <div class="form-row"><label>Full Name</label><input type="text" id="vol-name" placeholder="e.g. Anita Mehta"></div>
-    <div class="form-row"><label>Note</label><input type="text" id="vol-note" placeholder="e.g. Available afternoons only"></div>
+    <div class="form-row">
+      <label>Full Name</label>
+      <input type="text" id="vol-name" placeholder="e.g. Anita Mehta">
+    </div>
+    <div class="form-row">
+      <label>Note</label>
+      <input type="text" id="vol-note" placeholder="e.g. Available afternoons only">
+    </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="closeModal('vol-modal')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeModal('vol-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveVolunteer()">Save</button>
     </div>
   </div>
@@ -353,7 +495,10 @@
 <div class="modal-overlay hidden" id="leave-modal">
   <div class="modal">
     <h3 id="leave-modal-title">Add Leave Record</h3>
-    <div class="form-row"><label>Employee</label><select id="leave-emp-id"></select></div>
+    <div class="form-row">
+      <label>Employee</label>
+      <select id="leave-emp-id"></select>
+    </div>
     <div class="grid2">
       <div class="form-row"><label>From</label><input type="date" id="leave-from"></div>
       <div class="form-row"><label>To (inclusive)</label><input type="date" id="leave-to"></div>
@@ -361,17 +506,25 @@
     <div class="form-row">
       <label>Type</label>
       <select id="leave-type">
-        <option value="annual">Annual</option><option value="sick">Sick</option>
-        <option value="comp">Comp Off</option><option value="other">Other</option>
+        <option value="annual">Annual</option>
+        <option value="sick">Sick</option>
+        <option value="comp">Comp Off</option>
+        <option value="other">Other</option>
       </select>
     </div>
-    <div class="form-row"><label>Note</label><input type="text" id="leave-note" placeholder="e.g. Medical"></div>
+    <div class="form-row">
+      <label>Note</label>
+      <input type="text" id="leave-note" placeholder="e.g. Medical">
+    </div>
     <div class="form-row">
       <label>Status</label>
-      <select id="leave-status"><option value="active">Active</option><option value="cancelled">Cancelled</option></select>
+      <select id="leave-status">
+        <option value="active">Active</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="closeModal('leave-modal')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeModal('leave-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveLeave()">Save</button>
     </div>
   </div>
@@ -381,14 +534,20 @@
 <div class="modal-overlay hidden" id="swap-modal">
   <div class="modal">
     <h3 id="swap-modal-title">Add Day-Off Swap</h3>
-    <div class="form-row"><label>Employee</label><select id="swap-emp-id"></select></div>
+    <div class="form-row">
+      <label>Employee</label>
+      <select id="swap-emp-id"></select>
+    </div>
     <div class="grid2">
-      <div class="form-row"><label>Usual Day Off</label><input type="date" id="swap-from"></div>
+      <div class="form-row"><label>Usual Day Off (date)</label><input type="date" id="swap-from"></div>
       <div class="form-row"><label>Works Instead On</label><input type="date" id="swap-to"></div>
     </div>
-    <div class="form-row"><label>Note</label><input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali"></div>
+    <div class="form-row">
+      <label>Note</label>
+      <input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali">
+    </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="closeModal('swap-modal')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeModal('swap-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSwap()">Save</button>
     </div>
   </div>
@@ -398,15 +557,15 @@
 <div class="modal-overlay hidden" id="firebase-modal">
   <div class="modal">
     <h3>Firebase Setup</h3>
-    <div class="config-note">Create a free Firebase project → Add web app → copy config. Enable Realtime Database with read/write rules.</div>
+    <div class="config-note">Create a free Firebase project → Add web app → copy config. Enable Realtime Database with read/write rules set to true.</div>
     <div class="form-row"><label>API Key</label><input type="text" id="fb-apiKey" placeholder="AIza…"></div>
     <div class="form-row"><label>Auth Domain</label><input type="text" id="fb-authDomain"></div>
-    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL"></div>
+    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL" placeholder="https://your-project-default-rtdb.firebaseio.com"></div>
     <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId"></div>
     <div class="form-row"><label>App ID</label><input type="text" id="fb-appId"></div>
     <div class="form-row"><label>Admin PIN</label><input type="password" id="fb-pin" placeholder="4–6 digits"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost" onclick="closeModal('firebase-modal')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeModal('firebase-modal')">Cancel</button>
       <button class="btn btn-success" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
     </div>
   </div>
@@ -416,11 +575,11 @@
 <div class="modal-overlay hidden" id="reset-modal">
   <div class="modal">
     <h3>Delete All Data</h3>
-    <div class="inline-alert danger" style="margin-bottom:14px">Permanently deletes everything. Cannot be undone.</div>
-    <div class="form-row"><label>Admin PIN</label><input type="password" id="reset-pin" placeholder="PIN"></div>
+    <div class="inline-alert danger" style="margin-bottom:16px">Permanently deletes everything. Cannot be undone.</div>
+    <div class="form-row"><label>Admin PIN to confirm</label><input type="password" id="reset-pin" placeholder="PIN"></div>
     <div class="pin-error" id="reset-error"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
-      <button class="btn btn-ghost" onclick="closeModal('reset-modal')">Cancel</button>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-ghost"  onclick="closeModal('reset-modal')">Cancel</button>
       <button class="btn btn-danger" onclick="confirmReset()">Delete Everything</button>
     </div>
   </div>
@@ -432,9 +591,11 @@
   <button class="undo-btn" onclick="undoLastChange()">Undo</button>
 </div>
 
+<!-- SCRIPTS — order matters -->
 <script src="js/constants.js"></script>
 <script src="js/config.js"></script>
 <script src="js/firebase.js"></script>
+<script src="js/holidays.js"></script>
 <script src="js/state.js"></script>
 <script src="js/schedule.js"></script>
 <script src="js/live.js"></script>
