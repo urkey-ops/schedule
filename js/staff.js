@@ -1,42 +1,58 @@
+// ── staff.js ──────────────────────────────────────────────────
+
+// ── safeInt helper ────────────────────────────────────────────
+// Fixed: prevents NaN from blank form fields breaking calculations
+function safeInt(val, fallback = 0) {
+  const n = parseInt(val);
+  return isNaN(n) ? fallback : n;
+}
+
 // ── Roster ────────────────────────────────────────────────────
 function renderRoster() {
   const tbody = document.getElementById('roster-body');
   if (!tbody) return;
   const emps = state.employees;
+
   if (!emps.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No employees yet. Click Add Employee.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">
+      No employees yet. Click Add Employee.
+    </td></tr>`;
     return;
   }
+
   tbody.innerHTML = emps.map((e, i) => {
-    const hrs    = calcTotalHrsWeek(e.id);
-    const cap    = getEmpHourCap(e.id);
-    const hrsCls = hrs > cap ? 'hrs-over' : hrs >= cap - 5 ? 'hrs-ok' : 'hrs-under';
-    const blocked  = e.blocked ? Object.keys(e.blocked).filter(k => e.blocked[k]) : [];
-    const daysOff  = getEmpDaysOff(e.id);
+    const hrs     = calcScheduledHrsWeek(e.id); // from state.js — single source
+    const cap     = getEmpHourCap(e.id);
+    const hrsCls  = hrs > cap ? 'hrs-over' : hrs >= cap - 5 ? 'hrs-ok' : 'hrs-under';
+    const blocked = e.blocked ? Object.keys(e.blocked).filter(k => e.blocked[k]) : [];
+    const daysOff = getEmpDaysOff(e.id);
+
     return `<tr>
-      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
       <td style="font-weight:600">${escH(e.name)}</td>
       <td><span class="badge badge-active">${escH(e.fallback || 'Field Work')}</span></td>
       <td>${blocked.length
-        ? blocked.map(l => `<span class="loc-blocked-chip">${LOC_LABEL[l]||l}</span>`).join('')
-        : `<span class="loc-all-chip">All</span>`}</td>
-      <td><span class="badge ${e.status==='Active'?'badge-active':'badge-off'}">${e.status}</span></td>
+        ? blocked.map(l => `<span class="loc-blocked-chip">${LOCLABEL[l] || l}</span>`).join('')
+        : `<span class="loc-all-chip">All</span>`}
+      </td>
+      <td><span class="badge ${e.status === 'Active' ? 'badge-active' : 'badge-off'}">${e.status}</span></td>
       <td>
         <div class="hrs-bar-wrap">
           <span class="hrs-chip ${hrsCls}">${hrs}/${cap}h</span>
           <div class="hrs-bar">
-            <div class="hrs-bar-fill" style="width:${Math.min(100,hrs/cap*100)}%;background:${hrs>cap?'var(--red)':hrs>=cap-5?'var(--green)':'var(--amber)'}"></div>
+            <div class="hrs-bar-fill" style="width:${Math.min(100, hrs/cap*100)}%;background:${hrs>cap?'var(--red)':hrs>=cap-5?'var(--green)':'var(--amber)'}"></div>
           </div>
         </div>
       </td>
       <td>${daysOff.length
         ? daysOff.map(d => `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;background:var(--surface3);color:var(--muted);margin:1px">${d}</span>`).join('')
-        : `<span style="color:var(--subtle);font-size:11px">None</span>`}</td>
+        : `<span style="color:var(--subtle);font-size:11px">None</span>`}
+      </td>
       <td>${calcLeaveBalance(e.id)}</td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-ghost" onclick="openEditEmployee('${e.id}')">Edit</button>
-          <button class="btn btn-sm btn-plan"  onclick="openPlanSchedule('${e.id}')">Plan</button>
+          <button class="btn btn-sm btn-ghost"  onclick="openEditEmployee('${e.id}')">Edit</button>
+          <button class="btn btn-sm btn-plan"   onclick="openPlanSchedule('${e.id}')">Plan</button>
           <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${e.id}')">&#x2715;</button>
         </div>
       </td>
@@ -44,32 +60,28 @@ function renderRoster() {
   }).join('');
 }
 
-function calcTotalHrsWeek(empId) {
-  const mon = new Date(state.currentWeekMon + 'T00:00:00');
-  let total = 0;
-  for (let d = 0; d < 7; d++) {
-    const day = new Date(mon);
-    day.setDate(day.getDate() + d);
-    const iso = toDateStr(day);
-    if (isEmpDayOff(empId, iso)) continue;
-    TIME_SLOTS.forEach((_, si) => {
-      const { loc } = getResolvedLoc(iso, si, empId);
-      if (loc !== 'off' && loc !== 'vac') total += SLOT_HRS[si];
-    });
-  }
-  return Math.round(total * 10) / 10;
-}
-
+// Fixed: count working days only, skip weekends + employee's own days off
 function calcLeaveBalance(empId) {
-  const emp  = state.employees.find(e => e.id === empId);
+  const emp = state.employees.find(e => e.id === empId);
   if (!emp) return '';
+
   const used = (state.leaveRequests || [])
     .filter(l => l.empId === empId && l.status === 'active' && l.type === 'annual')
     .reduce((acc, l) => {
-      const from = new Date(l.from), to = new Date(l.to);
-      return acc + Math.round((to - from) / (1000*60*60*24)) + 1;
+      let count = 0;
+      const cur = new Date(l.from + 'T00:00:00');
+      const end = new Date(l.to   + 'T00:00:00');
+      while (cur <= end) {
+        const dow        = DAYSSHORT[(cur.getDay() + 6) % 7];
+        const isRegDayOff = getEmpDaysOff(empId).includes(dow);
+        if (!isRegDayOff) count++;
+        cur.setDate(cur.getDate() + 1);
+      }
+      return acc + count;
     }, 0);
-  const cap = emp.annualLeave || 20;
+
+  // Fixed: safeInt prevents NaN if annualLeave field was saved blank
+  const cap = safeInt(emp.annualLeave, 20);
   return `<span style="font-size:11px;color:var(--muted)">${cap - used}/${cap} AL</span>`;
 }
 
@@ -80,15 +92,15 @@ let blockedLocs = {};
 function openAddEmployee() {
   editEmpId   = null;
   blockedLocs = {};
-  document.getElementById('modal-title').textContent      = 'Add Employee';
-  document.getElementById('emp-name').value               = '';
-  document.getElementById('emp-fallback').value           = 'Field Work';
-  document.getElementById('emp-status').value             = 'Active';
-  document.getElementById('emp-annual').value             = '20';
-  document.getElementById('emp-sick').value               = '10';
-  document.getElementById('emp-hour-cap').value           = '40';
-  document.getElementById('emp-hrs-summary').textContent  = '';
-  DAYS_SHORT.forEach(d => {
+  document.getElementById('modal-title').textContent     = 'Add Employee';
+  document.getElementById('emp-name').value              = '';
+  document.getElementById('emp-fallback').value          = 'Field Work';
+  document.getElementById('emp-status').value            = 'Active';
+  document.getElementById('emp-annual').value            = '20';
+  document.getElementById('emp-sick').value              = '10';
+  document.getElementById('emp-hour-cap').value          = '40';
+  document.getElementById('emp-hrs-summary').textContent = '';
+  DAYSSHORT.forEach(d => {
     const cb = document.getElementById(`dow-off-${d}`);
     if (cb) cb.checked = false;
   });
@@ -101,22 +113,26 @@ function openEditEmployee(empId) {
   if (!emp) return;
   editEmpId   = empId;
   blockedLocs = emp.blocked ? { ...emp.blocked } : {};
-  document.getElementById('modal-title').textContent      = 'Edit Employee';
-  document.getElementById('emp-name').value               = emp.name;
-  document.getElementById('emp-fallback').value           = emp.fallback || 'Field Work';
-  document.getElementById('emp-status').value             = emp.status  || 'Active';
-  document.getElementById('emp-annual').value             = emp.annualLeave || 20;
-  document.getElementById('emp-sick').value               = emp.sickLeave   || 10;
-  document.getElementById('emp-hour-cap').value           = getEmpHourCap(empId);
+
+  document.getElementById('modal-title').textContent = 'Edit Employee';
+  document.getElementById('emp-name').value          = emp.name;
+  document.getElementById('emp-fallback').value      = emp.fallback || 'Field Work';
+  document.getElementById('emp-status').value        = emp.status  || 'Active';
+  document.getElementById('emp-annual').value        = safeInt(emp.annualLeave, 20);
+  document.getElementById('emp-sick').value          = safeInt(emp.sickLeave,   10);
+  document.getElementById('emp-hour-cap').value      = getEmpHourCap(empId);
+
   const daysOff = getEmpDaysOff(empId);
-  DAYS_SHORT.forEach(d => {
+  DAYSSHORT.forEach(d => {
     const cb = document.getElementById(`dow-off-${d}`);
     if (cb) cb.checked = daysOff.includes(d);
   });
-  const hrs = calcTotalHrsWeek(empId);
+
+  const hrs = calcScheduledHrsWeek(empId);
   const cap = getEmpHourCap(empId);
   document.getElementById('emp-hrs-summary').textContent =
     `Current week: ${hrs}h scheduled / ${cap}h cap`;
+
   updateLocToggles();
   openModal('emp-modal');
 }
@@ -127,24 +143,23 @@ function toggleLoc(loc) {
 }
 
 function updateLocToggles() {
-  ALL_LOCS.forEach(loc => {
+  ALLLOCS.forEach(loc => {
     const btn = document.getElementById(`tog-${loc}`);
     if (btn) btn.classList.toggle('blocked', !!blockedLocs[loc]);
   });
 }
 
+// Fixed: safeInt on all parseInt calls, ID-based lookup
 function saveEmployee() {
   const name = v('emp-name');
   if (!name) { alert('Name is required.'); return; }
-
-  // ── Duplicate name check ──────────────────────────────────
   if (!validateDuplicateEmployee(name, editEmpId)) return;
 
-  const daysOff = DAYS_SHORT.filter(d => {
+  const daysOff = DAYSSHORT.filter(d => {
     const cb = document.getElementById(`dow-off-${d}`);
     return cb && cb.checked;
   });
-  const hourCap = parseInt(document.getElementById('emp-hour-cap').value) || DEFAULT_HRS_CAP;
+  const hourCap = safeInt(v('emp-hour-cap'), DEFAULTHRSCAP);
 
   pushUndo('Save employee', state);
 
@@ -154,31 +169,31 @@ function saveEmployee() {
       state.employees[idx] = {
         ...state.employees[idx],
         name,
-        fallback:    v('emp-fallback') || 'Field Work',
-        status:      v('emp-status')   || 'Active',
-        annualLeave: parseInt(v('emp-annual')) || 20,
-        sickLeave:   parseInt(v('emp-sick'))   || 10,
+        fallback:    v('emp-fallback')  || 'Field Work',
+        status:      v('emp-status')    || 'Active',
+        annualLeave: safeInt(v('emp-annual'), 20),
+        sickLeave:   safeInt(v('emp-sick'),   10),
         blocked:     { ...blockedLocs },
       };
     }
     if (!state.empDaysOff) state.empDaysOff = {};
-    state.empDaysOff[editEmpId] = daysOff;
     if (!state.empHourCap) state.empHourCap = {};
+    state.empDaysOff[editEmpId] = daysOff;
     state.empHourCap[editEmpId] = hourCap;
   } else {
     const newId = uid();
     state.employees.push({
       id:          newId,
       name,
-      fallback:    v('emp-fallback') || 'Field Work',
-      status:      v('emp-status')   || 'Active',
-      annualLeave: parseInt(v('emp-annual')) || 20,
-      sickLeave:   parseInt(v('emp-sick'))   || 10,
+      fallback:    v('emp-fallback')  || 'Field Work',
+      status:      v('emp-status')    || 'Active',
+      annualLeave: safeInt(v('emp-annual'), 20),
+      sickLeave:   safeInt(v('emp-sick'),   10),
       blocked:     { ...blockedLocs },
     });
     if (!state.empDaysOff) state.empDaysOff = {};
-    state.empDaysOff[newId] = daysOff;
     if (!state.empHourCap) state.empHourCap = {};
+    state.empDaysOff[newId] = daysOff;
     state.empHourCap[newId] = hourCap;
   }
 
@@ -202,10 +217,14 @@ function renderVolunteers() {
   const container = document.getElementById('volunteer-list');
   if (!container) return;
   const vols = state.volunteers || [];
+
   if (!vols.length) {
-    container.innerHTML = `<div class="card"><div class="card-body" style="color:var(--muted);font-size:13px">No volunteers yet.</div></div>`;
+    container.innerHTML = `<div class="card"><div class="card-body" style="color:var(--muted);font-size:13px">
+      No volunteers yet.
+    </div></div>`;
     return;
   }
+
   container.innerHTML = vols.map(vol => {
     const avail = state.volAvailability?.[vol.id] || [];
     return `<div class="card" style="margin-bottom:10px">
@@ -215,7 +234,7 @@ function renderVolunteers() {
           ${vol.note ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">${escH(vol.note)}</div>` : ''}
         </div>
         <div style="display:flex;gap:6px">
-          ${DAYS_SHORT.map(d => `
+          ${DAYSSHORT.map(d => `
             <div class="vol-day-chip" onclick="toggleVolDay('${vol.id}','${d}')">
               <span>${d}</span>
               <div class="vol-toggle ${avail.includes(d) ? 'on' : ''}"></div>
@@ -253,17 +272,18 @@ function saveVolunteer() {
 function deleteVolunteer(volId) {
   if (!confirm('Delete volunteer?')) return;
   pushUndo('Delete volunteer', state);
-  state.volunteers = state.volunteers.filter(v => v.id !== volId);
+  state.volunteers = (state.volunteers || []).filter(v => v.id !== volId);
   persistAll('volunteers');
   renderVolunteers();
 }
 
 function toggleVolDay(volId, day) {
-  if (!state.volAvailability)        state.volAvailability = {};
-  if (!state.volAvailability[volId]) state.volAvailability[volId] = [];
+  if (!state.volAvailability)         state.volAvailability         = {};
+  if (!state.volAvailability[volId])  state.volAvailability[volId]  = [];
   const arr = state.volAvailability[volId];
   const idx = arr.indexOf(day);
-  if (idx !== -1) arr.splice(idx, 1); else arr.push(day);
+  if (idx !== -1) arr.splice(idx, 1);
+  else arr.push(day);
   persistAll('volAvailability');
   renderVolunteers();
 }
