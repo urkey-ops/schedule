@@ -3,146 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScheduleMaker Pro v4</title>
+<title>ScheduleMaker Pro v5</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0F1117;--surface:#181C27;--surface2:#1E2330;--surface3:#252A3A;
-  --border:#2A2F42;--border2:#323848;
-  --text:#F0F2F8;--muted:#8B91A8;--subtle:#555C75;
+  --bg:#0C0E14;--surface:#13151F;--surface2:#181B27;--surface3:#1E2230;--surface4:#252940;
+  --border:#242837;--border2:#2E3348;
+  --text:#EEF0F8;--muted:#7A8099;--subtle:#444D6A;
   --accent:#4F8EF7;--accent2:#3B7AE8;--accent-glow:rgba(79,142,247,.15);
-  --green:#34D399;--green-bg:rgba(52,211,153,.1);
-  --amber:#FBBF24;--amber-bg:rgba(251,191,36,.1);
-  --red:#F87171;--red-bg:rgba(248,113,113,.1);
-  --purple:#A78BFA;--purple-bg:rgba(167,139,250,.1);
-  --cyan:#22D3EE;--cyan-bg:rgba(34,211,238,.1);
-  --orange:#FB923C;--orange-bg:rgba(251,146,60,.1);
+  --green:#34D399;--green-bg:rgba(52,211,153,.08);
+  --amber:#FBBF24;--amber-bg:rgba(251,191,36,.08);
+  --red:#F87171;--red-bg:rgba(248,113,113,.08);
+  --purple:#A78BFA;--purple-bg:rgba(167,139,250,.08);
+  --cyan:#22D3EE;--cyan-bg:rgba(34,211,238,.08);
+  --orange:#FB923C;--orange-bg:rgba(251,146,60,.08);
 
-  --loc-gate:#4F8EF7;--loc-gate-bg:rgba(79,142,247,.12);
-  --loc-podium:#34D399;--loc-podium-bg:rgba(52,211,153,.12);
-  --loc-mandir:#FB923C;--loc-mandir-bg:rgba(251,146,60,.12);
-  --loc-field:#8B91A8;--loc-field-bg:rgba(139,145,168,.12);
-  --loc-giftshop:#22D3EE;--loc-giftshop-bg:rgba(34,211,238,.12);
-  --loc-lunch:#FBBF24;--loc-lunch-bg:rgba(251,191,36,.12);
-  --loc-off:#3A3F52;--loc-off-text:#555C75;
-  --loc-vac:#A78BFA;--loc-vac-bg:rgba(167,139,250,.12);
+  --loc-gate:#4F8EF7;--loc-gate-bg:rgba(79,142,247,.13);
+  --loc-podium:#34D399;--loc-podium-bg:rgba(52,211,153,.13);
+  --loc-mandir:#FB923C;--loc-mandir-bg:rgba(251,146,60,.13);
+  --loc-field:#8B91A8;--loc-field-bg:rgba(139,145,168,.1);
+  --loc-giftshop:#22D3EE;--loc-giftshop-bg:rgba(34,211,238,.13);
+  --loc-lunch:#FBBF24;--loc-lunch-bg:rgba(251,191,36,.13);
+  --loc-off:#1E2230;--loc-off-text:#444D6A;
+  --loc-vac:#A78BFA;--loc-vac-bg:rgba(167,139,250,.13);
 
   --r:10px;--r-sm:6px;--r-lg:14px;
-  --shadow:0 4px 24px rgba(0,0,0,.4);
-  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
+  --shadow:0 8px 32px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 /* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;padding:0 20px;height:52px;position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center;gap:10px;margin-right:24px}
-.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.3px}
-.logo-v{font-size:10px;background:var(--surface3);color:var(--accent);padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px}
-.nav-tabs{display:flex;gap:2px;flex:1}
-.nav-tab{padding:6px 14px;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s;border:none;background:none;font-family:'Outfit',sans-serif;white-space:nowrap}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:50px;position:sticky;top:0;z-index:100;gap:0}
+.logo{display:flex;align-items:center;gap:9px;margin-right:20px;flex-shrink:0}
+.logo-mark{width:26px;height:26px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.logo-text{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.logo-v{font-size:9px;background:var(--surface3);color:var(--accent);padding:1px 5px;border-radius:3px;font-weight:700;margin-left:3px;letter-spacing:.3px}
+.nav-tabs{display:flex;gap:1px;flex:1;overflow-x:auto}
+.nav-tab{padding:5px 12px;border-radius:var(--r-sm);cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);transition:all .15s;border:none;background:none;font-family:'Outfit',sans-serif;white-space:nowrap}
 .nav-tab:hover{color:var(--text);background:var(--surface3)}
 .nav-tab.active{color:var(--text);background:var(--surface3)}
-.admin-only{display:none}
-.admin-tab-visible{display:inline-flex}
-.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
-.sync-chip{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--surface3);color:var(--muted);display:flex;align-items:center;gap:5px;font-weight:500}
-.sync-chip.synced .dot{color:var(--green)}
-.sync-chip.syncing .dot{color:var(--amber)}
-.sync-chip.error .dot{color:var(--red)}
-.mode-chip{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
-.mode-admin{background:var(--amber-bg);color:var(--amber)}
-.mode-live{background:var(--green-bg);color:var(--green)}
+.admin-only{display:none}.admin-tab-visible{display:inline-flex}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0}
+.sync-chip{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--surface3);color:var(--muted);display:flex;align-items:center;gap:4px;font-weight:500}
+.sync-chip.synced .dot{color:var(--green)}.sync-chip.syncing .dot{color:var(--amber)}.sync-chip.error .dot{color:var(--red)}
+.mode-chip{font-size:9px;padding:2px 7px;border-radius:8px;font-weight:700;letter-spacing:.3px}
+.mode-admin{background:var(--amber-bg);color:var(--amber)}.mode-live{background:var(--green-bg);color:var(--green)}
 
-/* ── SUBNAV / WEEK NAV ── */
-.subnav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:90;height:48px;flex-wrap:nowrap;overflow-x:auto}
+/* ── SUBNAV ── */
+.subnav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:8px;position:sticky;top:50px;z-index:90;height:46px;overflow-x:auto}
 .subnav.hidden{display:none}
-.week-label{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;min-width:170px}
-.week-arrow{width:26px;height:26px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);transition:all .15s;flex-shrink:0}
-.week-arrow:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
-.today-btn{padding:4px 10px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
-.today-btn:hover{color:var(--text);border-color:var(--border2);background:var(--surface3)}
-.day-pills{display:flex;gap:4px;flex-wrap:nowrap}
-.day-pill{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);transition:all .15s;position:relative;white-space:nowrap;font-family:'Outfit',sans-serif}
+.week-label{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;min-width:160px}
+.week-arrow{width:24px;height:24px;border-radius:5px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);transition:all .15s;flex-shrink:0}
+.week-arrow:hover{background:var(--surface3);color:var(--text)}
+.today-btn{padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;font-size:10px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.today-btn:hover{color:var(--text);background:var(--surface3)}
+.day-pills{display:flex;gap:3px}
+.day-pill{padding:3px 9px;border-radius:16px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:10px;font-weight:600;color:var(--muted);transition:all .15s;position:relative;white-space:nowrap;font-family:'Outfit',sans-serif}
 .day-pill:hover{border-color:var(--border2);color:var(--text)}
 .day-pill.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
-.day-pill.today{border-color:var(--border2)}
-.day-pill.today:not(.active){color:var(--text)}
-.day-pill .gap-dot{position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--surface);display:none}
+.day-pill.today:not(.active){color:var(--text);border-color:var(--border2)}
+.day-pill .gap-dot{position:absolute;top:-3px;right:-3px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface);display:none}
 .day-pill.has-gap .gap-dot{display:block}
-.day-pill .override-dot{position:absolute;top:-3px;left:-3px;width:7px;height:7px;border-radius:50%;background:var(--amber);border:2px solid var(--surface);display:none}
-.day-pill.has-override .override-dot{display:block}
+.day-pill .ovr-dot{position:absolute;top:-3px;left:-3px;width:6px;height:6px;border-radius:50%;background:var(--orange);border:1.5px solid var(--surface);display:none}
+.day-pill.has-ovr .ovr-dot{display:block}
+.density-sw{display:flex;gap:3px;margin-left:auto;flex-shrink:0}
+.density-btn{padding:2px 9px;border-radius:12px;border:1px solid var(--border2);background:transparent;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);transition:all .15s}
+.density-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* ── PAGE LAYOUT ── */
-.page{display:none;padding:20px;max-width:1440px;margin:0 auto}
+/* ── LAYOUT ── */
+.page{display:none;padding:20px;max-width:1500px;margin:0 auto}
 .page.active{display:block}
-
-/* ── ALERT BANNERS ── */
-.alert-banner-area{margin-bottom:16px}
-.alert-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);margin-bottom:8px;font-size:12px;font-weight:500;border:1px solid}
-.alert-banner.leave{background:var(--red-bg);border-color:rgba(248,113,113,.2);color:var(--red)}
-.alert-banner.swap{background:var(--amber-bg);border-color:rgba(251,191,36,.2);color:var(--amber)}
-.alert-banner.info{background:var(--accent-glow);border-color:rgba(79,142,247,.2);color:var(--accent)}
-.alert-banner .fix-btn{margin-left:auto;padding:3px 10px;border-radius:var(--r-sm);border:1px solid currentColor;background:transparent;font-size:10px;font-weight:700;cursor:pointer;color:inherit;font-family:'Outfit',sans-serif;white-space:nowrap;flex-shrink:0}
-.alert-banner .fix-btn:hover{background:rgba(255,255,255,.08)}
-
-/* ── CARDS ── */
 .card{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border)}
-.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.card-hdr h2{font-size:13px;font-weight:600;color:var(--text)}
-.card-body{padding:16px 18px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.card-hdr h2{font-size:12px;font-weight:600;color:var(--text)}
+.card-body{padding:14px 16px}
+.page-hdr{margin-bottom:18px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.page-hdr-text h2{font-size:19px;font-weight:700;color:var(--text);letter-spacing:-.4px}
+.page-hdr-text p{color:var(--muted);font-size:11px;margin-top:2px}
+.section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.section-title{font-size:12px;font-weight:600;color:var(--text)}
+.section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
 
-/* ── PAGE HEADER ── */
-.page-hdr{margin-bottom:20px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.page-hdr-text h2{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.4px}
-.page-hdr-text p{color:var(--muted);font-size:12px;margin-top:3px}
+/* ── ALERTS ── */
+.alert-area{margin-bottom:14px}
+.alert-banner{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:var(--r);margin-bottom:6px;font-size:11px;font-weight:500;border:1px solid}
+.alert-banner.leave{background:var(--red-bg);border-color:rgba(248,113,113,.15);color:var(--red)}
+.alert-banner.swap{background:var(--amber-bg);border-color:rgba(251,191,36,.15);color:var(--amber)}
+.alert-banner.handover{background:var(--orange-bg);border-color:rgba(251,146,60,.15);color:var(--orange)}
+.fix-btn{margin-left:auto;padding:2px 9px;border-radius:4px;border:1px solid currentColor;background:transparent;font-size:9px;font-weight:700;cursor:pointer;color:inherit;font-family:'Outfit',sans-serif;flex-shrink:0}
+.fix-btn:hover{background:rgba(255,255,255,.06)}
+
+/* ── INLINE ALERTS ── */
+.inline-alert{padding:9px 13px;border-radius:var(--r);font-size:11px;display:flex;align-items:center;gap:8px;border:1px solid;margin-bottom:12px}
+.inline-alert.warn{background:var(--amber-bg);border-color:rgba(251,191,36,.15);color:var(--amber)}
+.inline-alert.info{background:var(--accent-glow);border-color:rgba(79,142,247,.15);color:var(--accent)}
+.inline-alert.danger{background:var(--red-bg);border-color:rgba(248,113,113,.15);color:var(--red)}
+.inline-alert.success{background:var(--green-bg);border-color:rgba(52,211,153,.15);color:var(--green)}
 
 /* ── BUTTONS ── */
-.btn{padding:7px 14px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn{padding:6px 13px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:'Outfit',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
-.btn-sm{padding:5px 10px;font-size:11px}
-.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2)}.btn-danger:hover{background:rgba(248,113,113,.2)}
-.btn-success{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.2)}.btn-success:hover{background:rgba(52,211,153,.2)}
-.btn-warn{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.btn-sm{padding:4px 9px;font-size:10px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.15)}.btn-danger:hover{background:rgba(248,113,113,.18)}
+.btn-success{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.15)}.btn-success:hover{background:rgba(52,211,153,.18)}
+.btn-warn{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,.15)}.btn-warn:hover{background:rgba(251,191,36,.18)}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--surface3);color:var(--text)}
-.btn-leave{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(167,139,250,.2)}.btn-leave:hover{background:rgba(167,139,250,.2)}
-.btn-plan{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(79,142,247,.2)}.btn-plan:hover{background:rgba(79,142,247,.2)}
+.btn-leave{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(167,139,250,.15)}.btn-leave:hover{background:rgba(167,139,250,.18)}
+.btn-plan{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(79,142,247,.15)}.btn-plan:hover{background:rgba(79,142,247,.18)}
 
 /* ── INPUTS ── */
-input[type=text],input[type=password],input[type=date],select,textarea{
-  border:1px solid var(--border2);border-radius:var(--r-sm);padding:7px 10px;
-  font-size:12px;font-family:'Outfit',sans-serif;color:var(--text);
-  background:var(--surface2);outline:none;transition:border .15s;width:100%}
-input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input[type=text],input[type=password],input[type=date],select,textarea{border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 9px;font-size:11px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--surface2);outline:none;transition:border .15s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 select option{background:var(--surface2);color:var(--text)}
 
-/* ── TABLES ── */
+/* ── DATA TABLE ── */
 .data-table{width:100%;border-collapse:collapse}
-.data-table th{background:var(--surface2);color:var(--muted);padding:8px 14px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--border)}
-.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.data-table th{background:var(--surface2);color:var(--muted);padding:7px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:11px;vertical-align:middle}
 .data-table tr:last-child td{border-bottom:none}
 .data-table tr:hover td{background:var(--surface2)}
 
 /* ── SCHEDULE GRID ── */
 .sched-wrap{overflow-x:auto}
-.sched-grid{width:100%;border-collapse:collapse;font-size:11px}
-.sched-grid th{background:var(--surface2);color:var(--muted);padding:7px 8px;text-align:center;font-size:10px;font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border);letter-spacing:.3px}
-.sched-grid th:first-child{position:sticky;left:0;z-index:3;background:var(--surface2);text-align:right}
-.sched-grid .slot-label{background:var(--surface);border-right:1px solid var(--border);padding:5px 10px;font-size:10px;color:var(--subtle);white-space:nowrap;font-family:'DM Mono',monospace;text-align:right;min-width:150px;position:sticky;left:0;z-index:2}
+.sched-grid{width:100%;border-collapse:collapse;font-size:10px}
+.sched-grid th{background:var(--surface2);color:var(--muted);padding:6px 6px;text-align:center;font-size:9px;font-weight:700;white-space:nowrap;border-bottom:1px solid var(--border);letter-spacing:.2px}
+.sched-grid th:first-child{position:sticky;left:0;z-index:3;background:var(--surface2);text-align:right;min-width:130px}
+.sched-grid .slot-label{background:var(--surface);border-right:1px solid var(--border);padding:4px 8px;font-size:9px;color:var(--subtle);white-space:nowrap;font-family:'DM Mono',monospace;text-align:right;position:sticky;left:0;z-index:2}
 .sched-grid .slot-label.lunch-slot{color:var(--amber)}
-.sched-grid .slot-label.current-slot{color:var(--accent);font-weight:500}
+.sched-grid .slot-label.cur-slot{color:var(--accent);font-weight:500}
 .sched-grid td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:2px}
-.sched-grid tr.current-row td{background:rgba(79,142,247,.04)}
-.sched-grid tr:hover td{background:var(--surface2)}
-.sched-grid tr:hover .slot-label{background:var(--surface)}
+.sched-grid tr.cur-row td{background:rgba(79,142,247,.04)!important}
+.sched-grid tr:hover td:not(.slot-label){background:var(--surface2)}
 
 /* ── LOC SELECT ── */
-.loc-select{width:100%;border:none;border-radius:var(--r-sm);padding:4px 6px;font-size:10px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;outline:none;background:var(--loc-off);color:var(--loc-off-text);transition:all .15s}
+.loc-select{width:100%;border:none;border-radius:5px;padding:3px 5px;font-size:9px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;outline:none;transition:all .1s}
 .loc-select:focus{box-shadow:0 0 0 2px var(--accent-glow)}
 .loc-gate{background:var(--loc-gate-bg)!important;color:var(--loc-gate)!important}
 .loc-podium{background:var(--loc-podium-bg)!important;color:var(--loc-podium)!important}
@@ -153,157 +152,213 @@ select option{background:var(--surface2);color:var(--text)}
 .loc-off{background:var(--loc-off)!important;color:var(--loc-off-text)!important}
 .loc-vac{background:var(--loc-vac-bg)!important;color:var(--loc-vac)!important}
 
-/* ── OVERRIDE CELL ── */
+/* ── CELL WRAP / OVERRIDE ── */
 .cell-wrap{position:relative}
-.cell-wrap.overridden .loc-select{border-left:2px solid var(--orange)!important}
-.cell-wrap .reset-btn{display:none;position:absolute;top:-14px;right:0;z-index:10;padding:1px 5px;border-radius:3px;background:var(--surface3);border:1px solid var(--border2);font-size:9px;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:'Outfit',sans-serif}
+.cell-wrap.overridden .loc-select{border-left:2px solid var(--orange)!important;border-radius:0 5px 5px 0!important}
+.reset-btn{display:none;position:absolute;top:-13px;right:0;z-index:10;padding:1px 5px;border-radius:3px;background:var(--surface4);border:1px solid var(--border2);font-size:8px;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:'Outfit',sans-serif}
 .cell-wrap:hover .reset-btn{display:block}
 
 /* ── COV CELLS ── */
-.cov-cell{text-align:center;padding:4px;font-size:11px}
-.cov-ok{color:var(--green)}
-.cov-fail{color:var(--red);animation:pulse .9s infinite alternate}
-@keyframes pulse{from{opacity:1}to{opacity:.4}}
+.cov-cell{text-align:center;padding:3px;font-size:10px}
+.cov-ok{color:var(--green)}.cov-fail{color:var(--red);animation:blink .9s infinite alternate}
+@keyframes blink{from{opacity:1}to{opacity:.35}}
+.leave-lock{background:var(--purple-bg);text-align:center;font-size:9px;font-weight:700;color:var(--purple);padding:3px 4px;border-radius:4px;cursor:not-allowed}
 
-/* ── LEAVE LOCK ── */
-.leave-lock-cell{background:var(--purple-bg);text-align:center;font-size:10px;font-weight:600;color:var(--purple);padding:4px;border-radius:var(--r-sm);cursor:not-allowed}
+/* ── ABSENT OVERLAY ── */
+.absent-lock{background:var(--red-bg);text-align:center;font-size:9px;font-weight:700;color:var(--red);padding:3px 4px;border-radius:4px;cursor:not-allowed;border:1px dashed rgba(248,113,113,.3)}
 
-/* ── LIVE BOARD ── */
-.live-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:16px}
+/* ══════════════════════════════════
+   LIVE BOARD
+══════════════════════════════════ */
+.live-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.live-clock{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--muted);background:var(--surface2);padding:4px 11px;border-radius:16px;border:1px solid var(--border)}
+
+/* ── LIVE VIEW TOGGLE ── */
+.live-view-toggle{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.lvt-btn{padding:4px 12px;border-radius:5px;border:none;background:transparent;font-size:10px;font-weight:600;cursor:pointer;color:var(--muted);font-family:'Outfit',sans-serif;transition:all .15s}
+.lvt-btn.active{background:var(--surface4);color:var(--text)}
+
+/* ── LOCATION CARDS ── */
+.live-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:14px}
 .live-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--surface)}
-.live-card-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.live-loc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.live-loc-name{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.live-slot-time{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
-.live-card-body{padding:16px 18px}
-.live-name{font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.3px}
-.live-uncovered{font-size:18px;font-weight:700;color:var(--red);margin-bottom:3px}
-.live-sub{font-size:11px;color:var(--muted)}
-.live-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.live-next-title{font-size:9px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.live-next-slot{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.live-card-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.live-loc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.live-loc-name{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.live-slot-time{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace}
+.live-card-body{padding:14px 16px}
+.live-emp-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-.3px}
+.live-uncovered{font-size:16px;font-weight:700;color:var(--red);margin-bottom:2px}
+.live-sub{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.absent-badge{font-size:9px;font-weight:700;background:var(--red-bg);color:var(--red);padding:1px 6px;border-radius:8px;border:1px solid rgba(248,113,113,.2)}
+.handover-badge{font-size:9px;font-weight:700;background:var(--orange-bg);color:var(--orange);padding:1px 6px;border-radius:8px;border:1px solid rgba(251,146,60,.2);animation:blink .8s infinite alternate}
+.present-toggle{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all .15s}
+.present-toggle.present{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.present-toggle.absent{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.live-next{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.live-next-title{font-size:8px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.live-next-slot{display:flex;justify-content:space-between;align-items:center;font-size:9px;padding:3px 0;border-bottom:1px solid var(--border)}
 .live-next-slot:last-child{border-bottom:none}
 .live-next-time{color:var(--muted);font-family:'DM Mono',monospace}
 
-/* ── VOLUNTEERS ── */
-.vol-chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--purple-bg);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
-.vol-day-chip{display:inline-flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
-.vol-day-chip span{font-size:9px;font-weight:600;color:var(--subtle);text-transform:uppercase}
-.vol-day-toggle{width:26px;height:16px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .2s;position:relative}
-.vol-day-toggle.on{background:var(--purple);border-color:var(--purple)}
-.vol-day-toggle::after{content:'';position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;background:var(--subtle);transition:all .2s}
-.vol-day-toggle.on::after{background:#fff;left:auto;right:2px}
+/* ── TIMELINE STRIP ── */
+.timeline-section{margin-bottom:14px}
+.timeline-section h3{font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px}
+.timeline-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.timeline-loc-label{font-size:9px;font-weight:700;color:var(--muted);width:56px;flex-shrink:0;text-align:right}
+.timeline-bar{flex:1;height:22px;background:var(--surface2);border-radius:6px;overflow:hidden;display:flex;position:relative;border:1px solid var(--border)}
+.timeline-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;cursor:pointer;transition:opacity .15s;position:relative;overflow:hidden;white-space:nowrap}
+.timeline-seg:hover{opacity:.8}
+.timeline-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--text);opacity:.7;border-radius:1px;pointer-events:none;z-index:5}
+.timeline-time-labels{display:flex;margin-left:64px;margin-bottom:2px}
+.timeline-time-label{font-size:8px;color:var(--subtle);font-family:'DM Mono',monospace;flex:1;text-align:left}
 
-/* ── STATUS BADGES ── */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+/* ── COMPLETED SLOTS TODAY ── */
+.history-section{margin-top:14px}
+.history-toggle{width:100%;padding:9px 13px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);font-family:'Outfit',sans-serif;text-align:left;border-radius:var(--r);transition:color .15s}
+.history-toggle:hover{color:var(--text);background:var(--surface2)}
+.history-toggle .arr{transition:transform .2s;font-size:9px;margin-left:auto}
+.history-toggle.open .arr{transform:rotate(180deg)}
+.history-body{display:none;padding:10px 0}
+.history-body.open{display:block}
+.hist-slot-row{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid var(--border);font-size:10px}
+.hist-slot-row:last-child{border-bottom:none}
+.hist-time{font-family:'DM Mono',monospace;color:var(--muted);min-width:110px;flex-shrink:0}
+.hist-locs{display:flex;gap:5px;flex-wrap:wrap}
+
+/* ── DEEP LOOKUP ── */
+.lookup-section{margin-top:14px}
+.lookup-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.lookup-result{background:var(--surface2);border-radius:var(--r);padding:12px;border:1px solid var(--border)}
+.lookup-slot-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px}
+.lookup-slot-row:last-child{border-bottom:none}
+
+/* ══════════════════════════════════
+   PERSONAL SCHEDULE VIEW
+══════════════════════════════════ */
+.my-schedule-section{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.my-sched-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.my-sched-hdr h3{font-size:12px;font-weight:600;color:var(--text)}
+.emp-selector{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.emp-pill{padding:4px 11px;border-radius:16px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:10px;font-weight:600;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif}
+.emp-pill:hover{border-color:var(--border2);color:var(--text);background:var(--surface3)}
+.emp-pill.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
+.my-sched-body{padding:14px 16px}
+.my-today-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.my-today-name{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.my-cur-loc{font-size:11px;font-weight:600;padding:4px 12px;border-radius:12px}
+.my-next-up{font-size:10px;color:var(--muted)}
+/* personal timeline */
+.my-timeline{display:flex;height:28px;background:var(--surface2);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;position:relative}
+.my-tl-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;cursor:default;white-space:nowrap;overflow:hidden}
+.my-tl-now{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.6);border-radius:1px;z-index:5}
+/* day columns for 6-day view */
+.my-6day{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.my-6day-col{background:var(--surface2);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+.my-6day-hdr{padding:6px 8px;font-size:9px;font-weight:700;border-bottom:1px solid var(--border);text-align:center}
+.my-6day-hdr.today-col{background:var(--accent-glow);color:var(--accent)}
+.my-6day-slot{padding:3px 6px;font-size:8px;font-weight:600;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:3px}
+.my-6day-slot:last-child{border-bottom:none}
+.my-6day-time{color:var(--subtle);font-family:'DM Mono',monospace;font-size:7px;flex-shrink:0}
+
+/* ── VOLUNTEERS ── */
+.vol-chip{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;background:var(--purple-bg);color:var(--purple);border:1px solid rgba(167,139,250,.15)}
+.vol-day-chip{display:inline-flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.vol-day-chip span{font-size:8px;font-weight:600;color:var(--subtle);text-transform:uppercase}
+.vol-toggle{width:24px;height:14px;border-radius:7px;border:1.5px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .2s;position:relative}
+.vol-toggle.on{background:var(--purple);border-color:var(--purple)}
+.vol-toggle::after{content:'';position:absolute;top:1.5px;left:1.5px;width:7px;height:7px;border-radius:50%;background:var(--subtle);transition:all .2s}
+.vol-toggle.on::after{background:#fff;left:auto;right:1.5px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:1px 7px;border-radius:12px;font-size:9px;font-weight:700}
 .badge-active{background:var(--green-bg);color:var(--green)}
 .badge-off{background:var(--surface3);color:var(--muted)}
 .badge-annual{background:var(--purple-bg);color:var(--purple)}
 .badge-sick{background:var(--red-bg);color:var(--red)}
 .badge-comp{background:var(--cyan-bg);color:var(--cyan)}
 .badge-other{background:var(--surface3);color:var(--muted)}
-.leave-status-active{background:var(--green-bg);color:var(--green);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
-.leave-status-cancelled{background:var(--surface3);color:var(--muted);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
-
-/* ── SECTION ── */
-.section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.section-title{font-size:13px;font-weight:600;color:var(--text)}
-.section-divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+.leave-status-active{background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700}
+.leave-status-cancelled{background:var(--surface3);color:var(--muted);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700}
 
 /* ── HRS BAR ── */
-.hrs-bar-wrap{display:flex;align-items:center;gap:6px}
-.hrs-bar{background:var(--surface3);border-radius:3px;height:4px;width:56px;overflow:hidden}
-.hrs-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.hrs-bar-wrap{display:flex;align-items:center;gap:5px}
+.hrs-bar{background:var(--surface3);border-radius:2px;height:3px;width:48px;overflow:hidden}
+.hrs-bar-fill{height:100%;border-radius:2px;transition:width .4s}
 
-/* ── LOC BLOCKED CHIPS ── */
-.loc-blocked-chip{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:var(--red-bg);color:var(--red);margin:1px;border:1px solid rgba(248,113,113,.15)}
-.loc-all-chip{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.15)}
+/* ── LOC CHIPS ── */
+.loc-blocked-chip{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;background:var(--red-bg);color:var(--red);margin:1px;border:1px solid rgba(248,113,113,.1)}
+.loc-all-chip{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.1)}
 
 /* ── SUGGEST ── */
-.suggest-panel{background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:11px;color:var(--amber)}
-.suggest-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--r-sm);background:rgba(251,191,36,.15);color:var(--amber);font-weight:600;cursor:pointer;border:1px solid rgba(251,191,36,.25);margin:2px;font-size:10px;font-family:'Outfit',sans-serif}
-.suggest-chip:hover{background:rgba(251,191,36,.25)}
+.suggest-panel{background:var(--amber-bg);border:1px solid rgba(251,191,36,.15);border-radius:var(--r);padding:9px 12px;margin-top:8px;font-size:10px;color:var(--amber)}
+.suggest-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;background:rgba(251,191,36,.12);color:var(--amber);font-weight:600;cursor:pointer;border:1px solid rgba(251,191,36,.2);margin:2px;font-size:9px;font-family:'Outfit',sans-serif}
+.suggest-chip:hover{background:rgba(251,191,36,.2)}
 
-/* ── ADVANCED TOOLS ── */
-.adv-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
-.adv-toggle{width:100%;padding:9px 14px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--muted);font-family:'Outfit',sans-serif;text-align:left;transition:color .15s}
+/* ── ADV TOOLS ── */
+.adv-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.adv-toggle{width:100%;padding:8px 12px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:10px;font-weight:600;color:var(--muted);font-family:'Outfit',sans-serif;text-align:left;transition:color .15s}
 .adv-toggle:hover{color:var(--text)}
-.adv-toggle .arr{transition:transform .2s;font-size:9px}
+.adv-toggle .arr{transition:transform .2s;font-size:8px;margin-left:auto}
 .adv-toggle.open .arr{transform:rotate(180deg)}
-.adv-body{display:none;padding:10px 14px;border-top:1px solid var(--border)}
+.adv-body{display:none;padding:9px 12px;border-top:1px solid var(--border)}
 .adv-body.open{display:block}
 
-/* ── DENSITY ── */
-.density-sw{display:flex;align-items:center;gap:4px}
-.density-btn{padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);transition:all .15s}
-.density-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-/* ── DEFAULT SCHEDULE PAGE ── */
-.dow-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
-.dow-pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif}
-.dow-pill:hover{border-color:var(--border2);color:var(--text)}
+/* ── DEFAULT PAGE ── */
+.dow-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.dow-pill{padding:4px 11px;border-radius:16px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:10px;font-weight:600;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif}
+.dow-pill:hover{color:var(--text);background:var(--surface3)}
 .dow-pill.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
 
 /* ── PLAN MODAL ── */
-.plan-day-block{border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
-.plan-day-hdr{background:var(--surface2);padding:8px 12px;font-size:11px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
-.plan-slot-row{display:flex;align-items:center;gap:8px;padding:4px 12px;border-bottom:1px solid var(--border)}
+.plan-day-block{border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px;overflow:hidden}
+.plan-day-hdr{background:var(--surface2);padding:7px 11px;font-size:10px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+.plan-slot-row{display:flex;align-items:center;gap:8px;padding:3px 11px;border-bottom:1px solid var(--border)}
 .plan-slot-row:last-child{border-bottom:none}
-.plan-slot-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);min-width:130px;flex-shrink:0}
+.plan-slot-label{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);min-width:120px;flex-shrink:0}
 
-/* ── SWAP REQUESTS ── */
-.swap-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)}
+/* ── SWAP ITEMS ── */
+.swap-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border)}
 .swap-item:last-child{border-bottom:none}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.modal{background:var(--surface);border-radius:var(--r-lg);padding:24px;width:100%;max-width:500px;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto;border:1px solid var(--border2)}
-.modal h3{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--text);letter-spacing:-.3px}
-.form-row{margin-bottom:13px}
-.form-row label{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.loc-toggles{display:flex;gap:6px;flex-wrap:wrap}
-.loc-toggle{padding:5px 10px;border-radius:var(--r-sm);border:1px solid var(--border2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.modal{background:var(--surface);border-radius:var(--r-lg);padding:22px;width:100%;max-width:480px;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto;border:1px solid var(--border2)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--text);letter-spacing:-.3px}
+.form-row{margin-bottom:11px}
+.form-row label{display:block;font-size:9px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px}
+.loc-toggles{display:flex;gap:5px;flex-wrap:wrap}
+.loc-toggle{padding:4px 9px;border-radius:5px;border:1px solid var(--border2);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif}
 .loc-toggle.blocked{border-color:var(--red);background:var(--red-bg);color:var(--red)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
 /* ── ADMIN TOOLS ── */
-.admin-tools{background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--r);padding:14px 18px;margin-top:20px}
-.admin-tools h3{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:10px}
+.admin-tools{background:var(--amber-bg);border:1px solid rgba(251,191,36,.15);border-radius:var(--r);padding:12px 16px;margin-top:18px}
+.admin-tools h3{font-size:11px;font-weight:600;color:var(--amber);margin-bottom:9px}
 
-/* ── PIN SCREEN ── */
+/* ── PIN ── */
 .pin-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center}
-.pin-box{background:var(--surface);border-radius:20px;padding:40px;width:100%;max-width:340px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
-.pin-logo{width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px}
-.pin-box h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.4px}
-.pin-box p{color:var(--muted);font-size:12px;margin-bottom:24px;line-height:1.6}
-.pin-input{font-size:24px;font-weight:700;text-align:center;letter-spacing:10px;border:1px solid var(--border2);border-radius:var(--r);padding:12px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace}
+.pin-box{background:var(--surface);border-radius:18px;padding:36px;width:100%;max-width:320px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
+.pin-logo{width:46px;height:46px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px}
+.pin-box h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:5px;letter-spacing:-.4px}
+.pin-box p{color:var(--muted);font-size:11px;margin-bottom:20px;line-height:1.6}
+.pin-input{font-size:22px;font-weight:700;text-align:center;letter-spacing:8px;border:1px solid var(--border2);border-radius:var(--r);padding:11px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace}
 .pin-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-.pin-error{color:var(--red);font-size:11px;margin-top:8px;min-height:16px}
-.pin-bypass{margin-top:14px;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:none;display:inline-block;transition:color .15s}
+.pin-error{color:var(--red);font-size:10px;margin-top:7px;min-height:14px}
+.pin-bypass{margin-top:12px;font-size:10px;color:var(--muted);cursor:pointer;display:inline-block;transition:color .15s}
 .pin-bypass:hover{color:var(--text)}
 
 /* ── UNDO TOAST ── */
-.undo-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface2);color:var(--text);padding:10px 16px;border-radius:24px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);transition:transform .3s;z-index:300;border:1px solid var(--border2)}
+.undo-toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);color:var(--text);padding:8px 14px;border-radius:20px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);transition:transform .25s;z-index:300;border:1px solid var(--border2)}
 .undo-toast.show{transform:translateX(-50%) translateY(0)}
-.undo-btn{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
-
-/* ── ALERT INLINE ── */
-.inline-alert{padding:10px 14px;border-radius:var(--r);font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;border:1px solid}
-.inline-alert.warn{background:var(--amber-bg);border-color:rgba(251,191,36,.2);color:var(--amber)}
-.inline-alert.info{background:var(--accent-glow);border-color:rgba(79,142,247,.2);color:var(--accent)}
-.inline-alert.danger{background:var(--red-bg);border-color:rgba(248,113,113,.2);color:var(--red)}
-.inline-alert.success{background:var(--green-bg);border-color:rgba(52,211,153,.2);color:var(--green)}
-
-/* ── CLOCK ── */
-.live-clock{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--muted);background:var(--surface2);padding:5px 12px;border-radius:20px;border:1px solid var(--border)}
-
-/* ── LIVE DATE ── */
-#live-date-label{color:var(--muted);font-size:12px;margin-top:3px}
+.undo-btn{background:var(--accent);color:#fff;border:none;border-radius:16px;padding:3px 9px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 
 /* ── SCHED LEGEND ── */
-.sched-legend{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--muted)}
-.legend-dot{width:8px;height:8px;border-radius:50%}
+.sched-legend{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:var(--muted)}
+.legend-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── CONFIG ── */
+.config-note{background:var(--surface2);border-radius:var(--r-sm);padding:11px;margin-bottom:12px;font-size:10px;color:var(--muted);line-height:1.6;border:1px solid var(--border)}
 
 .hidden{display:none}
 .ml-auto{margin-left:auto}
@@ -311,21 +366,18 @@ select option{background:var(--surface2);color:var(--text)}
 .flex{display:flex;align-items:center}
 .gap8{gap:8px}
 
-/* ── FIREBASE MODAL ── */
-.config-note{background:var(--surface2);border-radius:var(--r-sm);padding:12px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;border:1px solid var(--border)}
-
-@media(max-width:600px){
-  .topbar{padding:0 12px}
-  .nav-tab{padding:5px 8px;font-size:10px}
+@media(max-width:640px){
   .live-board{grid-template-columns:1fr}
+  .my-6day{grid-template-columns:repeat(3,1fr)}
   .page{padding:12px}
   .subnav{padding:0 12px}
+  .topbar{padding:0 12px}
 }
 </style>
 </head>
 <body>
 
-<!-- ══ PIN SCREEN ══ -->
+<!-- ══ PIN ══ -->
 <div id="pin-screen" class="pin-screen">
   <div class="pin-box">
     <div class="pin-logo">🏢</div>
@@ -333,9 +385,9 @@ select option{background:var(--surface2);color:var(--text)}
     <p>Enter admin PIN to manage schedules,<br>or view the live board without a PIN.</p>
     <input type="password" class="pin-input" id="pin-input" maxlength="6" placeholder="••••" onkeyup="checkPin(event)">
     <div class="pin-error" id="pin-error"></div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="submitPin()">Enter Admin</button>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:11px" onclick="submitPin()">Enter Admin</button>
     <a class="pin-bypass" onclick="enterLiveMode()">View live board only →</a>
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
       <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="showFirebaseConfig()">⚙ Configure Firebase</button>
     </div>
   </div>
@@ -345,14 +397,14 @@ select option{background:var(--surface2);color:var(--text)}
 <div class="topbar">
   <div class="logo">
     <div class="logo-mark">🏢</div>
-    <span class="logo-text">ScheduleMaker<span class="logo-v">v4</span></span>
+    <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-live" onclick="showPage('live',this)">Live Board</button>
     <button class="nav-tab admin-only" id="tab-default" onclick="showPage('default',this)">Default Schedule</button>
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
     <button class="nav-tab admin-only" id="tab-staff" onclick="showPage('staff',this)">Staff</button>
-    <button class="nav-tab admin-only" id="tab-leave" onclick="showPage('leave',this)">Leave & Swaps</button>
+    <button class="nav-tab admin-only" id="tab-leave" onclick="showPage('leave',this)">Leave &amp; Swaps</button>
   </div>
   <div class="topbar-right">
     <div class="sync-chip" id="sync-indicator"><span class="dot">⬤</span><span id="sync-text">local</span></div>
@@ -363,53 +415,105 @@ select option{background:var(--surface2);color:var(--text)}
 <!-- ══ WEEK SUBNAV ══ -->
 <div class="subnav hidden" id="week-nav-bar">
   <button class="week-arrow" onclick="shiftWeek(-1)">‹</button>
-  <span class="week-label" id="week-label">Week of …</span>
+  <span class="week-label" id="week-label">…</span>
   <button class="week-arrow" onclick="shiftWeek(1)">›</button>
   <button class="today-btn" onclick="goToToday()">Today</button>
   <div class="day-pills" id="day-pills"></div>
-  <div class="density-sw" style="margin-left:auto">
+  <div class="density-sw">
     <button class="density-btn active" id="density-normal" onclick="setDensity('normal')">Normal</button>
     <button class="density-btn" id="density-compact" onclick="setDensity('compact')">Compact</button>
   </div>
 </div>
 
-<!-- ══ PAGE: LIVE BOARD ══ -->
+<!-- ══════════════════════════════════════════════
+     PAGE: LIVE BOARD
+══════════════════════════════════════════════ -->
 <div class="page active" id="page-live">
-  <div class="page-hdr">
-    <div class="page-hdr-text">
-      <h2>Live Board</h2>
-      <p id="live-date-label">Loading…</p>
+  <div class="live-top">
+    <div>
+      <h2 style="font-size:19px;font-weight:700;letter-spacing:-.4px">Live Board</h2>
+      <p id="live-date-label" style="color:var(--muted);font-size:11px;margin-top:2px">Loading…</p>
     </div>
-    <div class="live-clock ml-auto" id="live-clock">--:-- --</div>
+    <div class="live-view-toggle ml-auto">
+      <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">Locations</button>
+      <button class="lvt-btn" id="lvt-my" onclick="setLiveView('my')">My Schedule</button>
+      <button class="lvt-btn" id="lvt-history" onclick="setLiveView('history')">History</button>
+    </div>
+    <div class="live-clock" id="live-clock">--:-- --</div>
   </div>
-  <div id="live-alert-area" class="alert-banner-area"></div>
-  <div id="live-board" class="live-board"></div>
-  <div class="card mt12">
-    <div class="card-hdr"><h2>Volunteers Available Today</h2></div>
-    <div class="card-body" id="live-volunteers"></div>
+
+  <div id="live-alert-area" class="alert-area"></div>
+
+  <!-- Locations view -->
+  <div id="view-locations">
+    <div class="timeline-section">
+      <div class="timeline-time-labels" id="tl-labels"></div>
+      <div id="location-timeline"></div>
+    </div>
+    <div id="live-board" class="live-board"></div>
+    <div class="card mt12">
+      <div class="card-hdr"><h2>Volunteers Available Today</h2></div>
+      <div class="card-body" id="live-volunteers"></div>
+    </div>
+  </div>
+
+  <!-- My Schedule view -->
+  <div id="view-my" class="hidden">
+    <div class="my-schedule-section">
+      <div class="my-sched-hdr">
+        <h3>Who are you?</h3>
+        <div class="emp-selector" id="emp-selector"></div>
+      </div>
+      <div id="my-sched-body" class="my-sched-body">
+        <p style="color:var(--muted);font-size:11px">Select your name above to see your schedule.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- History view -->
+  <div id="view-history" class="hidden">
+    <div class="card">
+      <div class="card-hdr"><h2>Completed Slots Today</h2></div>
+      <div id="history-today"></div>
+    </div>
+    <div class="card mt12">
+      <div class="card-hdr" style="flex-wrap:wrap;gap:8px">
+        <h2>Deep Lookup</h2>
+        <div class="lookup-controls">
+          <input type="date" id="lookup-date" style="width:130px" onchange="renderDeepLookup()">
+          <select id="lookup-loc" style="width:110px" onchange="renderDeepLookup()">
+            <option value="">All locations</option>
+            <option>Gate</option><option>Podium</option><option>Mandir</option>
+            <option>Field Work</option><option>Gift Shop</option>
+          </select>
+        </div>
+      </div>
+      <div id="deep-lookup-result" class="card-body"></div>
+    </div>
   </div>
 </div>
 
-<!-- ══ PAGE: DEFAULT SCHEDULE ══ -->
+<!-- ══════════════════════════════════════════════
+     PAGE: DEFAULT SCHEDULE
+══════════════════════════════════════════════ -->
 <div class="page" id="page-default">
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Default Schedule</h2>
-      <p>Set the baseline template for each day of week — used every week unless overridden</p>
+      <p>Set the baseline for each day of week — unset slots use each employee's fallback location</p>
     </div>
     <button class="btn btn-success ml-auto" onclick="saveDefault()">Save Default</button>
   </div>
-  <div class="inline-alert info">Changes here affect all future weeks. Past weeks already opened are unaffected unless you explicitly apply defaults.</div>
+  <div class="inline-alert info">Changes here affect all future weeks. Field Work fallback per employee is set in Staff → Edit.</div>
   <div class="dow-pills" id="dow-pills"></div>
   <div class="card">
-    <div class="sched-legend" id="default-legend">
+    <div class="sched-legend">
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-lunch)"></span>Lunch</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✅ covered &nbsp; ❌ missing</span>
+      <span style="margin-left:auto;font-size:9px;color:var(--subtle)">✅ covered &nbsp;❌ missing</span>
     </div>
     <div class="sched-wrap">
       <table class="sched-grid" id="default-table">
@@ -420,27 +524,27 @@ select option{background:var(--surface2);color:var(--text)}
   </div>
 </div>
 
-<!-- ══ PAGE: WEEKLY SCHEDULE ══ -->
+<!-- ══════════════════════════════════════════════
+     PAGE: WEEKLY SCHEDULE
+══════════════════════════════════════════════ -->
 <div class="page" id="page-schedule">
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Weekly Schedule</h2>
-      <p>Overrides on top of the default template · orange border = changed from default</p>
+      <p>Overrides layer on top of defaults · orange border = changed · 🔒 = on leave · ✖ = absent</p>
     </div>
   </div>
-  <div id="sched-alert-area" class="alert-banner-area"></div>
+  <div id="sched-alert-area" class="alert-area"></div>
   <div class="inline-alert warn hidden" id="coverage-alert"></div>
   <div class="adv-bar">
-    <button class="adv-toggle" id="adv-toggle" onclick="toggleAdvTools()">
-      Advanced tools <span class="arr">▾</span>
-    </button>
+    <button class="adv-toggle" id="adv-toggle" onclick="toggleAdv()">Advanced tools <span class="arr">▾</span></button>
     <div class="adv-body" id="adv-body">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;font-weight:600;color:var(--muted)">Copy this day to:</span>
-        <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
-        <span style="margin-left:12px;font-size:11px;font-weight:600;color:var(--muted)">Apply default:</span>
+        <span style="font-size:10px;font-weight:600;color:var(--muted)">Copy day to:</span>
+        <div id="copy-day-btns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+        <span style="margin-left:10px;font-size:10px;font-weight:600;color:var(--muted)">Apply default:</span>
         <button class="btn btn-sm btn-warn" onclick="applyDefaultToDay()">Apply Default to This Day</button>
-        <button class="btn btn-sm btn-ghost" onclick="clearOverridesForDay()">Clear Overrides for This Day</button>
+        <button class="btn btn-sm btn-ghost" onclick="clearOverridesForDay()">Clear Overrides</button>
       </div>
     </div>
   </div>
@@ -451,9 +555,8 @@ select option{background:var(--surface2);color:var(--text)}
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-lunch)"></span>Lunch</span>
-      <span class="legend-item" style="margin-left:8px"><span style="display:inline-block;width:10px;height:10px;border-left:2px solid var(--orange);margin-right:3px"></span>Override</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✅ covered &nbsp; ❌ missing &nbsp; 🔒 on leave</span>
+      <span class="legend-item" style="margin-left:6px"><span style="display:inline-block;width:8px;height:8px;border-left:2px solid var(--orange);margin-right:3px"></span>Override</span>
+      <span style="margin-left:auto;font-size:9px;color:var(--subtle)">✅ covered &nbsp;❌ missing &nbsp;🔒 leave &nbsp;✖ absent</span>
     </div>
     <div class="sched-wrap">
       <table class="sched-grid" id="sched-table">
@@ -462,27 +565,24 @@ select option{background:var(--surface2);color:var(--text)}
       </table>
     </div>
   </div>
-  <div id="suggest-area" style="margin-top:10px"></div>
+  <div id="suggest-area" style="margin-top:8px"></div>
 </div>
 
-<!-- ══ PAGE: STAFF ══ -->
+<!-- ══════════════════════════════════════════════
+     PAGE: STAFF
+══════════════════════════════════════════════ -->
 <div class="page" id="page-staff">
   <div class="page-hdr">
-    <div class="page-hdr-text">
-      <h2>Staff</h2>
-      <p>Manage employees and volunteers</p>
-    </div>
+    <div class="page-hdr-text"><h2>Staff</h2><p>Manage employees, fallback locations, and volunteers</p></div>
   </div>
   <div class="section-hdr">
     <span class="section-title">Employees</span>
     <button class="btn btn-primary btn-sm ml-auto" onclick="openAddEmployee()">+ Add Employee</button>
   </div>
-  <div class="card" style="margin-bottom:20px">
+  <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
       <table class="data-table" id="roster-table">
-        <thead>
-          <tr><th>#</th><th>Name</th><th>Locations</th><th>Status</th><th>This Week</th><th>Leave Balance</th><th>Actions</th></tr>
-        </thead>
+        <thead><tr><th>#</th><th>Name</th><th>Fallback</th><th>Locations</th><th>Status</th><th>This Week</th><th>Leave</th><th>Actions</th></tr></thead>
         <tbody id="roster-body"></tbody>
       </table>
     </div>
@@ -495,57 +595,61 @@ select option{background:var(--surface2);color:var(--text)}
   <div id="volunteer-list"></div>
   <div class="admin-tools">
     <h3>Admin Tools</h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-ghost" onclick="showFirebaseConfig()">⚙ Firebase Setup</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-sm btn-ghost" onclick="showFirebaseConfig()">⚙ Firebase</button>
       <button class="btn btn-sm btn-success" onclick="exportData()">↓ Export JSON</button>
       <button class="btn btn-sm btn-ghost" onclick="importData()">↑ Import JSON</button>
-      <button class="btn btn-sm btn-danger" onclick="resetAllData()">Delete All Data</button>
+      <button class="btn btn-sm btn-danger" onclick="resetAllData()">Delete All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
   </div>
 </div>
 
-<!-- ══ PAGE: LEAVE & SWAPS ══ -->
+<!-- ══════════════════════════════════════════════
+     PAGE: LEAVE & SWAPS
+══════════════════════════════════════════════ -->
 <div class="page" id="page-leave">
   <div class="page-hdr">
-    <div class="page-hdr-text">
-      <h2>Leave &amp; Day-Off Swaps</h2>
-      <p>Approved leave auto-locks slots to VACATION · swaps are notes only</p>
-    </div>
+    <div class="page-hdr-text"><h2>Leave &amp; Day-Off Swaps</h2><p>Active leave locks slots to VACATION · swaps are logged reminders</p></div>
   </div>
   <div class="section-hdr">
     <span class="section-title">Leave Records</span>
     <button class="btn btn-leave btn-sm ml-auto" onclick="openAddLeave()">+ Add Leave</button>
   </div>
-  <div class="card" style="margin-bottom:20px">
+  <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
       <table class="data-table" id="leave-table">
-        <thead>
-          <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Note</th><th>Status</th><th>Actions</th></tr>
-        </thead>
+        <thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Note</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody id="leave-body"></tbody>
       </table>
     </div>
   </div>
   <hr class="section-divider">
   <div class="section-hdr">
-    <span class="section-title">Day-Off Swap Requests</span>
+    <span class="section-title">Day-Off Swaps</span>
     <button class="btn btn-warn btn-sm ml-auto" onclick="openAddSwap()">+ Add Swap</button>
   </div>
-  <div class="card">
-    <div id="swap-list"></div>
-  </div>
+  <div class="card"><div id="swap-list"></div></div>
 </div>
 
 <!-- ══ MODALS ══ -->
-
-<!-- Employee Modal -->
 <div class="modal-overlay hidden" id="emp-modal">
   <div class="modal">
     <h3 id="modal-title">Add Employee</h3>
     <div class="form-row"><label>Full Name</label><input type="text" id="emp-name" placeholder="e.g. Raj Patel"></div>
     <div class="form-row">
-      <label>Blocked Locations <span style="color:var(--subtle);font-weight:400;text-transform:none">(click to block)</span></label>
+      <label>Fallback Location <span style="color:var(--subtle);font-weight:400;text-transform:none">(when slot is unscheduled)</span></label>
+      <select id="emp-fallback">
+        <option value="Field Work">Field Work</option>
+        <option value="OFF">OFF</option>
+        <option value="Gate">Gate</option>
+        <option value="Podium">Podium</option>
+        <option value="Mandir">Mandir</option>
+        <option value="Gift Shop">Gift Shop</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Blocked Locations</label>
       <div class="loc-toggles">
         <button class="loc-toggle" id="tog-gate" onclick="toggleLoc('gate')">Gate</button>
         <button class="loc-toggle" id="tog-podium" onclick="toggleLoc('podium')">Podium</button>
@@ -557,131 +661,119 @@ select option{background:var(--surface2);color:var(--text)}
     <div class="form-row"><label>Status</label>
       <select id="emp-status"><option>Active</option><option>Day Off</option><option>Vacation</option><option>Sick</option></select>
     </div>
-    <div class="grid2" style="margin-bottom:13px">
+    <div class="grid2" style="margin-bottom:11px">
       <div class="form-row" style="margin:0"><label>Annual Leave (days)</label><input type="text" id="emp-annual" placeholder="20"></div>
       <div class="form-row" style="margin:0"><label>Sick Leave (days)</label><input type="text" id="emp-sick" placeholder="10"></div>
     </div>
-    <div id="emp-hrs-summary" style="font-size:11px;color:var(--muted);margin-bottom:12px"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div id="emp-hrs-summary" style="font-size:10px;color:var(--muted);margin-bottom:10px"></div>
+    <div style="display:flex;gap:7px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('emp-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
     </div>
   </div>
 </div>
 
-<!-- Plan Schedule Modal -->
 <div class="modal-overlay hidden" id="plan-modal">
-  <div class="modal" style="max-width:440px">
+  <div class="modal" style="max-width:420px">
     <h3 id="plan-modal-title">Plan Schedule</h3>
     <div class="form-row">
       <label>Week</label>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px">
         <button class="week-arrow" onclick="planShiftWeek(-1)">‹</button>
-        <span id="plan-week-label" style="font-size:12px;font-weight:600;color:var(--text)"></span>
+        <span id="plan-week-label" style="font-size:11px;font-weight:600;color:var(--text)"></span>
         <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
       </div>
     </div>
     <div id="plan-days-container" style="max-height:55vh;overflow-y:auto"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:11px">
       <button class="btn btn-ghost" onclick="closeModal('plan-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="savePlanSchedule()">Save Week</button>
     </div>
   </div>
 </div>
 
-<!-- Volunteer Modal -->
 <div class="modal-overlay hidden" id="vol-modal">
   <div class="modal">
     <h3 id="vol-modal-title">Add Volunteer</h3>
     <div class="form-row"><label>Full Name</label><input type="text" id="vol-name" placeholder="e.g. Anita Mehta"></div>
-    <div class="form-row"><label>Note <span style="color:var(--subtle);font-weight:400;text-transform:none">(optional)</span></label><input type="text" id="vol-note" placeholder="e.g. Available afternoons only"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div class="form-row"><label>Note</label><input type="text" id="vol-note" placeholder="e.g. Available afternoons only"></div>
+    <div style="display:flex;gap:7px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('vol-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveVolunteer()">Save Volunteer</button>
+      <button class="btn btn-primary" onclick="saveVolunteer()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Leave Modal -->
 <div class="modal-overlay hidden" id="leave-modal">
   <div class="modal">
     <h3 id="leave-modal-title">Add Leave Record</h3>
     <div class="form-row"><label>Employee</label><select id="leave-emp-id"></select></div>
     <div class="grid2">
-      <div class="form-row"><label>From Date</label><input type="date" id="leave-from"></div>
-      <div class="form-row"><label>To Date (inclusive)</label><input type="date" id="leave-to"></div>
+      <div class="form-row"><label>From</label><input type="date" id="leave-from"></div>
+      <div class="form-row"><label>To (inclusive)</label><input type="date" id="leave-to"></div>
     </div>
-    <div class="form-row"><label>Leave Type</label>
-      <select id="leave-type">
-        <option value="annual">Annual Leave</option>
-        <option value="sick">Sick Leave</option>
-        <option value="comp">Comp Off</option>
-        <option value="other">Other / Unpaid</option>
-      </select>
+    <div class="form-row"><label>Type</label>
+      <select id="leave-type"><option value="annual">Annual</option><option value="sick">Sick</option><option value="comp">Comp Off</option><option value="other">Other</option></select>
     </div>
-    <div class="form-row"><label>Note <span style="color:var(--subtle);font-weight:400;text-transform:none">(optional)</span></label><input type="text" id="leave-note" placeholder="e.g. Medical"></div>
+    <div class="form-row"><label>Note</label><input type="text" id="leave-note" placeholder="e.g. Medical"></div>
     <div class="form-row"><label>Status</label>
       <select id="leave-status"><option value="active">Active</option><option value="cancelled">Cancelled</option></select>
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div style="display:flex;gap:7px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('leave-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveLeave()">Save Leave</button>
+      <button class="btn btn-primary" onclick="saveLeave()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Swap Modal -->
 <div class="modal-overlay hidden" id="swap-modal">
   <div class="modal">
     <h3 id="swap-modal-title">Add Day-Off Swap</h3>
     <div class="form-row"><label>Employee</label><select id="swap-emp-id"></select></div>
     <div class="grid2">
-      <div class="form-row"><label>Usual Day Off (give up)</label><input type="date" id="swap-from"></div>
+      <div class="form-row"><label>Usual Day Off</label><input type="date" id="swap-from"></div>
       <div class="form-row"><label>Works Instead On</label><input type="date" id="swap-to"></div>
     </div>
-    <div class="form-row"><label>Note <span style="color:var(--subtle);font-weight:400;text-transform:none">(optional)</span></label><input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div class="form-row"><label>Note</label><input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali"></div>
+    <div style="display:flex;gap:7px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('swap-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSwap()">Save Swap</button>
+      <button class="btn btn-primary" onclick="saveSwap()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Firebase Modal -->
 <div class="modal-overlay hidden" id="firebase-modal">
   <div class="modal">
     <h3>Firebase Setup</h3>
-    <div class="config-note">Create a free Firebase project → Add web app → copy config. Enable Realtime Database with read/write rules. Without Firebase, the app works on localStorage (single device only).</div>
+    <div class="config-note">Create a free Firebase project → Add web app → copy config. Enable Realtime Database with read/write rules.</div>
     <div class="form-row"><label>API Key</label><input type="text" id="fb-apiKey" placeholder="AIza…"></div>
-    <div class="form-row"><label>Auth Domain</label><input type="text" id="fb-authDomain" placeholder="your-app.firebaseapp.com"></div>
-    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL" placeholder="https://your-app-default-rtdb.firebaseio.com"></div>
-    <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId" placeholder="your-app"></div>
-    <div class="form-row"><label>App ID</label><input type="text" id="fb-appId" placeholder="1:xxx:web:xxx"></div>
-    <div class="form-row"><label>Admin PIN (4–6 digits)</label><input type="password" id="fb-pin" placeholder="e.g. 1234"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
+    <div class="form-row"><label>Auth Domain</label><input type="text" id="fb-authDomain"></div>
+    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL"></div>
+    <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId"></div>
+    <div class="form-row"><label>App ID</label><input type="text" id="fb-appId"></div>
+    <div class="form-row"><label>Admin PIN</label><input type="password" id="fb-pin" placeholder="4–6 digits"></div>
+    <div style="display:flex;gap:7px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('firebase-modal')">Cancel</button>
-      <button class="btn btn-success" onclick="saveFirebaseConfig()">Save & Connect</button>
+      <button class="btn btn-success" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
     </div>
   </div>
 </div>
 
-<!-- Reset Modal -->
 <div class="modal-overlay hidden" id="reset-modal">
   <div class="modal">
     <h3>Delete All Data</h3>
-    <div class="inline-alert danger" style="margin-bottom:16px">This permanently deletes all employees, schedules, leave records, and defaults. Cannot be undone.</div>
-    <div class="form-row"><label>Enter Admin PIN to confirm</label><input type="password" id="reset-pin" placeholder="PIN"></div>
+    <div class="inline-alert danger" style="margin-bottom:14px">Permanently deletes everything. Cannot be undone.</div>
+    <div class="form-row"><label>Admin PIN</label><input type="password" id="reset-pin" placeholder="PIN"></div>
     <div class="pin-error" id="reset-error"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-ghost" onclick="closeModal('reset-modal')">Cancel</button>
       <button class="btn btn-danger" onclick="confirmReset()">Delete Everything</button>
     </div>
   </div>
 </div>
 
-<!-- Undo Toast -->
 <div class="undo-toast" id="undo-toast">
-  <span id="undo-msg">Slot changed</span>
+  <span id="undo-msg">Changed</span>
   <button class="undo-btn" onclick="undoLastChange()">↩ Undo</button>
 </div>
 
@@ -689,11 +781,11 @@ select option{background:var(--surface2);color:var(--text)}
 // ══════════════════════════════════════════════════
 // CONSTANTS
 // ══════════════════════════════════════════════════
-const DAYS_SHORT  = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-const DAYS_FULL   = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const REQUIRED    = ['Gate','Podium','Mandir'];
-const ALL_LOCS    = ['gate','podium','mandir','field','giftshop'];
-const TIME_SLOTS  = [
+const DAYS_SHORT = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const DAYS_FULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const REQUIRED   = ['Gate','Podium','Mandir'];
+const ALL_LOCS   = ['gate','podium','mandir','field','giftshop'];
+const TIME_SLOTS = [
   '6:00–7:00 AM','7:00–8:00 AM','8:00–9:00 AM',
   '9:00–10:00 AM','10:00–11:00 AM','11:00 AM–12:00 PM',
   '12:00–12:30 PM','12:30–1:00 PM','1:00–1:30 PM',
@@ -701,13 +793,18 @@ const TIME_SLOTS  = [
   '4:30–5:30 PM','5:30–6:30 PM','6:30–7:30 PM',
   '7:30–8:30 PM'
 ];
-const SLOT_HRS    = [1,1,1,1,1,1,.5,.5,.5,1,1,1,1,1,1,1];
-const LUNCH_SLOTS = [6,7,8];
-const SLOT_START  = [360,420,480,540,600,660,720,750,780,810,870,930,990,1050,1110,1170];
-const LOC_OPTIONS = ['Gate','Podium','Mandir','Field Work','Gift Shop','LUNCH','OFF','VACATION'];
-const LOC_CLS     = {Gate:'gate',Podium:'podium',Mandir:'mandir','Field Work':'field','Gift Shop':'giftshop',LUNCH:'lunch',OFF:'off',VACATION:'vac'};
-const DEFAULT_PIN = '1234';
-const ALERT_DAYS  = 7;
+const SLOT_HRS   = [1,1,1,1,1,1,.5,.5,.5,1,1,1,1,1,1,1];
+const LUNCH_SLOTS= [6,7,8];
+const SLOT_START = [360,420,480,540,600,660,720,750,780,810,870,930,990,1050,1110,1170];
+const SLOT_END   = [420,480,540,600,660,720,750,780,810,870,930,990,1050,1110,1170,1230];
+const DAY_START  = 360; // 6:00 AM in minutes
+const DAY_END    = 1230;// 8:30 PM
+const LOC_OPTIONS= ['Gate','Podium','Mandir','Field Work','Gift Shop','LUNCH','OFF','VACATION'];
+const LOC_CLS    = {Gate:'gate',Podium:'podium',Mandir:'mandir','Field Work':'field','Gift Shop':'giftshop',LUNCH:'lunch',OFF:'off',VACATION:'vac'};
+const LOC_COLOR  = {Gate:'var(--loc-gate)',Podium:'var(--loc-podium)',Mandir:'var(--loc-mandir)','Field Work':'var(--loc-field)','Gift Shop':'var(--loc-giftshop)',LUNCH:'var(--loc-lunch)',OFF:'var(--loc-off-text)',VACATION:'var(--loc-vac)'};
+const DEFAULT_PIN= '1234';
+const ALERT_DAYS = 7;
+const HANDOVER_WARN_MINS = 15;
 
 // ══════════════════════════════════════════════════
 // DATE HELPERS
@@ -720,17 +817,20 @@ function getWeekDates(mon){return Array.from({length:7},(_,i)=>{const d=new Date
 function formatWeekLabel(mon){const sun=new Date(mon);sun.setDate(sun.getDate()+6);const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];if(mon.getMonth()===sun.getMonth())return`${mo[mon.getMonth()]} ${mon.getDate()}–${sun.getDate()}, ${mon.getFullYear()}`;return`${mo[mon.getMonth()]} ${mon.getDate()} – ${mo[sun.getMonth()]} ${sun.getDate()}, ${mon.getFullYear()}`;}
 function daysBetween(a,b){return Math.round((fromISO(b)-fromISO(a))/86400000)+1;}
 function dowKey(iso){const d=fromISO(iso),dow=d.getDay();return DAYS_SHORT[dow===0?6:dow-1];}
+function nowMins(){const n=new Date();return n.getHours()*60+n.getMinutes();}
+function currentSlotIdx(){const nm=nowMins();let si=-1;SLOT_START.forEach((s,i)=>{if(nm>=s&&(i===TIME_SLOTS.length-1||nm<SLOT_START[i+1]))si=i;});return si;}
 
 // ══════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════
 let state={
   employees:[],volunteers:[],
-  defaultSchedule:{},   // { MON: { slotIdx: { empId: loc } } }
-  schedule:{},           // { "ISO": { slotIdx: { empId: loc } } } — overrides only
+  defaultSchedule:{},  // DOW → slotIdx → empId → loc
+  schedule:{},          // ISO → slotIdx → empId → loc (overrides)
   volAvailability:{},
   leaveRequests:[],
   swapRequests:[],
+  absentToday:{},       // empId → bool (resets daily)
   currentWeekMon:null,
   currentDateISO:null,
   currentDow:'MON',
@@ -741,58 +841,69 @@ let editingEmpId=null,editingVolId=null,editingLeaveId=null,editingSwapId=null;
 let newEmpDisallowed={gate:false,podium:false,mandir:false,field:false,giftshop:false};
 let densityMode='normal';
 let planEmpId=null,planWeekMon=null,planDraft={};
+let liveView='locations';
+let selectedEmpId=sessionStorage.getItem('smPro_selectedEmp')||null;
 
 // ══════════════════════════════════════════════════
 // PERSISTENCE
 // ══════════════════════════════════════════════════
 function loadLocal(){
   try{
-    const s=localStorage.getItem('smPro_v4');
+    const s=localStorage.getItem('smPro_v5');
     if(s){const saved=JSON.parse(s);Object.assign(state,saved);}
-    // migrate employees
     state.employees.forEach(emp=>{
-      if(emp.locs&&!emp.disallowedLocs){emp.disallowedLocs={gate:!emp.locs.gate,podium:!emp.locs.podium,mandir:!emp.locs.mandir,field:!emp.locs.field,giftshop:false};delete emp.locs;}
       if(!emp.disallowedLocs)emp.disallowedLocs={gate:false,podium:false,mandir:false,field:false,giftshop:false};
       if(!emp.leaveBalance)emp.leaveBalance={annual:20,sick:10};
+      if(!emp.fallback)emp.fallback='Field Work';
     });
     if(!state.leaveRequests)state.leaveRequests=[];
     if(!state.swapRequests)state.swapRequests=[];
     if(!state.volAvailability)state.volAvailability={};
     if(!state.defaultSchedule)state.defaultSchedule={};
     if(!state.schedule)state.schedule={};
-  }catch(e){console.warn('Load failed:',e);}
+    if(!state.absentToday)state.absentToday={};
+    // reset absent if day changed
+    const savedDay=localStorage.getItem('smPro_absentDay');
+    if(savedDay!==todayISO())state.absentToday={};
+  }catch(e){console.warn('Load error:',e);}
 }
 function saveLocal(){
-  localStorage.setItem('smPro_v4',JSON.stringify({
+  localStorage.setItem('smPro_v5',JSON.stringify({
     employees:state.employees,volunteers:state.volunteers,
     defaultSchedule:state.defaultSchedule,schedule:state.schedule,
     volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
-    swapRequests:state.swapRequests,
+    swapRequests:state.swapRequests,absentToday:state.absentToday,
   }));
+  localStorage.setItem('smPro_absentDay',todayISO());
 }
 function persistAll(){saveLocal();pushToFirebase();}
 
 // ══════════════════════════════════════════════════
-// RESOLVED SCHEDULE (default + override)
+// RESOLVED SCHEDULE  (default + fallback + override)
 // ══════════════════════════════════════════════════
 function getResolvedLoc(iso,si,empId){
-  // override takes priority
-  const override=(state.schedule[iso]||{})[si];
-  if(override&&override[empId]!==undefined)return{loc:override[empId],isOverride:true};
-  // fall back to default for this day-of-week
+  // 1. override
+  const ov=(state.schedule[iso]||{})[si];
+  if(ov&&ov[empId]!==undefined)return{loc:ov[empId],isOverride:true,isFallback:false};
+  // 2. default template
   const dow=dowKey(iso);
   const def=(state.defaultSchedule[dow]||{})[si];
-  if(def&&def[empId]!==undefined)return{loc:def[empId],isOverride:false};
-  return{loc:'OFF',isOverride:false};
-}
-function isOverridden(iso,si,empId){
-  const over=(state.schedule[iso]||{})[si];
-  return over&&over[empId]!==undefined;
+  if(def&&def[empId]!==undefined)return{loc:def[empId],isOverride:false,isFallback:false};
+  // 3. employee fallback
+  const emp=state.employees.find(e=>e.id===empId);
+  const fb=(emp&&emp.fallback)||'Field Work';
+  return{loc:fb,isOverride:false,isFallback:true};
 }
 function getDefaultLoc(iso,si,empId){
   const dow=dowKey(iso);
   const def=(state.defaultSchedule[dow]||{})[si];
-  return(def&&def[empId]!==undefined)?def[empId]:'OFF';
+  if(def&&def[empId]!==undefined)return def[empId];
+  const emp=state.employees.find(e=>e.id===empId);
+  return(emp&&emp.fallback)||'Field Work';
+}
+function isOverridden(iso,si,empId){
+  const ov=(state.schedule[iso]||{})[si];
+  return!!(ov&&ov[empId]!==undefined);
 }
 function setOverride(iso,si,empId,loc){
   if(!state.schedule[iso])state.schedule[iso]={};
@@ -802,16 +913,10 @@ function setOverride(iso,si,empId,loc){
 function clearOverride(iso,si,empId){
   if(state.schedule[iso]&&state.schedule[iso][si])delete state.schedule[iso][si][empId];
 }
-function isLocCovered(iso,si,loc){
-  return state.employees.some(emp=>{
-    if(isOnLeave(emp.id,iso))return false;
-    const{l}={l:getResolvedLoc(iso,si,emp.id).loc};
-    return l===loc;
-  });
-}
 function isLocCoveredFull(iso,si,loc){
   return state.employees.some(emp=>{
     if(isOnLeave(emp.id,iso))return false;
+    if(state.absentToday[emp.id]&&iso===todayISO())return false;
     return getResolvedLoc(iso,si,emp.id).loc===loc;
   });
 }
@@ -822,16 +927,19 @@ function countDayGaps(iso){
 }
 function countDayOverrides(iso){
   let c=0;
-  const over=state.schedule[iso]||{};
-  Object.values(over).forEach(s=>Object.values(s||{}).forEach(()=>c++));
+  Object.values(state.schedule[iso]||{}).forEach(s=>Object.keys(s||{}).forEach(()=>c++));
   return c;
 }
 
 // ══════════════════════════════════════════════════
-// LEAVE HELPERS
+// LEAVE / ABSENT
 // ══════════════════════════════════════════════════
 function isOnLeave(empId,iso){
   return state.leaveRequests.some(lr=>lr.status==='active'&&lr.empId===empId&&lr.from<=iso&&lr.to>=iso);
+}
+function toggleAbsent(empId){
+  state.absentToday[empId]=!state.absentToday[empId];
+  persistAll();renderLiveBoard();
 }
 
 // ══════════════════════════════════════════════════
@@ -840,11 +948,10 @@ function isOnLeave(empId,iso){
 function initFirebase(){
   try{
     const cfg=JSON.parse(localStorage.getItem('smPro_fbConfig')||'null');
-    if(!cfg||!cfg.databaseURL)return;
-    if(typeof firebase==='undefined')return;
+    if(!cfg||!cfg.databaseURL||typeof firebase==='undefined')return;
     if(!firebase.apps.length)firebase.initializeApp(cfg);
     fbDb=firebase.database();fbConnected=true;
-    fbDb.ref('smPro_v4').on('value',snap=>{
+    fbDb.ref('smPro_v5').on('value',snap=>{
       const d=snap.val();
       if(d){Object.assign(state,d);renderAll();}
       setSyncStatus('synced');
@@ -855,11 +962,11 @@ function initFirebase(){
 function pushToFirebase(){
   if(!fbConnected||!fbDb)return;
   setSyncStatus('syncing');
-  fbDb.ref('smPro_v4').set({
+  fbDb.ref('smPro_v5').set({
     employees:state.employees,volunteers:state.volunteers,
     defaultSchedule:state.defaultSchedule,schedule:state.schedule,
     volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,
-    swapRequests:state.swapRequests,
+    swapRequests:state.swapRequests,absentToday:state.absentToday,
   }).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('error'));
 }
 function setSyncStatus(s){
@@ -875,68 +982,63 @@ function showFirebaseConfig(){
 }
 function saveFirebaseConfig(){
   const cfg={apiKey:v('fb-apiKey'),authDomain:v('fb-authDomain'),databaseURL:v('fb-databaseURL'),projectId:v('fb-projectId'),appId:v('fb-appId')};
-  const pin=v('fb-pin');
-  if(pin)localStorage.setItem('smPro_pin',pin);
+  const pin=v('fb-pin');if(pin)localStorage.setItem('smPro_pin',pin);
   localStorage.setItem('smPro_fbConfig',JSON.stringify(cfg));
   closeModal('firebase-modal');
-  alert('Config saved! Reload to connect Firebase.');
+  alert('Saved! Reload to connect Firebase.');
 }
 
 // ══════════════════════════════════════════════════
-// AHEAD-OF-TIME ALERTS
+// ALERTS
 // ══════════════════════════════════════════════════
 function buildAlerts(){
-  const alerts=[];
-  const today=todayISO();
+  const alerts=[],today=todayISO();
   const ahead=new Date();ahead.setDate(ahead.getDate()+ALERT_DAYS);
   const aheadISO=toISO(ahead);
-
-  // Leave alerts
   state.leaveRequests.filter(lr=>lr.status==='active'&&lr.to>=today&&lr.from<=aheadISO).forEach(lr=>{
     const emp=state.employees.find(e=>e.id===lr.empId);if(!emp)return;
-    // count affected slots in the leave period that still show non-OFF/non-VACATION default
     let affected=0;
-    const cur=new Date(Math.max(fromISO(lr.from),fromISO(today)));
+    const cur=new Date(Math.max(fromISO(lr.from).getTime(),fromISO(today).getTime()));
     const end=fromISO(lr.to);
     while(cur<=end){
       const iso=toISO(cur);
-      TIME_SLOTS.forEach((_,si)=>{
-        const{loc}=getResolvedLoc(iso,si,emp.id);
-        if(loc!=='OFF'&&loc!=='VACATION')affected++;
-      });
+      TIME_SLOTS.forEach((_,si)=>{const{loc}=getResolvedLoc(iso,si,emp.id);if(loc!=='OFF'&&loc!=='VACATION')affected++;});
       cur.setDate(cur.getDate()+1);
     }
-    alerts.push({type:'leave',msg:`${emp.name} on leave ${lr.from===lr.to?lr.from:lr.from+' – '+lr.to}${affected>0?' · '+affected+' slots need reassignment':''}`,jumpDate:lr.from>=today?lr.from:today});
+    alerts.push({type:'leave',msg:`${escH(emp.name)} on leave ${lr.from===lr.to?lr.from:lr.from+' – '+lr.to}${affected>0?' · '+affected+' slots need reassignment':''}`,jumpDate:lr.from>=today?lr.from:today});
   });
-
-  // Swap alerts
   state.swapRequests.forEach(sw=>{
     const emp=state.employees.find(e=>e.id===sw.empId);if(!emp)return;
-    if(sw.fromDate>=today&&sw.fromDate<=aheadISO){
-      alerts.push({type:'swap',msg:`${emp.name} day-off swap: off ${sw.fromDate}, works ${sw.toDate}`,jumpDate:sw.fromDate});
-    }
+    if(sw.fromDate>=today&&sw.fromDate<=aheadISO)
+      alerts.push({type:'swap',msg:`${escH(emp.name)} swap: off ${sw.fromDate}, works ${sw.toDate}`,jumpDate:sw.fromDate});
   });
-
+  // handover warning
+  const si=currentSlotIdx();
+  if(si>=0&&si<TIME_SLOTS.length-1){
+    const minsLeft=SLOT_END[si]-nowMins();
+    if(minsLeft<=HANDOVER_WARN_MINS&&minsLeft>0){
+      REQUIRED.forEach(loc=>{
+        const nextEmp=state.employees.find(emp=>!isOnLeave(emp.id,todayISO())&&!state.absentToday[emp.id]&&getResolvedLoc(todayISO(),si+1,emp.id).loc===loc);
+        alerts.push({type:'handover',msg:`⚡ Handover in ${minsLeft} min at ${loc}${nextEmp?' → '+nextEmp.name:' → UNCOVERED'}`,jumpDate:null});
+      });
+    }
+  }
   return alerts;
 }
 function renderAlerts(containerId){
   const el=document.getElementById(containerId);if(!el)return;
   const alerts=buildAlerts();
-  if(!alerts.length){el.innerHTML='';return;}
   el.innerHTML=alerts.map(a=>`
     <div class="alert-banner ${a.type}">
-      <span>${a.type==='leave'?'🔴':'🟡'} ${escHtml(a.msg)}</span>
-      ${state.mode==='admin'?`<button class="fix-btn" onclick="jumpToDate('${a.jumpDate}')">Fix Now →</button>`:''}
-    </div>
-  `).join('');
+      <span>${a.msg}</span>
+      ${a.jumpDate&&state.mode==='admin'?`<button class="fix-btn" onclick="jumpToDate('${a.jumpDate}')">Fix →</button>`:''}
+    </div>`).join('');
 }
 function jumpToDate(iso){
   const monday=getWeekMonday(fromISO(iso));
-  state.currentWeekMon=toISO(monday);
-  state.currentDateISO=iso;
+  state.currentWeekMon=toISO(monday);state.currentDateISO=iso;
   showPage('schedule',document.getElementById('tab-schedule'));
 }
-function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ══════════════════════════════════════════════════
 // PIN / MODE
@@ -982,14 +1084,22 @@ function showPage(name,tabEl){
   if(name==='live')renderLiveBoard();
   if(name==='default')renderDefaultSchedule();
 }
+function setLiveView(v){
+  liveView=v;
+  ['locations','my','history'].forEach(n=>{
+    document.getElementById('view-'+n).classList.toggle('hidden',n!==v);
+    document.getElementById('lvt-'+n).classList.toggle('active',n===v);
+  });
+  if(v==='history'){renderHistoryToday();renderDeepLookup();}
+  if(v==='my')renderMySchedule();
+}
 
 // ══════════════════════════════════════════════════
 // WEEK NAV
 // ══════════════════════════════════════════════════
 function initWeekState(){
   const monday=getWeekMonday(new Date());
-  state.currentWeekMon=toISO(monday);
-  state.currentDateISO=todayISO();
+  state.currentWeekMon=toISO(monday);state.currentDateISO=todayISO();
 }
 function shiftWeek(delta){
   const mon=fromISO(state.currentWeekMon);mon.setDate(mon.getDate()+delta*7);
@@ -997,35 +1107,30 @@ function shiftWeek(delta){
   renderWeekNav();renderSchedule();
 }
 function goToToday(){
-  state.currentWeekMon=toISO(getWeekMonday(new Date()));
-  state.currentDateISO=todayISO();
+  state.currentWeekMon=toISO(getWeekMonday(new Date()));state.currentDateISO=todayISO();
   renderWeekNav();renderSchedule();
 }
 function switchDay(iso){state.currentDateISO=iso;renderWeekNav();renderSchedule();}
 function renderWeekNav(){
   const monday=fromISO(state.currentWeekMon),weekDates=getWeekDates(monday),todayStr=todayISO();
   document.getElementById('week-label').textContent='Week of '+formatWeekLabel(monday);
-  const pillsEl=document.getElementById('day-pills');
-  pillsEl.innerHTML=weekDates.map((d,i)=>{
+  document.getElementById('day-pills').innerHTML=weekDates.map((d,i)=>{
     const iso=toISO(d),isSel=iso===state.currentDateISO,isToday=iso===todayStr;
-    const gaps=countDayGaps(iso),overrides=countDayOverrides(iso);
-    return`<button class="day-pill${isSel?' active':''}${isToday?' today':''}${gaps>0?' has-gap':''}${overrides>0?' has-override':''}"
-      onclick="switchDay('${iso}')" title="${gaps} gap(s), ${overrides} override(s)">
-      ${DAYS_SHORT[i]} ${d.getDate()}
-      <span class="gap-dot"></span>
-      <span class="override-dot"></span>
+    const gaps=countDayGaps(iso),ovrs=countDayOverrides(iso);
+    return`<button class="day-pill${isSel?' active':''}${isToday?' today':''}${gaps>0?' has-gap':''}${ovrs>0?' has-ovr':''}"
+      onclick="switchDay('${iso}')" title="${gaps} gap(s), ${ovrs} override(s)">
+      ${DAYS_SHORT[i]} ${d.getDate()}<span class="gap-dot"></span><span class="ovr-dot"></span>
     </button>`;
   }).join('');
-  // copy day buttons
-  const copyBtns=document.getElementById('copy-day-btns');
-  if(copyBtns)copyBtns.innerHTML=weekDates.map((d,i)=>{
+  const cb=document.getElementById('copy-day-btns');
+  if(cb)cb.innerHTML=weekDates.map((d,i)=>{
     const iso=toISO(d);if(iso===state.currentDateISO)return'';
     return`<button class="btn btn-sm btn-ghost" onclick="copyDayTo('${iso}')">${DAYS_SHORT[i]} ${d.getDate()}</button>`;
   }).join('');
 }
 
 // ══════════════════════════════════════════════════
-// DENSITY
+// DENSITY / ADV TOOLS
 // ══════════════════════════════════════════════════
 function setDensity(mode){
   densityMode=mode;
@@ -1033,9 +1138,280 @@ function setDensity(mode){
   document.getElementById('density-compact').classList.toggle('active',mode==='compact');
   renderSchedule();
 }
-function toggleAdvTools(){
+function toggleAdv(){
   const btn=document.getElementById('adv-toggle'),body=document.getElementById('adv-body');
   btn.classList.toggle('open');body.classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════
+// TIMELINE STRIP (live board)
+// ══════════════════════════════════════════════════
+function renderTimeline(){
+  const iso=todayISO(),total=DAY_END-DAY_START,nm=nowMins();
+  // time labels
+  const labels=['6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM'];
+  const labelMins=[360,480,600,720,840,960,1080,1200];
+  document.getElementById('tl-labels').innerHTML=labelMins.map(lm=>{
+    const pct=(lm-DAY_START)/total*100;
+    return`<span class="timeline-time-label" style="position:absolute;left:${pct}%">${labels[labelMins.indexOf(lm)]}</span>`;
+  }).join('');
+  document.getElementById('tl-labels').style.position='relative';
+  document.getElementById('tl-labels').style.height='14px';
+
+  // one row per required location
+  const nowPct=Math.max(0,Math.min(100,(nm-DAY_START)/total*100));
+  let html='';
+  REQUIRED.forEach(loc=>{
+    const color=LOC_COLOR[loc]||'var(--muted)';
+    let segs='';
+    // group consecutive slots by assigned employee
+    let groups=[];
+    TIME_SLOTS.forEach((_,si)=>{
+      const emp=state.employees.find(e=>{
+        if(isOnLeave(e.id,iso)||state.absentToday[e.id])return false;
+        return getResolvedLoc(iso,si,e.id).loc===loc;
+      });
+      const name=emp?emp.name.split(' ')[0]:'–';
+      const covered=!!emp;
+      const start=SLOT_START[si],end=SLOT_END[si];
+      if(groups.length&&groups[groups.length-1].name===name&&groups[groups.length-1].covered===covered)
+        groups[groups.length-1].end=end;
+      else groups.push({name,covered,start,end});
+    });
+    groups.forEach(g=>{
+      const left=(g.start-DAY_START)/total*100;
+      const width=(g.end-g.start)/total*100;
+      const bg=g.covered?`${color}`:'rgba(248,113,113,.3)';
+      const fg=g.covered?color:'var(--red)';
+      segs+=`<div class="timeline-seg" style="width:${width}%;background:${bg}22;color:${fg};border-right:1px solid var(--border)" title="${g.name} @ ${loc}">${width>4?g.name:''}</div>`;
+    });
+    html+=`<div class="timeline-row">
+      <span class="timeline-loc-label" style="color:${color}">${loc}</span>
+      <div class="timeline-bar">
+        ${segs}
+        <div class="timeline-now-line" style="left:${nowPct}%"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('location-timeline').innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════
+// LIVE BOARD – LOCATIONS VIEW
+// ══════════════════════════════════════════════════
+function renderLiveBoard(){
+  const iso=todayISO(),now=new Date(),nm=nowMins();
+  document.getElementById('live-date-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  renderAlerts('live-alert-area');
+  renderTimeline();
+
+  const si=currentSlotIdx();
+  const locColors={Gate:'var(--loc-gate)',Podium:'var(--loc-podium)',Mandir:'var(--loc-mandir)'};
+  let cards='';
+  REQUIRED.forEach(loc=>{
+    const color=locColors[loc];
+    const assignedEmp=state.employees.find(emp=>{
+      if(isOnLeave(emp.id,iso))return false;
+      if(state.absentToday[emp.id])return false;
+      return si>=0&&getResolvedLoc(iso,si,emp.id).loc===loc;
+    });
+    // handover warning
+    const minsLeft=si>=0?SLOT_END[si]-nm:999;
+    const handoverSoon=minsLeft<=HANDOVER_WARN_MINS&&minsLeft>0;
+    const nextEmp=si>=0&&si<TIME_SLOTS.length-1?state.employees.find(emp=>{
+      if(isOnLeave(emp.id,iso)||state.absentToday[emp.id])return false;
+      return getResolvedLoc(iso,si+1,emp.id).loc===loc;
+    }):null;
+
+    // next 3 slots
+    let nextSlots='';
+    if(assignedEmp&&si>=0){
+      for(let ni=si+1;ni<TIME_SLOTS.length&&ni<si+4;ni++){
+        const nLoc=getResolvedLoc(iso,ni,assignedEmp.id).loc;
+        const nc=LOC_CLS[nLoc]||'off';
+        nextSlots+=`<div class="live-next-slot">
+          <span class="live-next-time">${TIME_SLOTS[ni]}</span>
+          <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--loc-${nc}-bg,var(--surface3));color:var(--loc-${nc},var(--muted))">${nLoc}</span>
+        </div>`;
+      }
+    }
+
+    const isAdmin=state.mode==='admin';
+    cards+=`<div class="live-card">
+      <div class="live-card-hdr">
+        <div class="live-loc-name"><span class="live-loc-dot" style="background:${color}"></span>${loc}</div>
+        <span class="live-slot-time">${si>=0?TIME_SLOTS[si]:'Before hours'}</span>
+      </div>
+      <div class="live-card-body">
+        ${assignedEmp?`
+          <div class="live-emp-name">${escH(assignedEmp.name)}</div>
+          <div class="live-sub">
+            <span>${assignedEmp.status||'Active'}</span>
+            ${handoverSoon?`<span class="handover-badge">⚡ ${minsLeft}m left</span>`:''}
+            ${isAdmin?`<button class="present-toggle ${state.absentToday[assignedEmp.id]?'absent':'present'}" onclick="toggleAbsent('${assignedEmp.id}')">
+              ${state.absentToday[assignedEmp.id]?'✖ Absent':'✓ Present'}
+            </button>`:''}
+          </div>
+          ${handoverSoon&&nextEmp?`<div style="font-size:9px;color:var(--orange);margin-top:4px">Next: ${escH(nextEmp.name)}</div>`:''}
+          ${handoverSoon&&!nextEmp?`<div style="font-size:9px;color:var(--red);margin-top:4px">⚠ No one assigned next</div>`:''}
+          ${nextSlots?`<div class="live-next"><div class="live-next-title">Up next</div>${nextSlots}</div>`:''}`
+        :`<div class="live-uncovered">⚠ Uncovered</div>
+          <div class="live-sub">No one assigned to ${loc}</div>`}
+      </div>
+    </div>`;
+  });
+  document.getElementById('live-board').innerHTML=cards||`<p style="color:var(--muted);font-size:11px">No schedule data for today.</p>`;
+
+  const availVols=state.volunteers.filter(v=>(state.volAvailability[v.id]||{})[iso]);
+  document.getElementById('live-volunteers').innerHTML=availVols.length
+    ?`<div style="display:flex;flex-wrap:wrap;gap:5px">${availVols.map(v=>`<span class="vol-chip">${escH(v.name)}</span>`).join('')}</div>`
+    :`<p style="color:var(--muted);font-size:11px">No volunteers available today.</p>`;
+
+  // also refresh other views if open
+  if(liveView==='my')renderMySchedule();
+  if(liveView==='history'){renderHistoryToday();renderDeepLookup();}
+}
+
+// ══════════════════════════════════════════════════
+// MY SCHEDULE VIEW
+// ══════════════════════════════════════════════════
+function renderEmpSelector(){
+  document.getElementById('emp-selector').innerHTML=state.employees.map(emp=>`
+    <button class="emp-pill${selectedEmpId===emp.id?' active':''}" onclick="selectEmp('${emp.id}')">${escH(emp.name.split(' ')[0])}</button>
+  `).join('');
+}
+function selectEmp(empId){
+  selectedEmpId=empId;
+  sessionStorage.setItem('smPro_selectedEmp',empId);
+  renderEmpSelector();
+  renderMySchedule();
+}
+function renderMySchedule(){
+  renderEmpSelector();
+  const el=document.getElementById('my-sched-body');
+  if(!selectedEmpId){el.innerHTML='<p style="color:var(--muted);font-size:11px">Select your name above.</p>';return;}
+  const emp=state.employees.find(e=>e.id===selectedEmpId);
+  if(!emp){el.innerHTML='<p style="color:var(--muted);font-size:11px">Employee not found.</p>';return;}
+
+  const iso=todayISO(),nm=nowMins(),si=currentSlotIdx();
+  const{loc:curLoc}=getResolvedLoc(iso,si>=0?si:0,selectedEmpId);
+  const cls=LOC_CLS[curLoc]||'off';
+
+  // find next change
+  let nextChangeSlot=-1,nextChangeLoc='';
+  if(si>=0){
+    for(let ni=si+1;ni<TIME_SLOTS.length;ni++){
+      const{loc:nl}=getResolvedLoc(iso,ni,selectedEmpId);
+      if(nl!==curLoc){nextChangeSlot=ni;nextChangeLoc=nl;break;}
+    }
+  }
+
+  // personal timeline
+  const total=DAY_END-DAY_START;
+  const nowPct=Math.max(0,Math.min(100,(nm-DAY_START)/total*100));
+  let tlHtml='';
+  TIME_SLOTS.forEach((_,si2)=>{
+    const{loc}=getResolvedLoc(iso,si2,selectedEmpId);
+    const left=(SLOT_START[si2]-DAY_START)/total*100;
+    const width=(SLOT_END[si2]-SLOT_START[si2])/total*100;
+    const c=LOC_CLS[loc]||'off';
+    const color=LOC_COLOR[loc]||'var(--muted)';
+    tlHtml+=`<div class="my-tl-seg" style="width:${width}%;background:${color}22;color:${color}" title="${TIME_SLOTS[si2]}: ${loc}">${width>5?loc.split(' ')[0]:''}</div>`;
+  });
+
+  // 7-day view (today + next 6)
+  let dayColsHtml='';
+  for(let di=0;di<7;di++){
+    const d=new Date();d.setDate(d.getDate()+di);
+    const diso=toISO(d);
+    const isToday=di===0;
+    const onLeave=isOnLeave(selectedEmpId,diso);
+    dayColsHtml+=`<div class="my-6day-col">
+      <div class="my-6day-hdr${isToday?' today-col':''}">${DAYS_SHORT[(d.getDay()+6)%7]}<br><span style="font-size:10px;font-weight:400">${d.getDate()}</span></div>`;
+    TIME_SLOTS.forEach((_,si2)=>{
+      if(onLeave){dayColsHtml+=`<div class="my-6day-slot" style="color:var(--purple)"><span>🔒</span></div>`;return;}
+      const{loc}=getResolvedLoc(diso,si2,selectedEmpId);
+      const color=LOC_COLOR[loc]||'var(--muted)';
+      const isCur=isToday&&si2===si;
+      dayColsHtml+=`<div class="my-6day-slot${isCur?' cur-row':''}" style="color:${color};${isCur?'background:var(--accent-glow)':''}">
+        <span class="my-6day-time">${TIME_SLOTS[si2].split('–')[0]}</span>
+        <span>${loc.split(' ')[0]}</span>
+      </div>`;
+    });
+    dayColsHtml+='</div>';
+  }
+
+  el.innerHTML=`
+    <div class="my-today-header">
+      <div class="my-today-name">${escH(emp.name)}</div>
+      ${si>=0?`<span class="my-cur-loc loc-${cls}" style="background:var(--loc-${cls}-bg);color:var(--loc-${cls})">Now: ${curLoc}</span>`:''}
+      ${nextChangeSlot>=0?`<span class="my-next-up">→ ${nextChangeLoc} at ${TIME_SLOTS[nextChangeSlot].split('–')[0]}</span>`:''}
+    </div>
+    <div class="my-timeline">
+      ${tlHtml}
+      <div class="my-tl-now" style="left:${nowPct}%"></div>
+    </div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Today + Next 6 Days</div>
+    <div class="my-6day" style="overflow-x:auto">${dayColsHtml}</div>
+  `;
+}
+
+// ══════════════════════════════════════════════════
+// HISTORY – COMPLETED SLOTS TODAY
+// ══════════════════════════════════════════════════
+function renderHistoryToday(){
+  const iso=todayISO(),nm=nowMins(),el=document.getElementById('history-today');
+  const pastSlots=TIME_SLOTS.map((_,si)=>si).filter(si=>SLOT_END[si]<=nm);
+  if(!pastSlots.length){el.innerHTML='<div style="padding:14px 16px;color:var(--muted);font-size:11px">No completed slots yet today.</div>';return;}
+  let html='';
+  pastSlots.reverse().forEach(si=>{
+    html+=`<div class="hist-slot-row">
+      <span class="hist-time">${TIME_SLOTS[si]}</span>
+      <div class="hist-locs">`;
+    REQUIRED.forEach(loc=>{
+      const emp=state.employees.find(e=>{
+        if(isOnLeave(e.id,iso))return false;
+        return getResolvedLoc(iso,si,e.id).loc===loc;
+      });
+      const color=LOC_COLOR[loc];
+      html+=`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:${color}22;color:${color}">
+        ${loc}: ${emp?escH(emp.name.split(' ')[0]):'–'}
+      </span>`;
+    });
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════
+// HISTORY – DEEP LOOKUP
+// ══════════════════════════════════════════════════
+function renderDeepLookup(){
+  const dateVal=document.getElementById('lookup-date').value;
+  const locFilter=document.getElementById('lookup-loc').value;
+  const el=document.getElementById('deep-lookup-result');
+  if(!dateVal){el.innerHTML='<p style="color:var(--muted);font-size:11px">Pick a date above to look up any day\'s schedule.</p>';return;}
+  const iso=dateVal;
+  let html='';
+  TIME_SLOTS.forEach((slot,si)=>{
+    let rowHtml='';
+    const locsToShow=locFilter?[locFilter]:['Gate','Podium','Mandir','Field Work','Gift Shop'];
+    locsToShow.forEach(loc=>{
+      const emp=state.employees.find(e=>{
+        if(isOnLeave(e.id,iso))return false;
+        return getResolvedLoc(iso,si,e.id).loc===loc;
+      });
+      const color=LOC_COLOR[loc];
+      rowHtml+=`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:${color}22;color:${color};margin:1px">
+        ${loc}: ${emp?escH(emp.name.split(' ')[0]):'—'}
+      </span>`;
+    });
+    html+=`<div class="lookup-slot-row">
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);min-width:120px;flex-shrink:0">${slot}</span>
+      <div style="display:flex;flex-wrap:wrap;gap:2px">${rowHtml}</div>
+    </div>`;
+  });
+  el.innerHTML=html||'<p style="color:var(--muted);font-size:11px">No data.</p>';
 }
 
 // ══════════════════════════════════════════════════
@@ -1049,28 +1425,23 @@ function renderDowPills(){
 function switchDow(dow){state.currentDow=dow;renderDefaultSchedule();}
 function renderDefaultSchedule(){
   renderDowPills();
-  const dow=state.currentDow;
-  const emps=state.employees;
-  const cm=densityMode==='compact';
+  const dow=state.currentDow,emps=state.employees;
   const dowData=state.defaultSchedule[dow]||{};
-
   let hRow=`<tr><th>Time Slot</th>`;
-  emps.forEach(emp=>{hRow+=`<th title="${emp.name}">${emp.name.split(' ')[0]}</th>`;});
+  emps.forEach(emp=>{hRow+=`<th title="${escH(emp.name)}">${escH(emp.name.split(' ')[0])}<br><span style="font-size:8px;opacity:.6;font-weight:400">${emp.fallback||'Field Work'}</span></th>`;});
   REQUIRED.forEach(loc=>{hRow+=`<th>${loc}</th>`;});
   hRow+='</tr>';
   document.getElementById('default-head').innerHTML=hRow;
-
   let rows='';
   TIME_SLOTS.forEach((slot,si)=>{
     const isLunch=LUNCH_SLOTS.includes(si);
     rows+=`<tr><td class="slot-label${isLunch?' lunch-slot':''}">${slot}</td>`;
     emps.forEach(emp=>{
-      const curLoc=(dowData[si]||{})[emp.id]||'OFF';
+      const curLoc=(dowData[si]||{})[emp.id]||(emp.fallback||'Field Work');
       const cls=LOC_CLS[curLoc]||'off';
       const opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curLoc?'selected':''}>${o}</option>`).join('');
       rows+=`<td><select class="loc-select loc-${cls}" onchange="handleDefaultChange('${dow}',${si},'${emp.id}',this)">${opts}</select></td>`;
     });
-    // coverage
     REQUIRED.forEach(loc=>{
       const covered=emps.some(emp=>(dowData[si]||{})[emp.id]===loc);
       rows+=`<td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✅':'❌'}</td>`;
@@ -1084,76 +1455,57 @@ function handleDefaultChange(dow,si,empId,sel){
   if(!state.defaultSchedule[dow][si])state.defaultSchedule[dow][si]={};
   state.defaultSchedule[dow][si][empId]=sel.value;
   sel.className=`loc-select loc-${LOC_CLS[sel.value]||'off'}`;
-  // refresh cov row
   renderDefaultSchedule();
 }
-function saveDefault(){
-  persistAll();
-  showToast('Default schedule saved');
-}
+function saveDefault(){persistAll();showToast('Default schedule saved');}
 
 // ══════════════════════════════════════════════════
-// WEEKLY SCHEDULE RENDER
+// WEEKLY SCHEDULE
 // ══════════════════════════════════════════════════
 function renderSchedule(){
-  const iso=state.currentDateISO;
-  const emps=state.employees;
-  const isAdmin=state.mode==='admin';
-  const cm=densityMode==='compact';
-  const now=new Date(),nowMins=now.getHours()*60+now.getMinutes(),isToday=iso===todayISO();
-
-  // alerts
+  const iso=state.currentDateISO,emps=state.employees,isAdmin=state.mode==='admin';
+  const nm=nowMins(),isToday=iso===todayISO();
   renderAlerts('sched-alert-area');
-
-  // coverage alert
   let totalGaps=0;
   TIME_SLOTS.forEach((_,si)=>REQUIRED.forEach(loc=>{if(!isLocCoveredFull(iso,si,loc))totalGaps++;}));
   const alertEl=document.getElementById('coverage-alert');
   if(totalGaps>0){alertEl.classList.remove('hidden');alertEl.textContent=`⚠ ${totalGaps} coverage gap${totalGaps>1?'s':''} on this day`;}
   else alertEl.classList.add('hidden');
 
-  // thead
   let hRow=`<tr><th>Time Slot</th>`;
   emps.forEach(emp=>{
-    const hrs=calcEmpHoursLeft(emp.id,iso);
-    hRow+=`<th title="${emp.name}">${emp.name.split(' ')[0]}<br><span style="font-size:9px;opacity:.6">${hrs.toFixed(1)}h left</span></th>`;
+    const hrs=calcEmpHrsLeft(emp.id,iso);
+    hRow+=`<th title="${escH(emp.name)}">${escH(emp.name.split(' ')[0])}<br><span style="font-size:8px;opacity:.6">${hrs.toFixed(1)}h</span></th>`;
   });
   REQUIRED.forEach(loc=>{hRow+=`<th>${loc}</th>`;});
   hRow+='</tr>';
   document.getElementById('sched-head').innerHTML=hRow;
 
-  // tbody
   let rows='';
   TIME_SLOTS.forEach((slot,si)=>{
     const isLunch=LUNCH_SLOTS.includes(si);
-    const isCurrent=isToday&&nowMins>=SLOT_START[si]&&(si===TIME_SLOTS.length-1||nowMins<SLOT_START[si+1]);
-    rows+=`<tr class="${isCurrent?'current-row':''}">`;
-    rows+=`<td class="slot-label${isLunch?' lunch-slot':''}${isCurrent?' current-slot':''}">${slot}</td>`;
-
+    const isCur=isToday&&nm>=SLOT_START[si]&&(si===TIME_SLOTS.length-1||nm<SLOT_START[si+1]);
+    rows+=`<tr class="${isCur?'cur-row':''}">`;
+    rows+=`<td class="slot-label${isLunch?' lunch-slot':''}${isCur?' cur-slot':''}">${slot}</td>`;
     emps.forEach(emp=>{
-      if(isOnLeave(emp.id,iso)){
-        rows+=`<td><div class="leave-lock-cell" title="${emp.name} is on leave">🔒</div></td>`;
-        return;
-      }
-      const{loc,isOverride}=getResolvedLoc(iso,si,emp.id);
+      if(isOnLeave(emp.id,iso)){rows+=`<td><div class="leave-lock" title="On leave">🔒</div></td>`;return;}
+      if(isToday&&state.absentToday[emp.id]){rows+=`<td><div class="absent-lock" title="Marked absent">✖</div></td>`;return;}
+      const{loc,isOverride,isFallback}=getResolvedLoc(iso,si,emp.id);
       const cls=LOC_CLS[loc]||'off';
+      const defLoc=getDefaultLoc(iso,si,emp.id);
       if(isAdmin){
         const opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===loc?'selected':''}>${o}</option>`).join('');
-        const defLoc=getDefaultLoc(iso,si,emp.id);
-        rows+=`<td>
-          <div class="cell-wrap${isOverride?' overridden':''}">
-            <select class="loc-select loc-${cls}"
-              onchange="handleLocChange('${iso}',${si},'${emp.id}',this)"
-              title="${isOverride?'Override · default was: '+defLoc:'Default value'}"
-            >${opts}</select>
-            ${isOverride?`<button class="reset-btn" onclick="resetCell('${iso}',${si},'${emp.id}')">↩ reset</button>`:''}
-          </div>
-        </td>`;
+        rows+=`<td><div class="cell-wrap${isOverride?' overridden':''}">
+          <select class="loc-select loc-${cls}"
+            onchange="handleLocChange('${iso}',${si},'${emp.id}',this)"
+            title="${isOverride?'Override · default: '+defLoc:isFallback?'Fallback: '+loc:'Default: '+loc}"
+          >${opts}</select>
+          ${isOverride?`<button class="reset-btn" onclick="resetCell('${iso}',${si},'${emp.id}')">↩ reset</button>`:''}
+        </div></td>`;
       }else{
-        rows+=`<td><div class="loc-select loc-${cls}" style="padding:4px 6px;border-radius:var(--r-sm);font-size:10px;font-weight:600">${loc}</div></td>`;
+        rows+=`<td><div class="loc-select loc-${cls}" style="padding:3px 5px;border-radius:4px">${loc}</div></td>`;
       }
     });
-
     REQUIRED.forEach(loc=>{
       const covered=isLocCoveredFull(iso,si,loc);
       rows+=`<td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✅':'❌'}</td>`;
@@ -1161,28 +1513,18 @@ function renderSchedule(){
     rows+='</tr>';
   });
   document.getElementById('sched-body').innerHTML=rows;
-
   if(isAdmin)renderSuggestions(iso);
 }
 
-function calcEmpHoursLeft(empId,iso){
+function calcEmpHrsLeft(empId,iso){
   let worked=0;
-  TIME_SLOTS.forEach((_,si)=>{
-    const{loc}=getResolvedLoc(iso,si,empId);
-    if(loc&&loc!=='OFF'&&loc!=='VACATION')worked+=SLOT_HRS[si];
-  });
+  TIME_SLOTS.forEach((_,si)=>{const{loc}=getResolvedLoc(iso,si,empId);if(loc&&loc!=='OFF'&&loc!=='VACATION')worked+=SLOT_HRS[si];});
   return Math.max(0,8-worked);
 }
-function calcTotalHrsThisWeek(empId){
+function calcTotalHrsWeek(empId){
   const weekDates=getWeekDates(fromISO(state.currentWeekMon));
   let total=0;
-  weekDates.forEach(d=>{
-    const iso=toISO(d);
-    TIME_SLOTS.forEach((_,si)=>{
-      const{loc}=getResolvedLoc(iso,si,empId);
-      if(loc&&loc!=='OFF'&&loc!=='VACATION')total+=SLOT_HRS[si];
-    });
-  });
+  weekDates.forEach(d=>{const iso=toISO(d);TIME_SLOTS.forEach((_,si)=>{const{loc}=getResolvedLoc(iso,si,empId);if(loc&&loc!=='OFF'&&loc!=='VACATION')total+=SLOT_HRS[si];});});
   return total;
 }
 
@@ -1190,8 +1532,9 @@ function handleLocChange(iso,si,empId,sel){
   const prev=getResolvedLoc(iso,Number(si),empId).loc;
   undoStack={iso,si:Number(si),empId,prev};
   setOverride(iso,Number(si),empId,sel.value);
+  sel.className=`loc-select loc-${LOC_CLS[sel.value]||'off'}`;
   persistAll();renderSchedule();renderWeekNav();
-  showUndo(`${sel.value}`);
+  showUndo(sel.value);
 }
 function resetCell(iso,si,empId){
   clearOverride(iso,Number(si),empId);
@@ -1199,25 +1542,22 @@ function resetCell(iso,si,empId){
   showToast('Reset to default');
 }
 function applyDefaultToDay(){
-  const iso=state.currentDateISO;
-  if(!confirm(`Apply default schedule to ${iso}? Existing overrides will be cleared.`))return;
-  delete state.schedule[iso];
+  if(!confirm(`Apply default schedule to ${state.currentDateISO}? Overrides will be cleared.`))return;
+  delete state.schedule[state.currentDateISO];
   persistAll();renderSchedule();renderWeekNav();
 }
 function clearOverridesForDay(){
-  const iso=state.currentDateISO;
-  const cnt=countDayOverrides(iso);
-  if(!cnt){showToast('No overrides to clear');return;}
-  if(!confirm(`Clear ${cnt} override(s) for ${iso}?`))return;
-  delete state.schedule[iso];
+  const cnt=countDayOverrides(state.currentDateISO);
+  if(!cnt){showToast('No overrides');return;}
+  if(!confirm(`Clear ${cnt} override(s)?`))return;
+  delete state.schedule[state.currentDateISO];
   persistAll();renderSchedule();renderWeekNav();
 }
 function copyDayTo(targetIso){
   const hasData=state.schedule[targetIso]&&Object.keys(state.schedule[targetIso]).length>0;
-  if(hasData&&!confirm(`${targetIso} already has overrides. Overwrite?`))return;
+  if(hasData&&!confirm(`${targetIso} has overrides. Overwrite?`))return;
   state.schedule[targetIso]=JSON.parse(JSON.stringify(state.schedule[state.currentDateISO]||{}));
-  persistAll();renderWeekNav();
-  showToast(`Copied overrides to ${targetIso}`);
+  persistAll();renderWeekNav();showToast(`Copied to ${targetIso}`);
 }
 
 // ══════════════════════════════════════════════════
@@ -1228,20 +1568,18 @@ function renderSuggestions(iso){
   const gaps=[];
   TIME_SLOTS.forEach((_,si)=>REQUIRED.forEach(loc=>{if(!isLocCoveredFull(iso,si,loc))gaps.push({si,loc});}));
   if(!gaps.length){area.innerHTML='';return;}
-  let html=`<div class="suggest-panel"><strong>Quick-fill suggestions</strong><br style="margin:4px 0">`;
+  let html=`<div class="suggest-panel"><strong style="font-size:10px">Quick-fill suggestions</strong><br>`;
   gaps.slice(0,8).forEach(({si,loc})=>{
     const candidates=state.employees.filter(emp=>{
-      if(isOnLeave(emp.id,iso))return false;
-      const{l}={l:getResolvedLoc(iso,si,emp.id).loc};
-      const resolved=getResolvedLoc(iso,si,emp.id).loc;
-      if(resolved!=='OFF')return false;
+      if(isOnLeave(emp.id,iso)||state.absentToday[emp.id])return false;
+      if(getResolvedLoc(iso,si,emp.id).loc!=='OFF'&&getResolvedLoc(iso,si,emp.id).loc!=='Field Work')return false;
       const key=loc.toLowerCase().replace(' ','');
       return!(emp.disallowedLocs&&emp.disallowedLocs[key]);
     });
     if(candidates.length){
       const best=candidates[0];
       html+=`<button class="suggest-chip" onclick="applySuggestion('${iso}',${si},'${best.id}','${loc}')">
-        ${best.name.split(' ')[0]} → ${loc} @ ${TIME_SLOTS[si].split('–')[0].trim()}
+        ${escH(best.name.split(' ')[0])} → ${loc} @ ${TIME_SLOTS[si].split('–')[0]}
       </button>`;
     }
   });
@@ -1252,77 +1590,7 @@ function applySuggestion(iso,si,empId,loc){
   const prev=getResolvedLoc(iso,Number(si),empId).loc;
   undoStack={iso,si:Number(si),empId,prev};
   setOverride(iso,Number(si),empId,loc);
-  persistAll();renderSchedule();renderWeekNav();
-  showUndo('Suggestion applied');
-}
-
-// ══════════════════════════════════════════════════
-// LIVE BOARD
-// ══════════════════════════════════════════════════
-function renderLiveBoard(){
-  const iso=todayISO();
-  const now=new Date();
-  const nowMins=now.getHours()*60+now.getMinutes();
-  document.getElementById('live-date-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-  renderAlerts('live-alert-area');
-
-  let currentSlot=-1;
-  SLOT_START.forEach((sm,i)=>{if(nowMins>=sm&&(i===TIME_SLOTS.length-1||nowMins<SLOT_START[i+1]))currentSlot=i;});
-
-  const board=document.getElementById('live-board');
-  const locColors={Gate:'var(--loc-gate)',Podium:'var(--loc-podium)',Mandir:'var(--loc-mandir)'};
-
-  let cards='';
-  REQUIRED.forEach(loc=>{
-    const color=locColors[loc]||'var(--muted)';
-    const assignedEmp=state.employees.find(emp=>{
-      if(isOnLeave(emp.id,iso))return false;
-      return currentSlot>=0&&getResolvedLoc(iso,currentSlot,emp.id).loc===loc;
-    });
-    let nextSlots='';
-    if(assignedEmp){
-      for(let ni=currentSlot+1;ni<TIME_SLOTS.length&&ni<currentSlot+4;ni++){
-        const nLoc=getResolvedLoc(iso,ni,assignedEmp.id).loc;
-        const nc=LOC_CLS[nLoc]||'off';
-        nextSlots+=`<div class="live-next-slot">
-          <span class="live-next-time">${TIME_SLOTS[ni]}</span>
-          <span class="badge" style="background:var(--loc-${nc}-bg,var(--surface3));color:var(--loc-${nc},var(--muted))">${nLoc}</span>
-        </div>`;
-      }
-    }
-    cards+=`<div class="live-card">
-      <div class="live-card-hdr">
-        <div class="live-loc-name">
-          <span class="live-loc-dot" style="background:${color}"></span>
-          ${loc}
-        </div>
-        <span class="live-slot-time">${currentSlot>=0?TIME_SLOTS[currentSlot]:'—'}</span>
-      </div>
-      <div class="live-card-body">
-        ${assignedEmp
-          ?`<div class="live-name">${assignedEmp.name}</div>
-             <div class="live-sub">${assignedEmp.status||'Active'}</div>
-             ${nextSlots?`<div class="live-next"><div class="live-next-title">Up next</div>${nextSlots}</div>`:''}`
-          :`<div class="live-uncovered">⚠ Uncovered</div>
-             <div class="live-sub">No one assigned to ${loc}</div>`
-        }
-      </div>
-    </div>`;
-  });
-  board.innerHTML=cards||`<p style="color:var(--muted);font-size:12px">No schedule data for today.</p>`;
-
-  const volEl=document.getElementById('live-volunteers');
-  const availVols=state.volunteers.filter(v=>(state.volAvailability[v.id]||{})[iso]);
-  volEl.innerHTML=availVols.length
-    ?`<div style="display:flex;flex-wrap:wrap;gap:6px">${availVols.map(v=>`<span class="vol-chip">${v.name}</span>`).join('')}</div>`
-    :`<p style="color:var(--muted);font-size:12px">No volunteers marked available today.</p>`;
-}
-
-function tickClock(){
-  const now=new Date();let h=now.getHours(),m=now.getMinutes(),ampm=h>=12?'PM':'AM';
-  h=h%12||12;
-  document.getElementById('live-clock').textContent=`${h}:${String(m).padStart(2,'0')} ${ampm}`;
+  persistAll();renderSchedule();renderWeekNav();showUndo('Suggestion applied');
 }
 
 // ══════════════════════════════════════════════════
@@ -1345,7 +1613,7 @@ function buildPlanDraft(){
 }
 function renderPlanModal(){
   const emp=state.employees.find(e=>e.id===planEmpId);if(!emp)return;
-  document.getElementById('plan-modal-title').textContent=`Plan Schedule – ${emp.name}`;
+  document.getElementById('plan-modal-title').textContent=`Plan – ${escH(emp.name)}`;
   document.getElementById('plan-week-label').textContent=formatWeekLabel(fromISO(planWeekMon));
   const weekDates=getWeekDates(fromISO(planWeekMon));
   let html='';
@@ -1355,12 +1623,12 @@ function renderPlanModal(){
     TIME_SLOTS.forEach((slot,si)=>{
       const curVal=(planDraft[iso]||{})[si]||'OFF';
       if(onLeave){
-        html+=`<div class="plan-slot-row"><span class="plan-slot-label">${slot}</span><span style="font-size:10px;color:var(--purple);font-weight:600">🔒 On Leave</span></div>`;
+        html+=`<div class="plan-slot-row"><span class="plan-slot-label">${slot}</span><span style="font-size:9px;color:var(--purple);font-weight:700">🔒 On Leave</span></div>`;
       }else{
         const opts=LOC_OPTIONS.map(o=>`<option value="${o}"${o===curVal?'selected':''}>${o}</option>`).join('');
         html+=`<div class="plan-slot-row">
           <span class="plan-slot-label">${slot}</span>
-          <select class="loc-select loc-${LOC_CLS[curVal]||'off'}" style="max-width:130px" onchange="planDraftChange('${iso}',${si},this)">${opts}</select>
+          <select class="loc-select loc-${LOC_CLS[curVal]||'off'}" style="max-width:120px" onchange="planDraftChange('${iso}',${si},this)">${opts}</select>
         </div>`;
       }
     });
@@ -1376,7 +1644,6 @@ function planDraftChange(iso,si,sel){
 function savePlanSchedule(){
   Object.entries(planDraft).forEach(([iso,slots])=>{
     Object.entries(slots).forEach(([si,loc])=>{
-      // only store as override if different from default
       const defLoc=getDefaultLoc(iso,Number(si),planEmpId);
       if(loc!==defLoc)setOverride(iso,Number(si),planEmpId,loc);
       else clearOverride(iso,Number(si),planEmpId);
@@ -1390,58 +1657,51 @@ function savePlanSchedule(){
 // ══════════════════════════════════════════════════
 function renderRoster(){
   const tbody=document.getElementById('roster-body');
-  if(!state.employees.length){
-    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No employees yet.</td></tr>`;
-    renderVolunteers();return;
-  }
+  if(!state.employees.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">No employees yet.</td></tr>`;renderVolunteers();return;}
   tbody.innerHTML=state.employees.map((emp,i)=>{
-    const blocked=Object.entries(emp.disallowedLocs||{}).filter(([,v])=>v).map(([k])=>k);
-    const blockedHtml=blocked.length?blocked.map(k=>`<span class="loc-blocked-chip">${k}</span>`).join(''):`<span class="loc-all-chip">All locations</span>`;
-    const hrs=calcTotalHrsThisWeek(emp.id);
+    const blocked=Object.entries(emp.disallowedLocs||{}).filter(([,val])=>val).map(([k])=>k);
+    const blockedHtml=blocked.length?blocked.map(k=>`<span class="loc-blocked-chip">${k}</span>`).join(''):`<span class="loc-all-chip">All locs</span>`;
+    const hrs=calcTotalHrsWeek(emp.id);
     const pct=Math.min(100,hrs/40*100);
     const col=pct>80?'var(--green)':pct>50?'var(--amber)':'var(--red)';
     const bal=emp.leaveBalance||{annual:20,sick:10};
+    const fb=emp.fallback||'Field Work';
+    const fbCls=LOC_CLS[fb]||'off';
     return`<tr>
       <td style="color:var(--subtle)">${i+1}</td>
-      <td><strong style="color:var(--text)">${escHtml(emp.name)}</strong></td>
+      <td><strong style="color:var(--text)">${escH(emp.name)}</strong></td>
+      <td><span class="loc-select loc-${fbCls}" style="display:inline-block;padding:2px 7px;border-radius:5px;font-size:9px">${fb}</span></td>
       <td>${blockedHtml}</td>
       <td><span class="badge badge-${emp.status==='Active'?'active':'off'}">${emp.status||'Active'}</span></td>
-      <td>
-        <div class="hrs-bar-wrap">
-          <div class="hrs-bar"><div class="hrs-bar-fill" style="width:${pct}%;background:${col}"></div></div>
-          <span style="font-size:10px;color:var(--muted)">${hrs.toFixed(1)}h</span>
-        </div>
-      </td>
-      <td style="font-size:11px;color:var(--muted)">🌴 ${bal.annual}d &nbsp; 🤒 ${bal.sick}d</td>
-      <td>
-        <div style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-ghost" onclick="openEditEmployee('${emp.id}')">Edit</button>
-          <button class="btn btn-sm btn-plan" onclick="openPlanSchedule('${emp.id}')">Plan</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${emp.id}')">✕</button>
-        </div>
-      </td>
+      <td><div class="hrs-bar-wrap"><div class="hrs-bar"><div class="hrs-bar-fill" style="width:${pct}%;background:${col}"></div></div><span style="font-size:9px;color:var(--muted)">${hrs.toFixed(1)}h</span></div></td>
+      <td style="font-size:10px;color:var(--muted)">🌴 ${bal.annual}d 🤒 ${bal.sick}d</td>
+      <td><div style="display:flex;gap:3px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-ghost" onclick="openEditEmployee('${emp.id}')">Edit</button>
+        <button class="btn btn-sm btn-plan" onclick="openPlanSchedule('${emp.id}')">Plan</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${emp.id}')">✕</button>
+      </div></td>
     </tr>`;
   }).join('');
   renderVolunteers();
 }
 function renderVolunteers(){
   const el=document.getElementById('volunteer-list');
-  if(!state.volunteers.length){el.innerHTML=`<p style="color:var(--muted);font-size:12px;margin-bottom:16px">No volunteers yet.</p>`;return;}
+  if(!state.volunteers.length){el.innerHTML=`<p style="color:var(--muted);font-size:11px;margin-bottom:14px">No volunteers yet.</p>`;return;}
   const weekDates=getWeekDates(fromISO(state.currentWeekMon));
-  el.innerHTML=`<div class="card" style="margin-bottom:20px"><div style="overflow-x:auto">
-    <table class="data-table"><thead><tr><th>Name</th><th>Note</th><th>Available This Week</th><th>Actions</th></tr></thead>
-    <tbody>${state.volunteers.map(v=>{
+  el.innerHTML=`<div class="card" style="margin-bottom:18px"><div style="overflow-x:auto">
+    <table class="data-table"><thead><tr><th>Name</th><th>Note</th><th>Available This Week</th><th></th></tr></thead>
+    <tbody>${state.volunteers.map(vol=>{
       const toggles=weekDates.map((d,i)=>{
-        const iso=toISO(d),on=(state.volAvailability[v.id]||{})[iso];
-        return`<div class="vol-day-chip" onclick="toggleVolDay('${v.id}','${iso}')">
-          <span>${DAYS_SHORT[i]}</span><div class="vol-day-toggle${on?' on':''}"></div>
+        const iso=toISO(d),on=(state.volAvailability[vol.id]||{})[iso];
+        return`<div class="vol-day-chip" onclick="toggleVolDay('${vol.id}','${iso}')">
+          <span>${DAYS_SHORT[i]}</span><div class="vol-toggle${on?' on':''}"></div>
         </div>`;
       }).join('');
       return`<tr>
-        <td><strong style="color:var(--text)">${escHtml(v.name)}</strong></td>
-        <td style="color:var(--muted)">${escHtml(v.note||'—')}</td>
-        <td><div style="display:flex;gap:8px;flex-wrap:wrap">${toggles}</div></td>
-        <td><button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${v.id}')">✕</button></td>
+        <td><strong style="color:var(--text)">${escH(vol.name)}</strong></td>
+        <td style="color:var(--muted)">${escH(vol.note||'—')}</td>
+        <td><div style="display:flex;gap:7px;flex-wrap:wrap">${toggles}</div></td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${vol.id}')">✕</button></td>
       </tr>`;
     }).join('')}</tbody></table>
   </div></div>`;
@@ -1454,6 +1714,7 @@ function openAddEmployee(){
   editingEmpId=null;
   document.getElementById('modal-title').textContent='Add Employee';
   document.getElementById('emp-name').value='';
+  document.getElementById('emp-fallback').value='Field Work';
   document.getElementById('emp-status').value='Active';
   document.getElementById('emp-annual').value='20';
   document.getElementById('emp-sick').value='10';
@@ -1467,12 +1728,13 @@ function openEditEmployee(empId){
   editingEmpId=empId;
   document.getElementById('modal-title').textContent='Edit Employee';
   document.getElementById('emp-name').value=emp.name;
+  document.getElementById('emp-fallback').value=emp.fallback||'Field Work';
   document.getElementById('emp-status').value=emp.status||'Active';
   document.getElementById('emp-annual').value=(emp.leaveBalance||{}).annual||20;
   document.getElementById('emp-sick').value=(emp.leaveBalance||{}).sick||10;
   newEmpDisallowed={...emp.disallowedLocs};
   ALL_LOCS.forEach(l=>{const el=document.getElementById('tog-'+l);if(el)el.classList.toggle('blocked',!!(emp.disallowedLocs||{})[l]);});
-  document.getElementById('emp-hrs-summary').textContent=`This week: ${calcTotalHrsThisWeek(empId).toFixed(1)} hours scheduled`;
+  document.getElementById('emp-hrs-summary').textContent=`This week: ${calcTotalHrsWeek(empId).toFixed(1)} hours`;
   openModal('emp-modal');
 }
 function toggleLoc(loc){
@@ -1481,25 +1743,16 @@ function toggleLoc(loc){
 }
 function saveEmployee(){
   const name=v('emp-name');if(!name){alert('Enter a name.');return;}
-  if(editingEmpId){
-    const emp=state.employees.find(e=>e.id===editingEmpId);
-    emp.name=name;emp.status=v('emp-status');emp.disallowedLocs={...newEmpDisallowed};
-    emp.leaveBalance={annual:Number(v('emp-annual'))||20,sick:Number(v('emp-sick'))||10};
-  }else{
-    state.employees.push({id:'emp_'+Date.now(),name,status:v('emp-status'),disallowedLocs:{...newEmpDisallowed},leaveBalance:{annual:Number(v('emp-annual'))||20,sick:Number(v('emp-sick'))||10}});
-  }
+  const data={name,fallback:v('emp-fallback'),status:v('emp-status'),disallowedLocs:{...newEmpDisallowed},leaveBalance:{annual:Number(v('emp-annual'))||20,sick:Number(v('emp-sick'))||10}};
+  if(editingEmpId){Object.assign(state.employees.find(e=>e.id===editingEmpId),data);}
+  else state.employees.push({id:'emp_'+Date.now(),...data});
   persistAll();closeModal('emp-modal');renderRoster();
 }
 function deleteEmployee(empId){
-  if(!confirm('Delete this employee? Their schedule entries will remain as orphaned data.'))return;
+  if(!confirm('Delete employee?'))return;
   state.employees=state.employees.filter(e=>e.id!==empId);
-  // cleanup defaults and overrides
-  DAYS_SHORT.forEach(dow=>{
-    Object.keys(state.defaultSchedule[dow]||{}).forEach(si=>{delete(state.defaultSchedule[dow][si]||{})[empId];});
-  });
-  Object.keys(state.schedule).forEach(iso=>{
-    Object.keys(state.schedule[iso]||{}).forEach(si=>{delete(state.schedule[iso][si]||{})[empId];});
-  });
+  DAYS_SHORT.forEach(dow=>{Object.keys(state.defaultSchedule[dow]||{}).forEach(si=>{if(state.defaultSchedule[dow][si])delete state.defaultSchedule[dow][si][empId];});});
+  Object.keys(state.schedule).forEach(iso=>{Object.keys(state.schedule[iso]||{}).forEach(si=>{if(state.schedule[iso][si])delete state.schedule[iso][si][empId];});});
   persistAll();renderRoster();
 }
 
@@ -1521,22 +1774,21 @@ function toggleVolDay(volId,iso){if(!state.volAvailability[volId])state.volAvail
 // LEAVE CRUD
 // ══════════════════════════════════════════════════
 function renderLeave(){
-  const tbody=document.getElementById('leave-body');
   const sel=document.getElementById('leave-emp-id');
-  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  if(!state.leaveRequests.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No leave records yet.</td></tr>`;}
+  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${escH(e.name)}</option>`).join('');
+  const tbody=document.getElementById('leave-body');
+  if(!state.leaveRequests.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">No leave records.</td></tr>`;}
   else tbody.innerHTML=state.leaveRequests.map(lr=>{
     const emp=state.employees.find(e=>e.id===lr.empId);
-    const days=daysBetween(lr.from,lr.to);
     return`<tr>
-      <td><strong style="color:var(--text)">${escHtml(emp?emp.name:'Unknown')}</strong></td>
+      <td><strong style="color:var(--text)">${escH(emp?emp.name:'Unknown')}</strong></td>
       <td><span class="badge badge-${lr.type}">${lr.type}</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${lr.from}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${lr.to}</td>
-      <td>${days}</td>
-      <td style="color:var(--muted)">${escHtml(lr.note||'—')}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px">${lr.from}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px">${lr.to}</td>
+      <td>${daysBetween(lr.from,lr.to)}</td>
+      <td style="color:var(--muted)">${escH(lr.note||'—')}</td>
       <td><span class="leave-status-${lr.status}">${lr.status}</span></td>
-      <td><div style="display:flex;gap:4px">
+      <td><div style="display:flex;gap:3px">
         <button class="btn btn-sm btn-ghost" onclick="openEditLeave('${lr.id}')">Edit</button>
         <button class="btn btn-sm btn-danger" onclick="deleteLeave('${lr.id}')">✕</button>
       </div></td>
@@ -1546,22 +1798,18 @@ function renderLeave(){
 }
 function openAddLeave(){
   editingLeaveId=null;
-  document.getElementById('leave-modal-title').textContent='Add Leave Record';
-  const sel=document.getElementById('leave-emp-id');
-  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  document.getElementById('leave-from').value='';
-  document.getElementById('leave-to').value='';
+  document.getElementById('leave-modal-title').textContent='Add Leave';
+  document.getElementById('leave-emp-id').innerHTML=state.employees.map(e=>`<option value="${e.id}">${escH(e.name)}</option>`).join('');
+  ['leave-from','leave-to','leave-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('leave-type').value='annual';
-  document.getElementById('leave-note').value='';
   document.getElementById('leave-status').value='active';
   openModal('leave-modal');
 }
 function openEditLeave(leaveId){
   const lr=state.leaveRequests.find(l=>l.id===leaveId);if(!lr)return;
   editingLeaveId=leaveId;
-  document.getElementById('leave-modal-title').textContent='Edit Leave Record';
-  const sel=document.getElementById('leave-emp-id');
-  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}"${e.id===lr.empId?'selected':''}>${e.name}</option>`).join('');
+  document.getElementById('leave-modal-title').textContent='Edit Leave';
+  document.getElementById('leave-emp-id').innerHTML=state.employees.map(e=>`<option value="${e.id}"${e.id===lr.empId?'selected':''}>${escH(e.name)}</option>`).join('');
   document.getElementById('leave-from').value=lr.from;
   document.getElementById('leave-to').value=lr.to;
   document.getElementById('leave-type').value=lr.type;
@@ -1571,29 +1819,29 @@ function openEditLeave(leaveId){
 }
 function saveLeave(){
   const empId=v('leave-emp-id'),from=v('leave-from'),to=v('leave-to'),type=v('leave-type'),note=v('leave-note'),status=v('leave-status');
-  if(!empId||!from||!to){alert('Fill in employee, from, and to dates.');return;}
+  if(!empId||!from||!to){alert('Fill in all required fields.');return;}
   if(from>to){alert('From must be before To.');return;}
   if(editingLeaveId){const lr=state.leaveRequests.find(l=>l.id===editingLeaveId);Object.assign(lr,{empId,from,to,type,note,status});}
   else state.leaveRequests.push({id:'lr_'+Date.now(),empId,from,to,type,note,status});
   persistAll();closeModal('leave-modal');renderLeave();
 }
-function deleteLeave(leaveId){if(!confirm('Delete this leave record?'))return;state.leaveRequests=state.leaveRequests.filter(l=>l.id!==leaveId);persistAll();renderLeave();}
+function deleteLeave(leaveId){if(!confirm('Delete leave record?'))return;state.leaveRequests=state.leaveRequests.filter(l=>l.id!==leaveId);persistAll();renderLeave();}
 
 // ══════════════════════════════════════════════════
 // SWAP CRUD
 // ══════════════════════════════════════════════════
 function renderSwaps(){
   const el=document.getElementById('swap-list');
-  if(!state.swapRequests.length){el.innerHTML=`<div style="padding:16px 18px;color:var(--muted);font-size:12px">No swap requests recorded yet.</div>`;return;}
+  if(!state.swapRequests.length){el.innerHTML=`<div style="padding:14px 16px;color:var(--muted);font-size:11px">No swap requests.</div>`;return;}
   el.innerHTML=state.swapRequests.map(sw=>{
     const emp=state.employees.find(e=>e.id===sw.empId);
     return`<div class="swap-item">
       <div style="flex:1">
-        <strong style="color:var(--text)">${escHtml(emp?emp.name:'Unknown')}</strong>
-        <span style="color:var(--muted);font-size:11px;margin-left:8px">off <span style="font-family:'DM Mono',monospace">${sw.fromDate}</span> · works <span style="font-family:'DM Mono',monospace">${sw.toDate}</span></span>
-        ${sw.note?`<span style="color:var(--subtle);font-size:11px;margin-left:8px">${escHtml(sw.note)}</span>`:''}
+        <strong style="color:var(--text)">${escH(emp?emp.name:'Unknown')}</strong>
+        <span style="color:var(--muted);font-size:10px;margin-left:8px">off <span style="font-family:'DM Mono',monospace">${sw.fromDate}</span> · works <span style="font-family:'DM Mono',monospace">${sw.toDate}</span></span>
+        ${sw.note?`<span style="color:var(--subtle);font-size:10px;margin-left:6px">${escH(sw.note)}</span>`:''}
       </div>
-      <div style="display:flex;gap:4px">
+      <div style="display:flex;gap:3px">
         <button class="btn btn-sm btn-ghost" onclick="openEditSwap('${sw.id}')">Edit</button>
         <button class="btn btn-sm btn-danger" onclick="deleteSwap('${sw.id}')">✕</button>
       </div>
@@ -1602,20 +1850,16 @@ function renderSwaps(){
 }
 function openAddSwap(){
   editingSwapId=null;
-  document.getElementById('swap-modal-title').textContent='Add Day-Off Swap';
-  const sel=document.getElementById('swap-emp-id');
-  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  document.getElementById('swap-from').value='';
-  document.getElementById('swap-to').value='';
-  document.getElementById('swap-note').value='';
+  document.getElementById('swap-modal-title').textContent='Add Swap';
+  document.getElementById('swap-emp-id').innerHTML=state.employees.map(e=>`<option value="${e.id}">${escH(e.name)}</option>`).join('');
+  ['swap-from','swap-to','swap-note'].forEach(id=>document.getElementById(id).value='');
   openModal('swap-modal');
 }
 function openEditSwap(swapId){
   const sw=state.swapRequests.find(s=>s.id===swapId);if(!sw)return;
   editingSwapId=swapId;
   document.getElementById('swap-modal-title').textContent='Edit Swap';
-  const sel=document.getElementById('swap-emp-id');
-  sel.innerHTML=state.employees.map(e=>`<option value="${e.id}"${e.id===sw.empId?'selected':''}>${e.name}</option>`).join('');
+  document.getElementById('swap-emp-id').innerHTML=state.employees.map(e=>`<option value="${e.id}"${e.id===sw.empId?'selected':''}>${escH(e.name)}</option>`).join('');
   document.getElementById('swap-from').value=sw.fromDate;
   document.getElementById('swap-to').value=sw.toDate;
   document.getElementById('swap-note').value=sw.note||'';
@@ -1628,14 +1872,14 @@ function saveSwap(){
   else state.swapRequests.push({id:'sw_'+Date.now(),empId,fromDate,toDate,note});
   persistAll();closeModal('swap-modal');renderSwaps();
 }
-function deleteSwap(swapId){if(!confirm('Delete this swap record?'))return;state.swapRequests=state.swapRequests.filter(s=>s.id!==swapId);persistAll();renderSwaps();}
+function deleteSwap(swapId){if(!confirm('Delete swap?'))return;state.swapRequests=state.swapRequests.filter(s=>s.id!==swapId);persistAll();renderSwaps();}
 
 // ══════════════════════════════════════════════════
 // EXPORT / IMPORT / RESET
 // ══════════════════════════════════════════════════
 function exportData(){
   const blob=new Blob([JSON.stringify({employees:state.employees,volunteers:state.volunteers,defaultSchedule:state.defaultSchedule,schedule:state.schedule,volAvailability:state.volAvailability,leaveRequests:state.leaveRequests,swapRequests:state.swapRequests},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`schedulemaker_v4_${todayISO()}.json`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`schedulemaker_v5_${todayISO()}.json`;a.click();
 }
 function importData(){document.getElementById('import-file').click();}
 function handleImportFile(e){
@@ -1644,15 +1888,9 @@ function handleImportFile(e){
   reader.onload=evt=>{
     try{
       const d=JSON.parse(evt.target.result);
-      if(d.employees)state.employees=d.employees;
-      if(d.volunteers)state.volunteers=d.volunteers;
-      if(d.defaultSchedule)state.defaultSchedule=d.defaultSchedule;
-      if(d.schedule)state.schedule=d.schedule;
-      if(d.volAvailability)state.volAvailability=d.volAvailability;
-      if(d.leaveRequests)state.leaveRequests=d.leaveRequests;
-      if(d.swapRequests)state.swapRequests=d.swapRequests;
+      ['employees','volunteers','defaultSchedule','schedule','volAvailability','leaveRequests','swapRequests'].forEach(k=>{if(d[k])state[k]=d[k];});
       persistAll();renderAll();alert('Import successful!');
-    }catch(err){alert('Import failed: invalid JSON.');}
+    }catch{alert('Import failed: invalid JSON.');}
   };
   reader.readAsText(file);e.target.value='';
 }
@@ -1660,8 +1898,8 @@ function resetAllData(){openModal('reset-modal');}
 function confirmReset(){
   const entered=v('reset-pin'),stored=localStorage.getItem('smPro_pin')||DEFAULT_PIN;
   if(entered!==stored){document.getElementById('reset-error').textContent='Incorrect PIN.';return;}
-  state.employees=[];state.volunteers=[];state.defaultSchedule={};state.schedule={};
-  state.volAvailability={};state.leaveRequests=[];state.swapRequests=[];
+  ['employees','volunteers','leaveRequests','swapRequests'].forEach(k=>state[k]=[]);
+  ['defaultSchedule','schedule','volAvailability','absentToday'].forEach(k=>state[k]={});
   persistAll();closeModal('reset-modal');renderAll();alert('All data deleted.');
 }
 
@@ -1672,6 +1910,7 @@ let undoTimer=null;
 function showUndo(msg){
   const t=document.getElementById('undo-toast');
   document.getElementById('undo-msg').textContent=msg;
+  t.querySelector('.undo-btn').style.display='';
   t.classList.add('show');
   clearTimeout(undoTimer);
   undoTimer=setTimeout(()=>t.classList.remove('show'),4000);
@@ -1688,17 +1927,17 @@ function undoLastChange(){
 function showToast(msg){
   document.getElementById('undo-msg').textContent=msg;
   const t=document.getElementById('undo-toast');
-  // hide undo button for info toasts
   t.querySelector('.undo-btn').style.display='none';
   t.classList.add('show');
   clearTimeout(undoTimer);
-  undoTimer=setTimeout(()=>{t.classList.remove('show');t.querySelector('.undo-btn').style.display='';},2500);
+  undoTimer=setTimeout(()=>{t.classList.remove('show');t.querySelector('.undo-btn').style.display='';},2200);
 }
 
 // ══════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════
 function v(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function escH(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function openModal(id){document.getElementById(id).classList.remove('hidden');}
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 
@@ -1708,11 +1947,19 @@ function closeModal(id){document.getElementById(id).classList.add('hidden');}
 function renderAll(){
   renderLiveBoard();
   if(state.mode==='admin'){
-    renderRoster();
-    renderLeave();
+    renderRoster();renderLeave();
     if(document.getElementById('page-default').classList.contains('active'))renderDefaultSchedule();
     if(document.getElementById('page-schedule').classList.contains('active')){renderWeekNav();renderSchedule();}
   }
+}
+
+// ══════════════════════════════════════════════════
+// TICK CLOCK
+// ══════════════════════════════════════════════════
+function tickClock(){
+  const now=new Date();let h=now.getHours(),m=now.getMinutes(),ampm=h>=12?'PM':'AM';
+  h=h%12||12;
+  document.getElementById('live-clock').textContent=`${h}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
 // ══════════════════════════════════════════════════
@@ -1724,6 +1971,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   state.currentDow=DAYS_SHORT[(new Date().getDay()+6)%7];
   initFirebase();
   tickClock();
+  // set lookup date to today by default
+  document.getElementById('lookup-date').value=todayISO();
   setInterval(tickClock,15000);
   setInterval(()=>{
     if(document.getElementById('page-live').classList.contains('active'))renderLiveBoard();
