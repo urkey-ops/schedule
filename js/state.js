@@ -31,19 +31,22 @@ async function hashPin(pin) {
 async function setPinHash(pin) {
   const h = await hashPin(pin);
   localStorage.setItem('smPro_adminPinHash', h);
-  // Remove legacy plain-text PIN if present
   localStorage.removeItem('smPro_adminPin');
+  // Push to Firebase so all devices get it
+  state.adminPinHash = h;
+  markDirty('adminPinHash');
+  pushToFirebase();
 }
 
 async function verifyPin(pin) {
-  const stored = localStorage.getItem('smPro_adminPinHash');
-  if (!stored) return false;          // no PIN set yet → reject
+  const stored = localStorage.getItem('smPro_adminPinHash') || state.adminPinHash;
+  if (!stored) return false;
   const h = await hashPin(pin);
   return h === stored;
 }
 
 function hasPinSet() {
-  return !!localStorage.getItem('smPro_adminPinHash');
+  return !!(localStorage.getItem('smPro_adminPinHash') || state.adminPinHash);
 }
 
 // ── Persistence ───────────────────────────────────────────────
