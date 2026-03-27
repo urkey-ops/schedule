@@ -38,15 +38,13 @@ async function submitAdminPin() {
     return;
   }
 
-  // If PIN not yet in localStorage, Firebase may still be loading — wait up to 4s
-  if (!hasPinSet()) {
-    errEl.textContent = 'Connecting to server…';
-    await Promise.race([
-      waitForSync(),
-      new Promise(res => setTimeout(res, 4000))
-    ]);
-    errEl.textContent = '';
-  }
+  // Always wait for Firebase sync first — guaranteed fresh PIN hash
+  errEl.textContent = 'Verifying…';
+  await Promise.race([
+    waitForSync(),
+    new Promise(res => setTimeout(res, 5000))
+  ]);
+  errEl.textContent = '';
 
   if (!hasPinSet()) {
     errEl.textContent = 'No PIN set. Use Configure Firebase to set one first.';
