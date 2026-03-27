@@ -19,36 +19,31 @@ let state = {
 
 let _undoStack = [];
 
-// ── PIN Hashing (SHA-256 via Web Crypto) ──────────────────────
+// ── PIN Auth ──────────────────────────────────────────────────
+// PIN hash lives in config.js as HARDCODED_PIN_HASH.
+// To generate a new hash, run in browser console:
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpin'))
+//     .then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
+// Then paste the result into config.js as HARDCODED_PIN_HASH.
+
 async function hashPin(pin) {
-  const buf = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(pin)
-  );
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-async function setPinHash(pin) {
-  const h = await hashPin(pin);
-  localStorage.setItem('smPro_adminPinHash', h);
-  localStorage.removeItem('smPro_adminPin');
-  // Push to Firebase so all devices get it
-  state.adminPinHash = h;
-  markDirty('adminPinHash');
-  pushToFirebase();
-}
-
 async function verifyPin(pin) {
-  // Always prefer localStorage (fastest), fall back to state (from Firebase sync)
-  const stored = localStorage.getItem('smPro_adminPinHash') || state.adminPinHash;
-  if (!stored) return false;
+  if (!HARDCODED_PIN_HASH || HARDCODED_PIN_HASH === '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414') return false;
   const h = await hashPin(pin);
-  return h === stored;
+  return h === HARDCODED_PIN_HASH;
 }
 
 function hasPinSet() {
-  return !!(localStorage.getItem('smPro_adminPinHash') || state.adminPinHash);
+  return !!(HARDCODED_PIN_HASH && HARDCODED_PIN_HASH !== '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414');
 }
+
+// No-ops — kept so nothing else in codebase breaks if called
+async function setPinHash(pin) {}
+function _migrateLegacyPin() {}
 
 // ── Persistence ───────────────────────────────────────────────
 function saveLocal() {
@@ -139,19 +134,19 @@ function autoCleanAbsences() {
 function initState() {
   const saved = loadLocal();
   if (saved) {
-   // AFTER — adminPinHash now restored from local snapshot
-['employees','volunteers','defaultSchedule','schedule',
- 'volAvailability','absences','leaveRequests','swapRequests',
- 'holidays','empDaysOff','empHourCap','adminPinHash'].forEach(k => {
-  if (saved[k] !== undefined) state[k] = saved[k];
-});
+    ['employees','volunteers','defaultSchedule','schedule',
+     'volAvailability','absences','leaveRequests','swapRequests',
+     'holidays','empDaysOff','empHourCap'].forEach(k => {
+      if (saved[k] !== undefined) state[k] = saved[k];
+    });
   }
 
   autoCleanAbsences();
   initHolidays();
 
-  // Migrate legacy plain-text PIN to hash (one-time, silent)
-  _migrateLegacyPin();
+  // Clean up any legacy PIN keys from localStorage — no longer used
+  localStorage.removeItem('smPro_adminPin');
+  localStorage.removeItem('smPro_adminPinHash');
 
   let cfg = HARDCODED_CONFIG;
   try {
@@ -163,13 +158,4 @@ function initState() {
   } catch(e) { /* use hardcoded */ }
 
   if (cfg.apiKey && cfg.databaseURL) initFirebase(cfg);
-}
-
-// Migrate old plain-text PIN → hash silently on first load
-async function _migrateLegacyPin() {
-  const legacy = localStorage.getItem('smPro_adminPin');
-  if (legacy && !localStorage.getItem('smPro_adminPinHash')) {
-    await setPinHash(legacy);
-    localStorage.removeItem('smPro_adminPin');
-  }
 }
