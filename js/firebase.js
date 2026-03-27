@@ -19,7 +19,7 @@ let _debounceTimer = null;
 const FB_KEYS = [
   'employees','volunteers','defaultSchedule','schedule',
   'volAvailability','absences','leaveRequests','swapRequests',
-  'holidays','empDaysOff','empHourCap'
+  'holidays','empDaysOff','empHourCap','adminPinHash'
 ];
 
 async function initFirebase(cfg) {
@@ -34,18 +34,18 @@ async function initFirebase(cfg) {
     _db    = getDatabase(app);
     _fbRef = ref(_db, 'smPro');
 
-    onValue(_fbRef, snap => {
-      const data = snap.val();
-      if (!data) { setSyncStatus('synced'); return; }
-      FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
-      saveLocal();
-      renderAll();
-      setSyncStatus('synced');
-    }, err => {
-      console.error('Firebase read error', err);
-      setSyncStatus('error');
-      _fbInit = false;
-    });
+   onValue(_fbRef, snap => {
+  const data = snap.val();
+  if (!data) { setSyncStatus('synced'); return; }
+  FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
+
+  // Sync PIN hash to localStorage for offline verify
+  if (data.adminPinHash) localStorage.setItem('smPro_adminPinHash', data.adminPinHash);
+
+  saveLocal();
+  renderAll();
+  setSyncStatus('synced');
+});
 
     setSyncStatus('synced');
   } catch(e) {
