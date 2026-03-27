@@ -8,65 +8,53 @@ const HARDCODED_CONFIG = {
 };
 
 
+
 const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.0';
 let _db     = null;
 let _fbRef  = null;
 let _fbInit = false;
 
 async function initFirebase(cfg) {
-  if (_fbInit) return; // prevent double init
+  if (_fbInit) return;
   _fbInit = true;
 
   try {
     const { initializeApp, getApps } = await import(`${FB_SDK}/firebase-app.js`);
     const { getDatabase, ref, onValue, set } = await import(`${FB_SDK}/firebase-database.js`);
 
-    // Prevent duplicate Firebase app
     const existing = getApps().find(a => a.name === 'smPro');
     const app      = existing || initializeApp(cfg, 'smPro');
-
     _db    = getDatabase(app);
     _fbRef = ref(_db, 'smPro');
 
-    // Real-time listener — fires on ANY change from ANY device
     onValue(_fbRef, snap => {
       const data = snap.val();
       if (!data) { setSyncStatus('synced'); return; }
-
-      let changed = false;
       ['employees','volunteers','defaultSchedule','schedule',
-       'volAvailability','absences','leaveRequests','swapRequests'].forEach(k => {
-        const incoming = JSON.stringify(data[k]);
-        const current  = JSON.stringify(state[k]);
-        if (data[k] !== undefined && incoming !== current) {
-          state[k] = data[k];
-          changed  = true;
-        }
+       'volAvailability','absences','leaveRequests','swapRequests',
+       'holidays','empDaysOff','empHourCap'].forEach(k => {
+        if (data[k] !== undefined) state[k] = data[k];
       });
-
-      // Always save locally and re-render when Firebase sends data
       saveLocal();
       renderAll();
       setSyncStatus('synced');
     }, err => {
       console.error('Firebase read error', err);
       setSyncStatus('error');
-      _fbInit = false; // allow retry
+      _fbInit = false;
     });
 
     setSyncStatus('synced');
   } catch(e) {
     console.error('Firebase init failed', e);
     setSyncStatus('error');
-    _fbInit = false; // allow retry
+    _fbInit = false;
   }
 }
 
 function pushToFirebase() {
   if (!_fbRef) return;
-
   setSyncStatus('syncing');
-
   import(`${FB_SDK}/firebase-database.js`).then(({ set }) => {
     set(_fbRef, {
       employees:       state.employees       || [],
@@ -77,12 +65,12 @@ function pushToFirebase() {
       absences:        state.absences        || {},
       leaveRequests:   state.leaveRequests   || [],
       swapRequests:    state.swapRequests    || [],
+      holidays:        state.holidays        || {},
+      empDaysOff:      state.empDaysOff      || {},
+      empHourCap:      state.empHourCap      || {},
     })
-    .then(() => setSyncStatus('synced'))
-    .catch(e => {
-      console.error('Firebase write error', e);
-      setSyncStatus('error');
-    });
+    .then(()  => setSyncStatus('synced'))
+    .catch(e  => { console.error(e); setSyncStatus('error'); });
   });
 }
 
