@@ -13,21 +13,25 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <button class="admin-trigger-btn" id="admin-trigger-btn" onclick="openAdminLogin()">🔑 Admin</button>
-  <div class="logo">
-    <div class="logo-mark">📅</div>
-    <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
+  <!-- Row 1: always visible -->
+  <div class="topbar-row1">
+    <button class="admin-trigger-btn" id="admin-trigger-btn" onclick="openAdminLogin()">🔑 Admin</button>
+    <div class="logo">
+      <div class="logo-mark">📅</div>
+      <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
+    </div>
+    <div class="topbar-right">
+      <div class="sync-chip" id="sync-indicator"><span class="dot">●</span><span id="sync-text">local</span></div>
+      <div id="mode-badge" class="mode-chip mode-live">VIEW</div>
+    </div>
   </div>
+  <!-- Row 2: nav tabs — scrollable -->
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-live" onclick="showPage('live',this)">Live Board</button>
     <button class="nav-tab admin-only" id="tab-default" onclick="showPage('default',this)">Default Schedule</button>
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
     <button class="nav-tab admin-only" id="tab-staff" onclick="showPage('staff',this)">Staff</button>
     <button class="nav-tab admin-only" id="tab-leave" onclick="showPage('leave',this)">Leave &amp; Swaps</button>
-  </div>
-  <div class="topbar-right">
-    <div class="sync-chip" id="sync-indicator"><span class="dot">●</span><span id="sync-text">local</span></div>
-    <div id="mode-badge" class="mode-chip mode-live">VIEW</div>
   </div>
 </div>
 
