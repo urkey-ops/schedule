@@ -16,17 +16,12 @@ let _fbInit = false;
 const _dirtyKeys = new Set();
 let _debounceTimer = null;
 
+// adminPinHash intentionally excluded — PIN now lives in config.js
 const FB_KEYS = [
   'employees','volunteers','defaultSchedule','schedule',
   'volAvailability','absences','leaveRequests','swapRequests',
-  'holidays','empDaysOff','empHourCap','adminPinHash'
+  'holidays','empDaysOff','empHourCap'
 ];
-
-// ── Sync-ready promise: resolves once first Firebase snapshot arrives ──
-let _syncReadyResolve;
-const _syncReady = new Promise(res => { _syncReadyResolve = res; });
-// Expose so other modules can await it
-function waitForSync() { return _syncReady; }
 
 async function initFirebase(cfg) {
   if (_fbInit) return;
@@ -42,35 +37,27 @@ async function initFirebase(cfg) {
 
     onValue(_fbRef, snap => {
       const data = snap.val();
-      if (!data) { _syncReadyResolve(); setSyncStatus('synced'); return; }
+      if (!data) { setSyncStatus('synced'); return; }
       FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
-
-      // Sync PIN hash to localStorage for offline verify
-      if (data.adminPinHash) localStorage.setItem('smPro_adminPinHash', data.adminPinHash);
-
       saveLocal();
       renderAll();
       setSyncStatus('synced');
-      _syncReadyResolve(); // ← signal that first sync is complete
     });
 
     setSyncStatus('synced');
   } catch(e) {
     console.error('Firebase init failed', e);
     setSyncStatus('error');
-    _syncReadyResolve(); // ← resolve anyway so UI doesn't hang
     _fbInit = false;
   }
 }
 
-// Call this instead of pushToFirebase() when you know which key changed
 function markDirty(key) {
   _dirtyKeys.add(key);
 }
 
 function pushToFirebase() {
   if (!_fbRef) return;
-  // Debounce: flush all dirty keys together after 400ms
   clearTimeout(_debounceTimer);
   _debounceTimer = setTimeout(_flushDirty, 400);
 }
