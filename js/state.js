@@ -1,49 +1,44 @@
+// ── state.js ──────────────────────────────────────────────────
+
 let state = {
-  employees: [],
-  volunteers: [],
+  employees:       [],
+  volunteers:      [],
   defaultSchedule: {},
-  schedule: {},
+  schedule:        {},
   volAvailability: {},
-  absences: {},
-  leaveRequests: [],
-  swapRequests: [],
-  holidays: {},
-  empDaysOff: {},
-  empHourCap: {},
-  currentWeekMon: '',
-  currentDateISO: '',
-  currentDow: '',
-  mode: 'live',
-  meta: {}
+  absences:        {},
+  leaveRequests:   [],
+  swapRequests:    [],
+  holidays:        {},
+  empDaysOff:      {},
+  empHourCap:      {},
+  currentWeekMon:  null,
+  currentDateISO:  null,
+  currentDow:      null,
+  mode:            'live',
+  meta:            {}
 };
 
-let _undoStack = [];
+let undoStack = [];
 
 // ── PIN Auth ──────────────────────────────────────────────────
-// PIN hash lives in config.js as HARDCODED_PIN_HASH.
-// To generate a new hash, run in browser console:
-//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpin'))
-//     .then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
-// Then paste the result into config.js as HARDCODED_PIN_HASH.
-
 async function hashPin(pin) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
 async function verifyPin(pin) {
-  if (!HARDCODED_PIN_HASH || HARDCODED_PIN_HASH === 'PASTE_YOUR_HASH_HERE') return false;
+  if (!HARDCODEDPINHASH || HARDCODEDPINHASH === 'PASTE_YOUR_HASH_HERE') return false;
   const h = await hashPin(pin);
-  return h === HARDCODED_PIN_HASH;
+  return h === HARDCODEDPINHASH;
 }
 
 function hasPinSet() {
-  return !!(HARDCODED_PIN_HASH && HARDCODED_PIN_HASH !== 'PASTE_YOUR_HASH_HERE');
+  return !!HARDCODEDPINHASH && HARDCODEDPINHASH !== 'PASTE_YOUR_HASH_HERE';
 }
 
-// No-ops — kept so nothing else in codebase breaks if called
 async function setPinHash(pin) {}
-function _migrateLegacyPin() {}
+function migrateLegacyPin() {}
 
 // ── Persistence ───────────────────────────────────────────────
 function saveLocal() {
@@ -51,8 +46,8 @@ function saveLocal() {
     const snap = JSON.stringify(state);
     localStorage.setItem('smPro_data', snap);
     const slot = Date.now() % 3;
-    localStorage.setItem(`smPro_bk_${slot}`, snap);
-    localStorage.setItem(`smPro_bk_ts_${slot}`, Date.now());
+    localStorage.setItem(`smPro_bk${slot}`, snap);
+    localStorage.setItem(`smPro_bkts${slot}`, Date.now());
     sessionStorage.setItem('smPro_session', snap);
   } catch(e) { console.warn('saveLocal failed', e); }
 }
@@ -64,8 +59,8 @@ function loadLocal() {
     if (!raw) {
       let best = null, bestTs = 0;
       for (let i = 0; i < 3; i++) {
-        const ts = parseInt(localStorage.getItem(`smPro_bk_ts_${i}`) || 0);
-        const bk = localStorage.getItem(`smPro_bk_${i}`);
+        const ts = parseInt(localStorage.getItem(`smPro_bkts${i}`)) || 0;
+        const bk = localStorage.getItem(`smPro_bk${i}`);
         if (bk && ts > bestTs) { best = bk; bestTs = ts; }
       }
       if (best) raw = best;
@@ -74,7 +69,6 @@ function loadLocal() {
   } catch(e) { return null; }
 }
 
-// key is optional — if provided, only that slice is flagged dirty for Firebase
 function persistAll(key) {
   saveLocal();
   if (key) markDirty(key);
@@ -83,13 +77,13 @@ function persistAll(key) {
 
 // ── Undo ──────────────────────────────────────────────────────
 function pushUndo(label, snapshot) {
-  _undoStack.push({ label, snapshot: JSON.parse(JSON.stringify(snapshot)) });
-  if (_undoStack.length > 20) _undoStack.shift();
+  undoStack.push({ label, snapshot: JSON.parse(JSON.stringify(snapshot)) });
+  if (undoStack.length > 20) undoStack.shift();
 }
 
 function undoLastChange() {
-  if (!_undoStack.length) return;
-  const { snapshot } = _undoStack.pop();
+  if (!undoStack.length) return;
+  const { snapshot } = undoStack.pop();
   Object.assign(state, snapshot);
   persistAll();
   renderAll();
@@ -97,12 +91,31 @@ function undoLastChange() {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
+// Fixed: use crypto.randomUUID() instead of Date.now + Math.random
 function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  return crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
 }
 
-function toDateStr(d) { return d.toISOString().slice(0,10); }
-function todayStr() { return toDateStr(new Date()); }
+function toDateStr(d) { return d.toISOString().slice(0, 10); }
+function todayStr()   { return toDateStr(new Date()); }
+
+// ── Shared Hours Calculation (single source of truth) ─────────
+// Moved here from schedule.js and staff.js — both were identical duplicates
+function calcScheduledHrsWeek(empId) {
+  const mon = new Date(state.currentWeekMon + 'T00:00:00');
+  let total = 0;
+  for (let d = 0; d < 7; d++) {
+    const day = new Date(mon);
+    day.setDate(day.getDate() + d);
+    const iso = toDateStr(day);
+    if (isEmpDayOff(empId, iso)) continue;
+    TIMESLOTS.forEach((_, si) => {
+      const { loc } = getResolvedLoc(iso, si, empId);
+      if (loc !== 'off' && loc !== 'vac') total += SLOTHRS[si];
+    });
+  }
+  return Math.round(total * 10) / 10;
+}
 
 // ── Day Off Helpers ───────────────────────────────────────────
 function getEmpDaysOff(empId) {
@@ -110,21 +123,25 @@ function getEmpDaysOff(empId) {
 }
 
 function isEmpDayOff(empId, iso) {
-  const dow = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const dow = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
   const days = getEmpDaysOff(empId);
   if (!days.includes(dow)) return false;
-  const swapped = state.swapRequests?.some(s => s.empId === empId && s.fromDate === iso);
+  // Fixed: only active swaps unlock a day-off
+  const swapped = state.swapRequests?.some(s =>
+    s.empId === empId && s.fromDate === iso && s.status === 'active'
+  );
   return !swapped;
 }
 
 function getEmpHourCap(empId) {
-  return state.empHourCap?.[empId] || DEFAULT_HRS_CAP;
+  return state.empHourCap?.[empId] || DEFAULTHRSCAP;
 }
 
 // ── Absence Helpers ───────────────────────────────────────────
 function autoCleanAbsences() {
   const today = todayStr();
-  if (!state.absences) { state.absences = {}; return; }
+  if (!state.absences) return;
+  // Fixed: only delete dates strictly BEFORE today, not today itself
   Object.keys(state.absences).forEach(iso => {
     if (iso < today) delete state.absences[iso];
   });
@@ -140,22 +157,30 @@ function initState() {
       if (saved[k] !== undefined) state[k] = saved[k];
     });
   }
-
   autoCleanAbsences();
   initHolidays();
-
-  // Clean up any legacy PIN keys from localStorage — no longer used
   localStorage.removeItem('smPro_adminPin');
   localStorage.removeItem('smPro_adminPinHash');
 
-  let cfg = HARDCODED_CONFIG;
+  let cfg = HARDCODEDCONFIG;
   try {
     const savedCfg = localStorage.getItem('smPro_fbConfig');
     if (savedCfg) {
       const parsed = JSON.parse(savedCfg);
       if (parsed.apiKey && parsed.databaseURL) cfg = parsed;
     }
-  } catch(e) { /* use hardcoded */ }
-
+  } catch(e) {}
   if (cfg.apiKey && cfg.databaseURL) initFirebase(cfg);
+}
+
+// ── Midnight re-render ────────────────────────────────────────
+function scheduleMidnightRefresh() {
+  const now  = new Date();
+  const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+  setTimeout(() => {
+    state.currentDateISO = todayStr();
+    state.currentDow     = DAYSSHORT[(new Date().getDay() + 6) % 7];
+    renderAll();
+    scheduleMidnightRefresh(); // reschedule for next midnight
+  }, msUntilMidnight);
 }
