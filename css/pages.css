@@ -408,3 +408,35 @@
   display: none;
 }
 .day-pill.has-hday .hday-dot { display: block; }
+
+/* ── Mobile: stack live board cards, fix scroll ────────────── */
+@media (max-width: 640px) {
+  .live-board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .emp-card {
+    width: 100%;
+  }
+
+  /* Fade right edge to signal horizontal scroll on tables */
+  .sched-wrap {
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sched-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 32px; height: 100%;
+    background: linear-gradient(to right, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  /* Hide timeline on mobile — too dense */
+  .timeline-section {
+    display: none;
+  }
+}
