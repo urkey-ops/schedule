@@ -1,16 +1,16 @@
 // ── Hardcoded config — auto-connects on every device ─────────
 const HARDCODED_CONFIG = {
-  apiKey:      "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
-  authDomain:  "schedulemaker-6a571.firebaseapp.com",
+  apiKey: "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
+  authDomain: "schedulemaker-6a571.firebaseapp.com",
   databaseURL: "https://schedulemaker-6a571-default-rtdb.firebaseio.com",
-  projectId:   "schedulemaker-6a571",
-  appId:       "1:685602481293:web:2e5e0359b3df42f825aec4"
+  projectId: "schedulemaker-6a571",
+  appId: "1:685602481293:web:2e5e0359b3df42f825aec4"
 };
 
-const FB_SDK   = 'https://www.gstatic.com/firebasejs/10.12.0';
-let _db        = null;
-let _fbRef     = null;
-let _fbInit    = false;
+const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.0';
+let _db = null;
+let _fbRef = null;
+let _fbInit = false;
 
 // Dirty-key tracking — only push changed slices
 const _dirtyKeys = new Set();
@@ -22,6 +22,12 @@ const FB_KEYS = [
   'holidays','empDaysOff','empHourCap','adminPinHash'
 ];
 
+// ── Sync-ready promise: resolves once first Firebase snapshot arrives ──
+let _syncReadyResolve;
+const _syncReady = new Promise(res => { _syncReadyResolve = res; });
+// Expose so other modules can await it
+function waitForSync() { return _syncReady; }
+
 async function initFirebase(cfg) {
   if (_fbInit) return;
   _fbInit = true;
@@ -31,26 +37,28 @@ async function initFirebase(cfg) {
 
     const existing = getApps().find(a => a.name === 'smPro');
     const app = existing || initializeApp(cfg, 'smPro');
-    _db    = getDatabase(app);
+    _db = getDatabase(app);
     _fbRef = ref(_db, 'smPro');
 
-   onValue(_fbRef, snap => {
-  const data = snap.val();
-  if (!data) { setSyncStatus('synced'); return; }
-  FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
+    onValue(_fbRef, snap => {
+      const data = snap.val();
+      if (!data) { _syncReadyResolve(); setSyncStatus('synced'); return; }
+      FB_KEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
 
-  // Sync PIN hash to localStorage for offline verify
-  if (data.adminPinHash) localStorage.setItem('smPro_adminPinHash', data.adminPinHash);
+      // Sync PIN hash to localStorage for offline verify
+      if (data.adminPinHash) localStorage.setItem('smPro_adminPinHash', data.adminPinHash);
 
-  saveLocal();
-  renderAll();
-  setSyncStatus('synced');
-});
+      saveLocal();
+      renderAll();
+      setSyncStatus('synced');
+      _syncReadyResolve(); // ← signal that first sync is complete
+    });
 
     setSyncStatus('synced');
   } catch(e) {
     console.error('Firebase init failed', e);
     setSyncStatus('error');
+    _syncReadyResolve(); // ← resolve anyway so UI doesn't hang
     _fbInit = false;
   }
 }
@@ -89,7 +97,7 @@ function setSyncStatus(status) {
   const text = document.getElementById('sync-text');
   if (!chip || !text) return;
   chip.className = `sync-chip ${status}`;
-  text.textContent = status === 'synced'  ? 'firebase'
-                   : status === 'syncing' ? 'syncing…'
-                   : 'error';
+  text.textContent = status === 'synced' ? 'firebase'
+    : status === 'syncing' ? 'syncing…'
+    : 'error';
 }
