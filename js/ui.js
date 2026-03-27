@@ -38,15 +38,14 @@ async function submitAdminPin() {
     return;
   }
 
-  // If PIN not in localStorage yet, Firebase may still be syncing — wait up to 3s
+  // If PIN not yet in localStorage, Firebase may still be loading — wait up to 4s
   if (!hasPinSet()) {
-    errEl.textContent = 'Syncing with server…';
-    try {
-      await Promise.race([
-        waitForSync(),
-        new Promise(res => setTimeout(res, 3000))
-      ]);
-    } catch(e) {}
+    errEl.textContent = 'Connecting to server…';
+    await Promise.race([
+      waitForSync(),
+      new Promise(res => setTimeout(res, 4000))
+    ]);
+    errEl.textContent = '';
   }
 
   if (!hasPinSet()) {
