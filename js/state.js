@@ -81,14 +81,16 @@ function todayStr() {
 function initState() {
   const saved = loadLocal();
   if (saved) {
-    // Merge saved data into state preserving defaults for missing keys
     Object.keys(saved).forEach(k => { state[k] = saved[k]; });
   }
 
-  // Load Firebase config if saved
-  const fbCfg = localStorage.getItem('smPro_fbConfig');
-  if (fbCfg) {
-    try { initFirebase(JSON.parse(fbCfg)); }
+  // Always auto-connect Firebase using hardcoded config
+  // Override with saved config if user entered a custom one
+  const savedCfg = localStorage.getItem('smPro_fbConfig');
+  const cfg = savedCfg ? JSON.parse(savedCfg) : HARDCODED_CONFIG;
+
+  if (cfg && cfg.apiKey && cfg.databaseURL) {
+    try { initFirebase(cfg); }
     catch(e) { console.error('Firebase init failed', e); }
   }
 }
