@@ -639,3 +639,31 @@
 /* ── Scroll hint ── */
 .scroll-hint { text-align: center; font-size: 12px; color: var(--subtle); padding: 7px; letter-spacing: .3px; }
 @media (min-width: 768px) { .scroll-hint { display: none; } }
+
+
+/* ── Density modes ───────────────────────────────────────────
+   Applied as class on .sched-grid by setDensity() in ui.js
+   Replaces the old inline-style approach that got wiped on
+   every renderSchedule() call                               */
+
+.sched-grid.density-compact td,
+.sched-grid.density-compact th {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+.sched-grid.density-compact .loc-select {
+  padding: 2px;
+  font-size: 9px;
+}
+
+.sched-grid.density-normal td,
+.sched-grid.density-normal th {
+  font-size: inherit;
+  padding: inherit;
+}
+
+.sched-grid.density-normal .loc-select {
+  padding: inherit;
+  font-size: inherit;
+}
