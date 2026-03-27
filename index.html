@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>ScheduleMaker Pro v5</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
@@ -11,24 +11,9 @@
 </head>
 <body>
 
-<!-- PIN SCREEN -->
-<div id="pin-screen" class="pin-screen">
-  <div class="pin-box">
-    <div class="pin-logo">📅</div>
-    <h2>ScheduleMaker</h2>
-    <p>Enter admin PIN to manage schedules,<br>or view the live board without a PIN.</p>
-    <input type="password" class="pin-input" id="pin-input" maxlength="6" placeholder="••••••" onkeyup="checkPin(event)">
-    <div class="pin-error" id="pin-error"></div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:11px" onclick="submitPin()">Enter Admin</button>
-    <a class="pin-bypass" onclick="enterLiveMode()">View live board only</a>
-    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="showFirebaseConfig()">Configure Firebase</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOPBAR -->
 <div class="topbar">
+  <button class="admin-trigger-btn" id="admin-trigger-btn" onclick="openAdminLogin()">🔑 Admin</button>
   <div class="logo">
     <div class="logo-mark">📅</div>
     <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
@@ -63,8 +48,8 @@
 <div class="page active" id="page-live">
   <div class="live-top">
     <div>
-      <h2 style="font-size:19px;font-weight:700;letter-spacing:-.4px">Live Board</h2>
-      <p id="live-date-label" style="color:var(--muted);font-size:11px;margin-top:2px">Loading…</p>
+      <h2 style="font-size:20px;font-weight:700;letter-spacing:-.4px;color:var(--text)">Live Board</h2>
+      <p id="live-date-label" style="color:var(--muted);font-size:12px;margin-top:2px">Loading…</p>
     </div>
     <div class="live-view-toggle ml-auto">
       <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">Locations</button>
@@ -97,7 +82,7 @@
         <div class="emp-selector" id="emp-selector"></div>
       </div>
       <div id="my-sched-body" class="my-sched-body">
-        <p style="color:var(--muted);font-size:11px">Select your name above to see your schedule.</p>
+        <p style="color:var(--muted);font-size:12px">Select your name above to see your schedule.</p>
       </div>
     </div>
   </div>
@@ -112,8 +97,8 @@
       <div class="card-hdr" style="flex-wrap:wrap;gap:8px">
         <h2>Deep Lookup</h2>
         <div class="lookup-controls">
-          <input type="date" id="lookup-date" style="width:130px" onchange="renderDeepLookup()">
-          <select id="lookup-loc" style="width:110px" onchange="renderDeepLookup()">
+          <input type="date" id="lookup-date" style="width:140px" onchange="renderDeepLookup()">
+          <select id="lookup-loc" style="width:130px" onchange="renderDeepLookup()">
             <option value="">All locations</option>
             <option>Gate</option><option>Podium</option><option>Mandir</option>
             <option>Field Work</option><option>Gift Shop</option>
@@ -143,7 +128,7 @@
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span style="margin-left:auto;font-size:9px;color:var(--subtle)">✔ covered &nbsp; ✖ missing</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp; ✖ missing</span>
     </div>
     <div class="sched-wrap">
       <table class="sched-grid" id="default-table">
@@ -168,9 +153,9 @@
     <button class="adv-toggle" id="adv-toggle" onclick="toggleAdv()">Advanced tools <span class="arr">▼</span></button>
     <div class="adv-body" id="adv-body">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:10px;font-weight:600;color:var(--muted)">Copy day to</span>
-        <div id="copy-day-btns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
-        <span style="margin-left:10px;font-size:10px;font-weight:600;color:var(--muted)">Apply default</span>
+        <span style="font-size:11px;font-weight:600;color:var(--muted)">Copy day to</span>
+        <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+        <span style="margin-left:10px;font-size:11px;font-weight:600;color:var(--muted)">Apply default</span>
         <button class="btn btn-sm btn-warn" onclick="applyDefaultToDay()">Apply Default to This Day</button>
         <button class="btn btn-sm btn-ghost" onclick="clearOverridesForDay()">Clear Overrides</button>
       </div>
@@ -183,8 +168,10 @@
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span class="legend-item" style="margin-left:6px"><span style="display:inline-block;width:8px;height:8px;border-left:2px solid var(--orange);margin-right:3px"></span>Override</span>
-      <span style="margin-left:auto;font-size:9px;color:var(--subtle)">✔ covered &nbsp; ✖ missing &nbsp; 🔒 leave &nbsp; ✖ absent</span>
+      <span class="legend-item" style="margin-left:6px">
+        <span style="display:inline-block;width:9px;height:9px;border-left:2px solid var(--orange);margin-right:3px"></span>Override
+      </span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp; ✖ missing &nbsp; 🔒 leave &nbsp; ✖ absent</span>
     </div>
     <div class="sched-wrap">
       <table class="sched-grid" id="sched-table">
@@ -193,7 +180,7 @@
       </table>
     </div>
   </div>
-  <div id="suggest-area" style="margin-top:8px"></div>
+  <div id="suggest-area" style="margin-top:10px"></div>
 </div>
 
 <!-- PAGE: STAFF -->
@@ -221,7 +208,7 @@
   <div id="volunteer-list"></div>
   <div class="admin-tools">
     <h3>Admin Tools</h3>
-    <div style="display:flex;gap:7px;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-sm btn-ghost" onclick="showFirebaseConfig()">Firebase</button>
       <button class="btn btn-sm btn-success" onclick="exportData()">Export JSON</button>
       <button class="btn btn-sm btn-ghost" onclick="importData()">Import JSON</button>
@@ -256,7 +243,31 @@
   <div class="card"><div id="swap-list"></div></div>
 </div>
 
-<!-- MODALS -->
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Admin Login Modal -->
+<div class="modal-overlay hidden" id="admin-login-modal">
+  <div class="modal" style="max-width:340px">
+    <div class="admin-login-box">
+      <div class="pin-logo">🔑</div>
+      <h3>Admin Login</h3>
+      <p>Enter your PIN to unlock admin controls and edit schedules.</p>
+      <input type="password" class="pin-input-field" id="admin-pin-input"
+        maxlength="6" placeholder="••••••"
+        onkeyup="checkAdminPin(event)">
+      <div class="pin-error" id="admin-pin-error"></div>
+      <button class="btn btn-warn" style="width:100%;justify-content:center;margin-top:14px"
+        onclick="submitAdminPin()">Unlock Admin</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px"
+        onclick="closeModal('admin-login-modal')">Cancel</button>
+    </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center"
+        onclick="switchToFirebaseModal()">Configure Firebase</button>
+    </div>
+  </div>
+</div>
+
 <!-- Employee Modal -->
 <div class="modal-overlay hidden" id="emp-modal">
   <div class="modal">
@@ -276,10 +287,10 @@
     <div class="form-row">
       <label>Blocked Locations</label>
       <div class="loc-toggles">
-        <button class="loc-toggle" id="tog-gate" onclick="toggleLoc('gate')">Gate</button>
-        <button class="loc-toggle" id="tog-podium" onclick="toggleLoc('podium')">Podium</button>
-        <button class="loc-toggle" id="tog-mandir" onclick="toggleLoc('mandir')">Mandir</button>
-        <button class="loc-toggle" id="tog-field" onclick="toggleLoc('field')">Field Work</button>
+        <button class="loc-toggle" id="tog-gate"     onclick="toggleLoc('gate')">Gate</button>
+        <button class="loc-toggle" id="tog-podium"   onclick="toggleLoc('podium')">Podium</button>
+        <button class="loc-toggle" id="tog-mandir"   onclick="toggleLoc('mandir')">Mandir</button>
+        <button class="loc-toggle" id="tog-field"    onclick="toggleLoc('field')">Field Work</button>
         <button class="loc-toggle" id="tog-giftshop" onclick="toggleLoc('giftshop')">Gift Shop</button>
       </div>
     </div>
@@ -289,12 +300,12 @@
         <option>Active</option><option>Day Off</option><option>Vacation</option><option>Sick</option>
       </select>
     </div>
-    <div class="grid2" style="margin-bottom:11px">
+    <div class="grid2" style="margin-bottom:12px">
       <div class="form-row" style="margin:0"><label>Annual Leave days</label><input type="text" id="emp-annual" placeholder="20"></div>
       <div class="form-row" style="margin:0"><label>Sick Leave days</label><input type="text" id="emp-sick" placeholder="10"></div>
     </div>
-    <div id="emp-hrs-summary" style="font-size:10px;color:var(--muted);margin-bottom:10px"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end">
+    <div id="emp-hrs-summary" style="font-size:11px;color:var(--muted);margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('emp-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
     </div>
@@ -303,18 +314,18 @@
 
 <!-- Plan Schedule Modal -->
 <div class="modal-overlay hidden" id="plan-modal">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:440px">
     <h3 id="plan-modal-title">Plan Schedule</h3>
     <div class="form-row">
       <label>Week</label>
-      <div style="display:flex;align-items:center;gap:7px">
+      <div style="display:flex;align-items:center;gap:8px">
         <button class="week-arrow" onclick="planShiftWeek(-1)">‹</button>
-        <span id="plan-week-label" style="font-size:11px;font-weight:600;color:var(--text)"></span>
+        <span id="plan-week-label" style="font-size:12px;font-weight:600;color:var(--text)"></span>
         <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
       </div>
     </div>
     <div id="plan-days-container" style="max-height:55vh;overflow-y:auto"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:11px">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
       <button class="btn btn-ghost" onclick="closeModal('plan-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="savePlanSchedule()">Save Week</button>
     </div>
@@ -327,7 +338,7 @@
     <h3 id="vol-modal-title">Add Volunteer</h3>
     <div class="form-row"><label>Full Name</label><input type="text" id="vol-name" placeholder="e.g. Anita Mehta"></div>
     <div class="form-row"><label>Note</label><input type="text" id="vol-note" placeholder="e.g. Available afternoons only"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('vol-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveVolunteer()">Save</button>
     </div>
@@ -355,7 +366,7 @@
       <label>Status</label>
       <select id="leave-status"><option value="active">Active</option><option value="cancelled">Cancelled</option></select>
     </div>
-    <div style="display:flex;gap:7px;justify-content:flex-end">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('leave-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveLeave()">Save</button>
     </div>
@@ -372,7 +383,7 @@
       <div class="form-row"><label>Works Instead On</label><input type="date" id="swap-to"></div>
     </div>
     <div class="form-row"><label>Note</label><input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('swap-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSwap()">Save</button>
     </div>
@@ -390,7 +401,7 @@
     <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId"></div>
     <div class="form-row"><label>App ID</label><input type="text" id="fb-appId"></div>
     <div class="form-row"><label>Admin PIN</label><input type="password" id="fb-pin" placeholder="4–6 digits"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('firebase-modal')">Cancel</button>
       <button class="btn btn-success" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
     </div>
@@ -404,7 +415,7 @@
     <div class="inline-alert danger" style="margin-bottom:14px">Permanently deletes everything. Cannot be undone.</div>
     <div class="form-row"><label>Admin PIN</label><input type="password" id="reset-pin" placeholder="PIN"></div>
     <div class="pin-error" id="reset-error"></div>
-    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:14px">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-ghost" onclick="closeModal('reset-modal')">Cancel</button>
       <button class="btn btn-danger" onclick="confirmReset()">Delete Everything</button>
     </div>
