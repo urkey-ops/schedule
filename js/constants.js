@@ -83,3 +83,24 @@ const HINDU_FESTIVALS_DEFAULT = {
   '2027-09-15': { name:'Ganesh Chaturthi', emoji:'🐘', color:'#EA580C' },
   '2027-10-09': { name:'Diwali',            emoji:'🪔', color:'#D97706' },
 };
+
+// ── Aliases — do not remove ───────────────────────────────────
+const SLOTSTART      = SLOT_START;
+const SLOTEND        = SLOT_END;
+const SLOTHRS        = SLOT_HRS;
+const TIMESLOTS      = TIME_SLOTS;
+const DAYSSHORT      = DAYS_SHORT;
+const DAYSFULL       = DAYS_FULL;
+const LOCOPTIONS     = LOC_OPTIONS;
+const LOCCLS         = LOC_CLS;
+const LOCLABEL       = LOC_LABEL;
+const LOCCOLOR       = LOC_COLOR;
+const ALLLOCS        = ALL_LOCS;
+const REQUIREDLOCS   = REQUIRED_LOCS;
+const LUNCHSLOTS     = LUNCH_SLOTS;
+const DAYSTART       = DAY_START;
+const DAYEND         = DAY_END;
+const DEFAULTHRSCAP  = DEFAULT_HRS_CAP;
+const MAXHRSCAP      = MAX_HRS_CAP;
+const USFEDERALHOLIDAYS     = US_FEDERAL_HOLIDAYS;
+const HINDUFESTIVALSDEFAULT = HINDU_FESTIVALS_DEFAULT;
