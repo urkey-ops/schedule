@@ -18,30 +18,31 @@ let _undoStack = [];
 
 // ── Persistence ───────────────────────────────────────────────
 function saveLocal() {
-  const snap = JSON.stringify(state);
-  localStorage.setItem('smPro_data', snap);
-  const slot = Date.now() % 3;
-  localStorage.setItem(`smPro_bk_${slot}`, snap);
-  localStorage.setItem(`smPro_bk_ts_${slot}`, Date.now());
-  sessionStorage.setItem('smPro_session', snap);
+  try {
+    const snap = JSON.stringify(state);
+    localStorage.setItem('smPro_data', snap);
+    const slot = Date.now() % 3;
+    localStorage.setItem(`smPro_bk_${slot}`, snap);
+    localStorage.setItem(`smPro_bk_ts_${slot}`, Date.now());
+    sessionStorage.setItem('smPro_session', snap);
+  } catch(e) { console.warn('saveLocal failed', e); }
 }
 
 function loadLocal() {
-  let raw = localStorage.getItem('smPro_data');
-  if (!raw) raw = sessionStorage.getItem('smPro_session');
-  if (!raw) {
-    let best = null, bestTs = 0;
-    for (let i = 0; i < 3; i++) {
-      const ts = parseInt(localStorage.getItem(`smPro_bk_ts_${i}`) || 0);
-      const bk = localStorage.getItem(`smPro_bk_${i}`);
-      if (bk && ts > bestTs) { best = bk; bestTs = ts; }
+  try {
+    let raw = localStorage.getItem('smPro_data');
+    if (!raw) raw = sessionStorage.getItem('smPro_session');
+    if (!raw) {
+      let best = null, bestTs = 0;
+      for (let i = 0; i < 3; i++) {
+        const ts = parseInt(localStorage.getItem(`smPro_bk_ts_${i}`) || 0);
+        const bk = localStorage.getItem(`smPro_bk_${i}`);
+        if (bk && ts > bestTs) { best = bk; bestTs = ts; }
+      }
+      if (best) raw = best;
     }
-    if (best) {
-      const restore = confirm('⚠️ Main data missing. Restore from backup?');
-      if (restore) raw = best;
-    }
-  }
-  return raw ? JSON.parse(raw) : null;
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
 }
 
 function persistAll() {
@@ -79,18 +80,28 @@ function todayStr() {
 
 // ── Init ──────────────────────────────────────────────────────
 function initState() {
+  // Load local cache first so app shows instantly
   const saved = loadLocal();
   if (saved) {
-    Object.keys(saved).forEach(k => { state[k] = saved[k]; });
+    ['employees','volunteers','defaultSchedule','schedule',
+     'volAvailability','absences','leaveRequests','swapRequests'].forEach(k => {
+      if (saved[k] !== undefined) state[k] = saved[k];
+    });
   }
 
-  // Always auto-connect Firebase using hardcoded config
-  // Override with saved config if user entered a custom one
-  const savedCfg = localStorage.getItem('smPro_fbConfig');
-  const cfg = savedCfg ? JSON.parse(savedCfg) : HARDCODED_CONFIG;
+  // Always connect Firebase using hardcoded config
+  // If user saved a custom config via UI, use that instead
+  let cfg = HARDCODED_CONFIG;
+  try {
+    const savedCfg = localStorage.getItem('smPro_fbConfig');
+    if (savedCfg) {
+      const parsed = JSON.parse(savedCfg);
+      // Only use saved config if it has a valid key
+      if (parsed.apiKey && parsed.databaseURL) cfg = parsed;
+    }
+  } catch(e) { /* use hardcoded */ }
 
-  if (cfg && cfg.apiKey && cfg.databaseURL) {
-    try { initFirebase(cfg); }
-    catch(e) { console.error('Firebase init failed', e); }
+  if (cfg.apiKey && cfg.databaseURL) {
+    initFirebase(cfg);
   }
 }
