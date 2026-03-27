@@ -32,25 +32,8 @@ function checkAdminPin(e) {
 async function submitAdminPin() {
   const pin = document.getElementById('admin-pin-input').value.trim();
   const errEl = document.getElementById('admin-pin-error');
-
-  if (!pin) {
-    errEl.textContent = 'Please enter your PIN.';
-    return;
-  }
-
-  // Always wait for Firebase sync first — guaranteed fresh PIN hash
-  errEl.textContent = 'Verifying…';
-  await Promise.race([
-    waitForSync(),
-    new Promise(res => setTimeout(res, 5000))
-  ]);
-  errEl.textContent = '';
-
-  if (!hasPinSet()) {
-    errEl.textContent = 'No PIN set. Use Configure Firebase to set one first.';
-    return;
-  }
-
+  if (!pin) { errEl.textContent = 'Please enter your PIN.'; return; }
+  if (!hasPinSet()) { errEl.textContent = 'No PIN configured. Contact your administrator.'; return; }
   const ok = await verifyPin(pin);
   if (ok) {
     closeModal('admin-login-modal');
