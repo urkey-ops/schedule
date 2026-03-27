@@ -1,20 +1,20 @@
 let state = {
-  employees:       [],
-  volunteers:      [],
+  employees: [],
+  volunteers: [],
   defaultSchedule: {},
-  schedule:        {},
+  schedule: {},
   volAvailability: {},
-  absences:        {},
-  leaveRequests:   [],
-  swapRequests:    [],
-  holidays:        {},
-  empDaysOff:      {},
-  empHourCap:      {},
-  currentWeekMon:  '',
-  currentDateISO:  '',
-  currentDow:      '',
-  mode:            'live',
-  meta:            {}
+  absences: {},
+  leaveRequests: [],
+  swapRequests: [],
+  holidays: {},
+  empDaysOff: {},
+  empHourCap: {},
+  currentWeekMon: '',
+  currentDateISO: '',
+  currentDow: '',
+  mode: 'live',
+  meta: {}
 };
 
 let _undoStack = [];
@@ -39,6 +39,7 @@ async function setPinHash(pin) {
 }
 
 async function verifyPin(pin) {
+  // Always prefer localStorage (fastest), fall back to state (from Firebase sync)
   const stored = localStorage.getItem('smPro_adminPinHash') || state.adminPinHash;
   if (!stored) return false;
   const h = await hashPin(pin);
@@ -104,8 +105,9 @@ function undoLastChange() {
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
+
 function toDateStr(d) { return d.toISOString().slice(0,10); }
-function todayStr()   { return toDateStr(new Date()); }
+function todayStr() { return toDateStr(new Date()); }
 
 // ── Day Off Helpers ───────────────────────────────────────────
 function getEmpDaysOff(empId) {
@@ -167,6 +169,6 @@ async function _migrateLegacyPin() {
   const legacy = localStorage.getItem('smPro_adminPin');
   if (legacy && !localStorage.getItem('smPro_adminPinHash')) {
     await setPinHash(legacy);
+    localStorage.removeItem('smPro_adminPin');
   }
-  localStorage.removeItem('smPro_adminPin');
 }
