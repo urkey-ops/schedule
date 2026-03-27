@@ -2,7 +2,7 @@
 const HARDCODED_CONFIG = {
   apiKey:      "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
   authDomain:  "schedulemaker-6a571.firebaseapp.com",
-  databaseURL: "schedulemaker-6a571.firebaseapp.com",
+  databaseURL: 'https://schedulemaker-6a571-default-rtdb.firebaseio.com'  
   projectId:   "schedulemaker-6a571",
   appId:       "1:685602481293:web:2e5e0359b3df42f825aec4"
 };
