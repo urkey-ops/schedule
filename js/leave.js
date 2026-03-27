@@ -4,7 +4,8 @@ let editingSwapId  = null;
 // ── Leave ─────────────────────────────────────────────────────
 function isOnLeave(empId, iso) {
   return state.leaveRequests?.some(l =>
-    l.status === 'active' && l.empId === empId && l.from <= iso && l.to >= iso
+    l.status === 'active' && l.empId === empId &&
+    l.from <= iso && l.to >= iso
   ) || false;
 }
 
@@ -14,16 +15,17 @@ function toggleAbsent(empId, iso, btn) {
   state.absences[iso][empId] = !state.absences[iso][empId];
   if (btn) {
     const absent = state.absences[iso][empId];
-    btn.className  = `present-toggle ${absent ? 'absent' : 'present'}`;
+    btn.className   = `present-toggle ${absent ? 'absent' : 'present'}`;
     btn.textContent = absent ? '✖ Absent' : '✔ Present';
   }
-  persistAll();
+  persistAll('absences');
 }
 
 function buildAlerts() {
   const alerts = [];
   const today  = todayStr();
-  const soon   = new Date(); soon.setDate(soon.getDate() + ALERT_DAYS);
+  const soon   = new Date();
+  soon.setDate(soon.getDate() + ALERT_DAYS);
   const soonStr = toDateStr(soon);
 
   state.leaveRequests?.forEach(lr => {
@@ -44,7 +46,6 @@ function buildAlerts() {
       alerts.push({ type:'swap', msg:`${emp.name} swap: works ${sw.toDate} (off ${sw.fromDate})`, jumpDate: sw.toDate });
     }
   });
-
   return alerts;
 }
 
@@ -62,26 +63,24 @@ function renderSchedAlerts() {
 function renderLeave() {
   const tbody = document.getElementById('leave-body');
   if (!tbody) return;
-
   tbody.innerHTML = (state.leaveRequests || []).map(lr => {
     const emp  = state.employees.find(e => e.id === lr.empId);
     const days = lr.from && lr.to
       ? Math.round((new Date(lr.to) - new Date(lr.from)) / 86400000) + 1
       : '?';
-    const typeBadge = { annual:'badge-annual', sick:'badge-sick',
-      comp:'badge-comp', other:'badge-other' }[lr.type] || 'badge-other';
+    const typeBadge = { annual:'badge-annual', sick:'badge-sick', comp:'badge-comp', other:'badge-other' }[lr.type] || 'badge-other';
     return `<tr>
       <td>${escH(emp?.name || 'Unknown')}</td>
       <td><span class="badge ${typeBadge}">${lr.type}</span></td>
       <td style="font-family:DM Mono,monospace">${lr.from}</td>
       <td style="font-family:DM Mono,monospace">${lr.to}</td>
       <td style="color:var(--muted)">${days}d</td>
-      <td style="color:var(--muted)">${escH(lr.note||'')}</td>
+      <td style="color:var(--muted)">${escH(lr.note || '')}</td>
       <td><span class="leave-status-${lr.status}">${lr.status}</span></td>
       <td>
         <div style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-ghost" onclick="openEditLeave('${lr.id}')">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteLeave('${lr.id}')">✕</button>
+          <button class="btn btn-sm btn-ghost"  onclick="openEditLeave('${lr.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteLeave('${lr.id}')">&#x2715;</button>
         </div>
       </td>
     </tr>`;
@@ -100,13 +99,13 @@ function openAddLeave() {
 }
 
 function openEditLeave(leaveId) {
-  const lr = state.leaveRequests.find(l => l.id === leaveId);
+  const lr = (state.leaveRequests || []).find(l => l.id === leaveId);
   if (!lr) return;
   editingLeaveId = leaveId;
   document.getElementById('leave-modal-title').textContent = 'Edit Leave';
   document.getElementById('leave-emp-id').innerHTML =
     state.employees.map(e =>
-      `<option value="${e.id}" ${e.id===lr.empId?'selected':''}>${escH(e.name)}</option>`
+      `<option value="${e.id}" ${e.id === lr.empId ? 'selected' : ''}>${escH(e.name)}</option>`
     ).join('');
   document.getElementById('leave-from').value   = lr.from;
   document.getElementById('leave-to').value     = lr.to;
@@ -123,17 +122,23 @@ function saveLeave() {
   const type   = document.getElementById('leave-type').value;
   const note   = v('leave-note');
   const status = document.getElementById('leave-status').value;
+
   if (!empId || !from || !to) { alert('Fill in all required fields.'); return; }
   if (from > to) { alert('From must be before To.'); return; }
 
+  // ── Overlap check ─────────────────────────────────────────
+  if (status === 'active' && !validateLeaveOverlap(empId, from, to, editingLeaveId)) return;
+
   if (!state.leaveRequests) state.leaveRequests = [];
+
   if (editingLeaveId) {
     const lr = state.leaveRequests.find(l => l.id === editingLeaveId);
     Object.assign(lr, { empId, from, to, type, note, status });
   } else {
     state.leaveRequests.push({ id: uid(), empId, from, to, type, note, status });
   }
-  persistAll();
+
+  persistAll('leaveRequests');
   closeModal('leave-modal');
   renderLeave();
   showToast('Leave saved');
@@ -142,7 +147,7 @@ function saveLeave() {
 function deleteLeave(leaveId) {
   if (!confirm('Delete leave record?')) return;
   state.leaveRequests = state.leaveRequests.filter(l => l.id !== leaveId);
-  persistAll();
+  persistAll('leaveRequests');
   renderLeave();
 }
 
@@ -150,12 +155,10 @@ function deleteLeave(leaveId) {
 function renderSwaps() {
   const el = document.getElementById('swap-list');
   if (!el) return;
-
   if (!state.swapRequests?.length) {
     el.innerHTML = `<div style="padding:14px 16px;color:var(--muted);font-size:11px">No swap requests.</div>`;
     return;
   }
-
   el.innerHTML = state.swapRequests.map(sw => {
     const emp = state.employees.find(e => e.id === sw.empId);
     return `<div class="swap-item">
@@ -168,8 +171,8 @@ function renderSwaps() {
         ${sw.note ? `<span style="color:var(--subtle);font-size:10px;margin-left:6px">${escH(sw.note)}</span>` : ''}
       </div>
       <div style="display:flex;gap:3px">
-        <button class="btn btn-sm btn-ghost" onclick="openEditSwap('${sw.id}')">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteSwap('${sw.id}')">✕</button>
+        <button class="btn btn-sm btn-ghost"  onclick="openEditSwap('${sw.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSwap('${sw.id}')">&#x2715;</button>
       </div>
     </div>`;
   }).join('');
@@ -185,13 +188,13 @@ function openAddSwap() {
 }
 
 function openEditSwap(swapId) {
-  const sw = state.swapRequests.find(s => s.id === swapId);
+  const sw = (state.swapRequests || []).find(s => s.id === swapId);
   if (!sw) return;
   editingSwapId = swapId;
   document.getElementById('swap-modal-title').textContent = 'Edit Swap';
   document.getElementById('swap-emp-id').innerHTML =
     state.employees.map(e =>
-      `<option value="${e.id}" ${e.id===sw.empId?'selected':''}>${escH(e.name)}</option>`
+      `<option value="${e.id}" ${e.id === sw.empId ? 'selected' : ''}>${escH(e.name)}</option>`
     ).join('');
   document.getElementById('swap-from').value = sw.fromDate;
   document.getElementById('swap-to').value   = sw.toDate;
@@ -204,16 +207,22 @@ function saveSwap() {
   const fromDate = v('swap-from');
   const toDate   = v('swap-to');
   const note     = v('swap-note');
+
   if (!empId || !fromDate || !toDate) { alert('Fill in all date fields.'); return; }
 
+  // ── Swap must reference an actual day-off ─────────────────
+  if (!validateSwapDayOff(empId, fromDate)) return;
+
   if (!state.swapRequests) state.swapRequests = [];
+
   if (editingSwapId) {
     const sw = state.swapRequests.find(s => s.id === editingSwapId);
     Object.assign(sw, { empId, fromDate, toDate, note });
   } else {
     state.swapRequests.push({ id: uid(), empId, fromDate, toDate, note });
   }
-  persistAll();
+
+  persistAll('swapRequests');
   closeModal('swap-modal');
   renderSwaps();
   showToast('Swap saved');
@@ -222,6 +231,6 @@ function saveSwap() {
 function deleteSwap(swapId) {
   if (!confirm('Delete swap?')) return;
   state.swapRequests = state.swapRequests.filter(s => s.id !== swapId);
-  persistAll();
+  persistAll('swapRequests');
   renderSwaps();
 }
