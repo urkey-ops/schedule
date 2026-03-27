@@ -1,64 +1,186 @@
-// ── Current view state ────────────────────────────────────────
 let density = 'normal';
 
 // ── Helpers ───────────────────────────────────────────────────
 function getWeekMonday(d) {
-  const clone = new Date(d);
-  clone.setHours(0,0,0,0);
-  clone.setDate(clone.getDate() - ((clone.getDay() + 6) % 7));
-  return clone;
+  const c = new Date(d);
+  c.setHours(0,0,0,0);
+  c.setDate(c.getDate() - ((c.getDay()+6)%7));
+  return c;
 }
 
 function nowMins() {
   const n = new Date();
-  return n.getHours() * 60 + n.getMinutes();
+  return n.getHours()*60 + n.getMinutes();
 }
 
 function currentSlotIdx() {
   const nm = nowMins();
-  return SLOT_START.findIndex((s, i) => nm >= s * 60 && nm < SLOT_END[i] * 60);
+  return SLOT_START.findIndex((s,i) => nm >= s*60 && nm < SLOT_END[i]*60);
 }
 
 function formatWeekLabel(monday) {
-  return monday.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  return monday.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 
-// ── Resolved location for any cell ───────────────────────────
-// Returns { loc, source } where source = 'override'|'default'|'fallback'|'leave'|'absent'
+// ── Resolved location ─────────────────────────────────────────
 function getResolvedLoc(iso, slotIdx, empId) {
   const emp = state.employees.find(e => e.id === empId);
-  if (!emp) return { loc: 'off', source: 'fallback' };
+  if (!emp) return { loc:'off', source:'fallback' };
+
+  // Regular day off — hard OFF unless swapped
+  if (isEmpDayOff(empId, iso))
+    return { loc:'off', source:'dayoff' };
 
   // Absence
   if (state.absences?.[iso]?.[empId])
-    return { loc: 'off', source: 'absent' };
+    return { loc:'off', source:'absent' };
 
   // Active leave
   if (isOnLeave(empId, iso))
-    return { loc: 'vac', source: 'leave' };
+    return { loc:'vac', source:'leave' };
 
-  // Day-off swap: employee works on their usual day off
-  const activeSwap = state.swapRequests?.find(s => s.empId === empId && s.toDate === iso);
-  // (swap just means they show up as normal — no special loc change needed)
-
-  // Weekly schedule override
+  // Weekly override
   const ovr = state.schedule?.[iso]?.[slotIdx]?.[empId];
   if (ovr !== undefined)
-    return { loc: ovr, source: 'override' };
+    return { loc:ovr, source:'override' };
 
-  // Default schedule (keyed by day-of-week string e.g. 'MON')
-  const dow = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  // Default schedule
+  const dow = DAYS_SHORT[(new Date(iso+'T00:00:00').getDay()+6)%7];
   const def = state.defaultSchedule?.[dow]?.[slotIdx]?.[empId];
   if (def !== undefined)
-    return { loc: def, source: 'default' };
+    return { loc:def, source:'default' };
 
   // Fallback
-  const fb = emp.fallback ? emp.fallback.toLowerCase().replace(/\s+/g, '') : 'field';
-  return { loc: fb, source: 'fallback' };
+  const fb = emp.fallback ? emp.fallback.toLowerCase().replace(/\s+/g,'') : 'field';
+  return { loc:fb, source:'fallback' };
 }
 
 function isOverrideSet(iso, slotIdx, empId) {
   return state.schedule?.[iso]?.[slotIdx]?.[empId] !== undefined;
+}
+
+// ── Hours calc ────────────────────────────────────────────────
+function calcScheduledHrsWeek(empId) {
+  const mon = new Date(state.currentWeekMon + 'T00:00:00');
+  let total = 0;
+  for (let d = 0; d < 7; d++) {
+    const day = new Date(mon);
+    day.setDate(day.getDate() + d);
+    const iso = toDateStr(day);
+    if (isEmpDayOff(empId, iso)) continue;
+    TIME_SLOTS.forEach((_, si) => {
+      const { loc } = getResolvedLoc(iso, si, empId);
+      if (loc !== 'off' && loc !== 'vac') {
+        total += SLOT_HRS[si];
+      }
+    });
+  }
+  return Math.round(total * 10) / 10;
+}
+
+function hrsChipHtml(empId) {
+  const hrs = calcScheduledHrsWeek(empId);
+  const cap = getEmpHourCap(empId);
+  const cls = hrs > cap         ? 'hrs-over'
+            : hrs >= cap - 5    ? 'hrs-ok'
+            : 'hrs-under';
+  return `<span class="hrs-chip ${cls}" title="${hrs}h scheduled / ${cap}h cap">${hrs}/${cap}h</span>`;
+}
+
+// ── Range Fill ────────────────────────────────────────────────
+function renderRangeFill(mode) {
+  // mode = 'weekly' | 'default'
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+  const empOptions = activeEmps.map(e =>
+    `<option value="${e.id}">${escH(e.name)}</option>`
+  ).join('');
+  const locOptions = LOC_OPTIONS.filter(l => !['vac','off'].includes(l.val)).map(l =>
+    `<option value="${l.val}">${l.label}</option>`
+  ).join('');
+  const timeOptions = TIME_SLOTS.map((t,i) =>
+    `<option value="${i}">${t}</option>`
+  ).join('');
+
+  return `<div class="range-fill-bar">
+    <span class="range-fill-label">⚡ Quick Fill</span>
+    <select id="rf-emp-${mode}" style="flex:2;min-width:120px">${empOptions}</select>
+    <select id="rf-loc-${mode}" style="flex:1;min-width:100px">${locOptions}</select>
+    <span style="font-size:11px;color:var(--muted);white-space:nowrap">From</span>
+    <select id="rf-from-${mode}" style="flex:1;min-width:110px">${timeOptions}</select>
+    <span style="font-size:11px;color:var(--muted);white-space:nowrap">To</span>
+    <select id="rf-to-${mode}" style="flex:1;min-width:110px">${timeOptions}</select>
+    <button class="btn btn-warn btn-sm" onclick="applyRangeFill('${mode}')">Apply</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearRangeFill('${mode}')">Clear Range</button>
+  </div>`;
+}
+
+function applyRangeFill(mode) {
+  const empId = document.getElementById(`rf-emp-${mode}`).value;
+  const loc   = document.getElementById(`rf-loc-${mode}`).value;
+  const from  = parseInt(document.getElementById(`rf-from-${mode}`).value);
+  const to    = parseInt(document.getElementById(`rf-to-${mode}`).value);
+  if (from > to) { alert('From time must be before To time.'); return; }
+
+  pushUndo('Range fill', state);
+
+  if (mode === 'weekly') {
+    const iso = state.currentDateISO;
+    // Check leave
+    if (isOnLeave(empId, iso)) {
+      if (!confirm('This employee is on leave for this date. Apply anyway?')) return;
+    }
+    // Check day off
+    if (isEmpDayOff(empId, iso)) {
+      if (!confirm('This is their regular day off. Override and apply?')) return;
+    }
+    if (!state.schedule)       state.schedule       = {};
+    if (!state.schedule[iso])  state.schedule[iso]  = {};
+    for (let si = from; si <= to; si++) {
+      if (!state.schedule[iso][si]) state.schedule[iso][si] = {};
+      state.schedule[iso][si][empId] = loc;
+    }
+    persistAll();
+    renderSchedule();
+    showToast(`Filled ${TIME_SLOTS[from]} → ${TIME_SLOTS[to]}`);
+  }
+
+  if (mode === 'default') {
+    const dow = state.currentDow;
+    if (!state.defaultSchedule)        state.defaultSchedule        = {};
+    if (!state.defaultSchedule[dow])   state.defaultSchedule[dow]   = {};
+    for (let si = from; si <= to; si++) {
+      if (!state.defaultSchedule[dow][si]) state.defaultSchedule[dow][si] = {};
+      state.defaultSchedule[dow][si][empId] = loc;
+    }
+    persistAll();
+    renderDefaultSchedule();
+    showToast(`Default filled ${TIME_SLOTS[from]} → ${TIME_SLOTS[to]}`);
+  }
+}
+
+function clearRangeFill(mode) {
+  const empId = document.getElementById(`rf-emp-${mode}`).value;
+  const from  = parseInt(document.getElementById(`rf-from-${mode}`).value);
+  const to    = parseInt(document.getElementById(`rf-to-${mode}`).value);
+  pushUndo('Clear range', state);
+
+  if (mode === 'weekly') {
+    const iso = state.currentDateISO;
+    for (let si = from; si <= to; si++) {
+      if (state.schedule?.[iso]?.[si]) delete state.schedule[iso][si][empId];
+    }
+    persistAll();
+    renderSchedule();
+  }
+  if (mode === 'default') {
+    const dow = state.currentDow;
+    for (let si = from; si <= to; si++) {
+      if (state.defaultSchedule?.[dow]?.[si]) delete state.defaultSchedule[dow][si][empId];
+    }
+    persistAll();
+    renderDefaultSchedule();
+  }
+  showToast('Range cleared');
 }
 
 // ── Weekly Schedule ───────────────────────────────────────────
@@ -69,66 +191,119 @@ function renderSchedule() {
   const tbody      = document.getElementById('sched-body');
   if (!thead || !tbody) return;
 
+  // Hours chips row
+  const hrsRow = document.getElementById('sched-hrs-row');
+  if (hrsRow) {
+    hrsRow.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface2)">
+        ${activeEmps.map(e => `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:11px;font-weight:600;color:var(--muted)">${escH(e.name.split(' ')[0])}</span>
+            ${hrsChipHtml(e.id)}
+          </div>`).join('')}
+      </div>`;
+  }
+
   thead.innerHTML = `<tr>
-    <th style="min-width:130px">Time</th>
-    ${activeEmps.map(e =>
-      `<th title="${escH(e.name)}">${escH(e.name.split(' ')[0])}</th>`
-    ).join('')}
+    <th style="min-width:110px;text-align:right">Time</th>
+    ${activeEmps.map(e => {
+      const isDayOff = isEmpDayOff(e.id, iso);
+      return `<th title="${escH(e.name)}" class="${isDayOff?'dayoff-col':''}">
+        ${escH(e.name.split(' ')[0])}
+        ${isDayOff ? '<br><span style="font-size:8px;color:var(--subtle);font-weight:400">day off</span>' : ''}
+      </th>`;
+    }).join('')}
     <th>Cov</th>
   </tr>`;
 
-  const nm         = nowMins();
-  const todayStr_  = todayStr();
-  const isToday    = iso === todayStr_;
+  const nm        = nowMins();
+  const todayStr_ = todayStr();
+  const isToday   = iso === todayStr_;
+
+  // Holiday banner
+  const holiday = getHolidayForDate(iso);
+  const hb = document.getElementById('sched-holiday-banner');
+  if (hb) {
+    if (holiday) {
+      hb.innerHTML = `<div class="holiday-banner" style="background:${holiday.color}18;border-color:${holiday.color}40;color:${holiday.color}">
+        ${holiday.emoji} <strong>${escH(holiday.name)}</strong>
+      </div>`;
+      hb.classList.remove('hidden');
+    } else {
+      hb.classList.add('hidden');
+    }
+  }
 
   tbody.innerHTML = TIME_SLOTS.map((slot, si) => {
     const isLunch   = LUNCH_SLOTS.includes(si);
-    const slotStart = SLOT_START[si] * 60;
-    const slotEnd   = SLOT_END[si]   * 60;
+    const slotStart = SLOT_START[si]*60;
+    const slotEnd   = SLOT_END[si]*60;
     const isCurrent = isToday && nm >= slotStart && nm < slotEnd;
 
     const cells = activeEmps.map(emp => {
+      const isDayOff = isEmpDayOff(emp.id, iso);
+
+      if (isDayOff) {
+        const hasOverride = isOverrideSet(iso, si, emp.id);
+        if (hasOverride || state.mode !== 'admin') {
+          // Show normal cell if admin overrode the day off
+          if (!hasOverride) {
+            return `<td class="dayoff-col">
+              <div class="dayoff-lock">
+                OFF
+                ${state.mode==='admin' ? `<button class="dayoff-override-btn" onclick="overrideDayOff('${iso}',${si},'${emp.id}')">🔓</button>` : ''}
+              </div>
+            </td>`;
+          }
+        } else {
+          return `<td class="dayoff-col">
+            <div class="dayoff-lock">
+              OFF
+              <button class="dayoff-override-btn" onclick="overrideDayOff('${iso}',${si},'${emp.id}')">🔓</button>
+            </div>
+          </td>`;
+        }
+      }
+
       const { loc, source } = getResolvedLoc(iso, si, emp.id);
-      const cls             = LOC_CLS[loc] || '';
+      const cls = LOC_CLS[loc] || '';
 
       if (source === 'leave')
         return `<td><div class="leave-lock">🔒 LEAVE</div></td>`;
       if (source === 'absent')
         return `<td><div class="absent-lock">✖ ABSENT</div></td>`;
 
-      const isOvr = isOverrideSet(iso, si, emp.id);
+      const isOvr   = isOverrideSet(iso, si, emp.id);
       const options = LOC_OPTIONS.map(o =>
-        `<option value="${o.val}" ${loc === o.val ? 'selected' : ''}>${o.label}</option>`
+        `<option value="${o.val}" ${loc===o.val?'selected':''}>${o.label}</option>`
       ).join('');
 
       return `<td>
-        <div class="cell-wrap ${isOvr ? 'overridden' : ''}">
-          ${isOvr && state.mode === 'admin'
-            ? `<button class="reset-btn" onclick="resetCell('${iso}',${si},'${emp.id}')">↺ reset</button>`
+        <div class="cell-wrap ${isOvr?'overridden':''}">
+          ${isOvr && state.mode==='admin'
+            ? `<button class="reset-btn" onclick="resetCell('${iso}',${si},'${emp.id}')">↺</button>`
             : ''}
-          ${state.mode === 'admin'
-            ? `<select class="loc-select ${cls}"
-                onchange="handleLocChange('${iso}',${si},'${emp.id}',this)">
-                ${options}
-               </select>`
-            : `<div class="loc-select ${cls}" style="padding:3px 5px">${LOC_LABEL[loc] || loc}</div>`
+          ${state.mode==='admin'
+            ? `<select class="loc-select ${cls}" onchange="handleLocChange('${iso}',${si},'${emp.id}',this)">${options}</select>`
+            : `<div class="loc-select ${cls}" style="padding:3px 5px">${LOC_LABEL[loc]||loc}</div>`
           }
         </div>
       </td>`;
     }).join('');
 
-    // Coverage check — all REQUIRED_LOCS must be covered
+    // Coverage — exclude day-off and absent employees
     const covered = REQUIRED_LOCS.every(req =>
       activeEmps.some(e => {
+        if (isEmpDayOff(e.id, iso)) return false;
         const { loc, source } = getResolvedLoc(iso, si, e.id);
         return loc === req && source !== 'absent' && source !== 'leave';
       })
     );
 
-    return `<tr class="${isCurrent ? 'cur-row' : ''}" data-si="${si}">
-      <td class="slot-label ${isLunch ? 'lunch-slot' : ''} ${isCurrent ? 'cur-slot' : ''}">${slot}</td>
+    return `<tr class="${isCurrent?'cur-row':''}" data-si="${si}">
+      <td class="slot-label ${isLunch?'lunch-slot':''} ${isCurrent?'cur-slot':''}">${slot}</td>
       ${cells}
-      <td class="cov-cell ${covered ? 'cov-ok' : 'cov-fail'}">${covered ? '✔' : '✖'}</td>
+      <td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✔':'✖'}</td>
     </tr>`;
   }).join('');
 
@@ -137,25 +312,39 @@ function renderSchedule() {
   updateDayPillDots();
 }
 
+function overrideDayOff(iso, slotIdx, empId) {
+  if (!confirm('Override day off for this slot?')) return;
+  pushUndo('Override day off', state);
+  if (!state.schedule)               state.schedule               = {};
+  if (!state.schedule[iso])          state.schedule[iso]          = {};
+  if (!state.schedule[iso][slotIdx]) state.schedule[iso][slotIdx] = {};
+  const emp = state.employees.find(e => e.id === empId);
+  const fb  = emp?.fallback ? emp.fallback.toLowerCase().replace(/\s+/g,'') : 'field';
+  state.schedule[iso][slotIdx][empId] = fb;
+  persistAll();
+  renderSchedule();
+}
+
 function handleLocChange(iso, slotIdx, empId, sel) {
   pushUndo('Schedule change', state);
-  if (!state.schedule)              state.schedule              = {};
-  if (!state.schedule[iso])         state.schedule[iso]         = {};
+  if (!state.schedule)               state.schedule               = {};
+  if (!state.schedule[iso])          state.schedule[iso]          = {};
   if (!state.schedule[iso][slotIdx]) state.schedule[iso][slotIdx] = {};
   state.schedule[iso][slotIdx][empId] = sel.value;
-  sel.className = `loc-select ${LOC_CLS[sel.value] || ''}`;
+  sel.className = `loc-select ${LOC_CLS[sel.value]||''}`;
   sel.closest('.cell-wrap').classList.add('overridden');
   persistAll();
   showToast('Schedule updated');
   updateDayPillDots();
   renderSchedAlerts();
+  // Refresh hrs chips
+  const hrsRow = document.getElementById('sched-hrs-row');
+  if (hrsRow) renderSchedule();
 }
 
 function resetCell(iso, slotIdx, empId) {
   pushUndo('Reset cell', state);
-  if (state.schedule?.[iso]?.[slotIdx]) {
-    delete state.schedule[iso][slotIdx][empId];
-  }
+  if (state.schedule?.[iso]?.[slotIdx]) delete state.schedule[iso][slotIdx][empId];
   persistAll();
   renderSchedule();
 }
@@ -163,9 +352,9 @@ function resetCell(iso, slotIdx, empId) {
 function applyDefaultToDay() {
   pushUndo('Apply default', state);
   const iso = state.currentDateISO;
-  const dow = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const dow = DAYS_SHORT[(new Date(iso+'T00:00:00').getDay()+6)%7];
   const def = state.defaultSchedule?.[dow] || {};
-  if (!state.schedule)      state.schedule      = {};
+  if (!state.schedule) state.schedule = {};
   state.schedule[iso] = JSON.parse(JSON.stringify(def));
   persistAll();
   renderSchedule();
@@ -183,8 +372,7 @@ function clearOverridesForDay() {
 
 function copyDayTo(targetIso) {
   pushUndo('Copy day', state);
-  const srcIso = state.currentDateISO;
-  const src    = state.schedule?.[srcIso] || {};
+  const src = state.schedule?.[state.currentDateISO] || {};
   if (!state.schedule) state.schedule = {};
   state.schedule[targetIso] = JSON.parse(JSON.stringify(src));
   persistAll();
@@ -193,14 +381,12 @@ function copyDayTo(targetIso) {
 
 // ── Day Pill Dots ─────────────────────────────────────────────
 function updateDayPillDots() {
-  const pills = document.querySelectorAll('.day-pill');
-  pills.forEach(pill => {
-    const iso  = pill.getAttribute('onclick')?.match(/'([\d-]+)'/)?.[1];
+  document.querySelectorAll('.day-pill').forEach(pill => {
+    const iso = pill.getAttribute('onclick')?.match(/'([\d-]+)'/)?.[1];
     if (!iso) return;
-    const gaps = countDayGaps(iso);
-    const ovrs = countDayOverrides(iso);
-    pill.classList.toggle('has-gap', gaps > 0);
-    pill.classList.toggle('has-ovr', ovrs > 0);
+    pill.classList.toggle('has-gap',  countDayGaps(iso)     > 0);
+    pill.classList.toggle('has-ovr',  countDayOverrides(iso) > 0);
+    pill.classList.toggle('has-hday', !!getHolidayForDate(iso));
   });
 }
 
@@ -213,8 +399,15 @@ function renderDefaultSchedule() {
   if (!thead || !tbody) return;
 
   thead.innerHTML = `<tr>
-    <th style="min-width:130px">Time</th>
-    ${activeEmps.map(e => `<th>${escH(e.name.split(' ')[0])}</th>`).join('')}
+    <th style="min-width:110px;text-align:right">Time</th>
+    ${activeEmps.map(e => {
+      const daysOff = getEmpDaysOff(e.id);
+      const isOff   = daysOff.includes(dow);
+      return `<th class="${isOff?'dayoff-col':''}" title="${escH(e.name)}">
+        ${escH(e.name.split(' ')[0])}
+        ${isOff ? '<br><span style="font-size:8px;color:var(--subtle);font-weight:400">day off</span>' : ''}
+      </th>`;
+    }).join('')}
     <th>Cov</th>
   </tr>`;
 
@@ -222,11 +415,16 @@ function renderDefaultSchedule() {
     const isLunch = LUNCH_SLOTS.includes(si);
 
     const cells = activeEmps.map(emp => {
+      const daysOff = getEmpDaysOff(emp.id);
+      const isOff   = daysOff.includes(dow);
+
+      if (isOff) return `<td class="dayoff-col"><div class="dayoff-lock">OFF</div></td>`;
+
       const saved = state.defaultSchedule?.[dow]?.[si]?.[emp.id];
       const loc   = saved ?? (emp.fallback ? emp.fallback.toLowerCase().replace(/\s+/g,'') : 'field');
       const cls   = LOC_CLS[loc] || '';
       const options = LOC_OPTIONS.map(o =>
-        `<option value="${o.val}" ${loc === o.val ? 'selected' : ''}>${o.label}</option>`
+        `<option value="${o.val}" ${loc===o.val?'selected':''}>${o.label}</option>`
       ).join('');
       return `<td>
         <select class="loc-select ${cls}"
@@ -238,6 +436,7 @@ function renderDefaultSchedule() {
 
     const covered = REQUIRED_LOCS.every(req =>
       activeEmps.some(e => {
+        if (getEmpDaysOff(e.id).includes(dow)) return false;
         const saved = state.defaultSchedule?.[dow]?.[si]?.[e.id];
         const loc   = saved ?? (e.fallback ? e.fallback.toLowerCase().replace(/\s+/g,'') : 'field');
         return loc === req;
@@ -245,19 +444,19 @@ function renderDefaultSchedule() {
     );
 
     return `<tr data-si="${si}">
-      <td class="slot-label ${isLunch ? 'lunch-slot' : ''}">${slot}</td>
+      <td class="slot-label ${isLunch?'lunch-slot':''}">${slot}</td>
       ${cells}
-      <td class="cov-cell ${covered ? 'cov-ok' : 'cov-fail'}">${covered ? '✔' : '✖'}</td>
+      <td class="cov-cell ${covered?'cov-ok':'cov-fail'}">${covered?'✔':'✖'}</td>
     </tr>`;
   }).join('');
 }
 
 function handleDefaultChange(dow, slotIdx, empId, sel) {
-  if (!state.defaultSchedule)             state.defaultSchedule             = {};
-  if (!state.defaultSchedule[dow])        state.defaultSchedule[dow]        = {};
-  if (!state.defaultSchedule[dow][slotIdx]) state.defaultSchedule[dow][slotIdx] = {};
+  if (!state.defaultSchedule)                   state.defaultSchedule                   = {};
+  if (!state.defaultSchedule[dow])              state.defaultSchedule[dow]              = {};
+  if (!state.defaultSchedule[dow][slotIdx])     state.defaultSchedule[dow][slotIdx]     = {};
   state.defaultSchedule[dow][slotIdx][empId] = sel.value;
-  sel.className = `loc-select ${LOC_CLS[sel.value] || ''}`;
+  sel.className = `loc-select ${LOC_CLS[sel.value]||''}`;
 }
 
 function saveDefault() {
@@ -267,8 +466,8 @@ function saveDefault() {
 }
 
 // ── Plan Modal ────────────────────────────────────────────────
-let planWeekMon  = '';
-let planEmpId    = '';
+let planWeekMon = '';
+let planEmpId   = '';
 
 function openPlanSchedule(empId) {
   planEmpId   = empId;
@@ -279,7 +478,7 @@ function openPlanSchedule(empId) {
 
 function planShiftWeek(delta) {
   const d = new Date(planWeekMon + 'T00:00:00');
-  d.setDate(d.getDate() + delta * 7);
+  d.setDate(d.getDate() + delta*7);
   planWeekMon = toDateStr(d);
   renderPlanModal();
 }
@@ -287,30 +486,36 @@ function planShiftWeek(delta) {
 function renderPlanModal() {
   const emp = state.employees.find(e => e.id === planEmpId);
   if (!emp) return;
-
   document.getElementById('plan-modal-title').textContent = `Plan – ${emp.name}`;
   const wStart = new Date(planWeekMon + 'T00:00:00');
-  const wEnd   = new Date(wStart); wEnd.setDate(wEnd.getDate() + 6);
+  const wEnd   = new Date(wStart); wEnd.setDate(wEnd.getDate()+6);
   document.getElementById('plan-week-label').textContent =
     `${wStart.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${
       wEnd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}`;
 
-  document.getElementById('plan-days-container').innerHTML = DAYS_FULL.map((day, di) => {
-    const d   = new Date(wStart); d.setDate(d.getDate() + di);
+  document.getElementById('plan-days-container').innerHTML = DAYS_FULL.map((day,di) => {
+    const d   = new Date(wStart); d.setDate(d.getDate()+di);
     const iso = toDateStr(d);
+    const dow = DAYS_SHORT[di];
+    const isDayOff = getEmpDaysOff(planEmpId).includes(dow);
 
-    const slots = TIME_SLOTS.map((slot, si) => {
+    if (isDayOff) return `<div class="plan-day-block">
+      <div class="plan-day-hdr">${day} – ${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+        <span style="margin-left:8px;font-size:10px;color:var(--subtle)">(regular day off)</span>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--subtle)">Day off — not schedulable</div>
+    </div>`;
+
+    const slots = TIME_SLOTS.map((slot,si) => {
       const { loc } = getResolvedLoc(iso, si, planEmpId);
-      const cls     = LOC_CLS[loc] || '';
+      const cls     = LOC_CLS[loc]||'';
       const options = LOC_OPTIONS.map(o =>
-        `<option value="${o.val}" ${loc === o.val ? 'selected' : ''}>${o.label}</option>`
+        `<option value="${o.val}" ${loc===o.val?'selected':''}>${o.label}</option>`
       ).join('');
       return `<div class="plan-slot-row">
         <span class="plan-slot-label">${slot}</span>
         <select class="loc-select ${cls}" style="flex:1"
-          onchange="handlePlanChange('${iso}',${si},this)">
-          ${options}
-        </select>
+          onchange="handlePlanChange('${iso}',${si},this)">${options}</select>
       </div>`;
     }).join('');
 
@@ -326,7 +531,7 @@ function handlePlanChange(iso, slotIdx, sel) {
   if (!state.schedule[iso])          state.schedule[iso]          = {};
   if (!state.schedule[iso][slotIdx]) state.schedule[iso][slotIdx] = {};
   state.schedule[iso][slotIdx][planEmpId] = sel.value;
-  sel.className = `loc-select ${LOC_CLS[sel.value] || ''}`;
+  sel.className = `loc-select ${LOC_CLS[sel.value]||''}`;
 }
 
 function savePlanSchedule() {
@@ -340,43 +545,35 @@ function savePlanSchedule() {
 function renderSuggest() {
   const area = document.getElementById('suggest-area');
   if (!area) return;
-
   const iso        = state.currentDateISO;
   const activeEmps = state.employees.filter(e => e.status === 'Active');
   const suggestions = [];
 
-  TIME_SLOTS.forEach((_, si) => {
+  TIME_SLOTS.forEach((_,si) => {
     REQUIRED_LOCS.forEach(req => {
       const covered = activeEmps.some(e => {
+        if (isEmpDayOff(e.id, iso)) return false;
         const { loc, source } = getResolvedLoc(iso, si, e.id);
         return loc === req && source !== 'absent' && source !== 'leave';
       });
-
       if (!covered) {
         const candidates = activeEmps.filter(e => {
+          if (isEmpDayOff(e.id, iso)) return false;
           const { source } = getResolvedLoc(iso, si, e.id);
           return !e.blocked?.[req] && source !== 'absent' && source !== 'leave';
         });
-        if (candidates.length) {
-          suggestions.push({
-            slot: TIME_SLOTS[si],
-            loc:  req,
-            emp:  candidates[0].name
-          });
-        }
+        if (candidates.length) suggestions.push({ slot:TIME_SLOTS[si], loc:req, emp:candidates[0].name });
       }
     });
   });
 
   if (!suggestions.length) { area.innerHTML = ''; return; }
-
   area.innerHTML = `<div class="suggest-panel">
-    <strong>💡 Coverage suggestions:</strong><br>
+    <strong>💡 Coverage suggestions:</strong>
     <div style="margin-top:6px">
-      ${suggestions.slice(0, 6).map(s =>
-        `<span class="suggest-chip"
-          onclick="applySuggestion('${s.emp}','${s.loc}')">
-          ${escH(s.emp)} → ${LOC_LABEL[s.loc] || s.loc} @ ${s.slot}
+      ${suggestions.slice(0,6).map(s =>
+        `<span class="suggest-chip" onclick="applySuggestion('${s.emp}','${s.loc}')">
+          ${escH(s.emp)} → ${LOC_LABEL[s.loc]||s.loc} @ ${s.slot}
         </span>`
       ).join('')}
     </div>
@@ -384,25 +581,23 @@ function renderSuggest() {
 }
 
 function applySuggestion(empName, loc) {
-  // Find emp and apply to first uncovered slot for that loc today
-  const iso  = state.currentDateISO;
-  const emp  = state.employees.find(e => e.name === empName);
+  const iso = state.currentDateISO;
+  const emp = state.employees.find(e => e.name === empName);
   if (!emp) return;
-
-  TIME_SLOTS.forEach((_, si) => {
-    const isCovered = state.employees.filter(e => e.status === 'Active').some(e => {
-      const { loc: l, source } = getResolvedLoc(iso, si, e.id);
+  TIME_SLOTS.forEach((_,si) => {
+    const isCovered = state.employees.filter(e => e.status==='Active').some(e => {
+      if (isEmpDayOff(e.id, iso)) return false;
+      const { loc:l, source } = getResolvedLoc(iso, si, e.id);
       return l === loc && source !== 'absent' && source !== 'leave';
     });
     if (!isCovered) {
-      if (!state.schedule)               state.schedule               = {};
-      if (!state.schedule[iso])          state.schedule[iso]          = {};
-      if (!state.schedule[iso][si])      state.schedule[iso][si]      = {};
+      if (!state.schedule)          state.schedule          = {};
+      if (!state.schedule[iso])     state.schedule[iso]     = {};
+      if (!state.schedule[iso][si]) state.schedule[iso][si] = {};
       state.schedule[iso][si][emp.id] = loc;
     }
   });
-
   persistAll();
   renderSchedule();
-  showToast(`Applied: ${empName} → ${LOC_LABEL[loc] || loc}`);
+  showToast(`Applied: ${empName} → ${LOC_LABEL[loc]||loc}`);
 }
