@@ -32,13 +32,13 @@ async function hashPin(pin) {
 }
 
 async function verifyPin(pin) {
-  if (!HARDCODED_PIN_HASH || HARDCODED_PIN_HASH === '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414') return false;
+  if (!HARDCODED_PIN_HASH || HARDCODED_PIN_HASH === 'PASTE_YOUR_HASH_HERE') return false;
   const h = await hashPin(pin);
   return h === HARDCODED_PIN_HASH;
 }
 
 function hasPinSet() {
-  return !!(HARDCODED_PIN_HASH && HARDCODED_PIN_HASH !== '8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414');
+  return !!(HARDCODED_PIN_HASH && HARDCODED_PIN_HASH !== 'PASTE_YOUR_HASH_HERE');
 }
 
 // No-ops — kept so nothing else in codebase breaks if called
