@@ -139,11 +139,12 @@ function autoCleanAbsences() {
 function initState() {
   const saved = loadLocal();
   if (saved) {
-    ['employees','volunteers','defaultSchedule','schedule',
-     'volAvailability','absences','leaveRequests','swapRequests',
-     'holidays','empDaysOff','empHourCap'].forEach(k => {
-      if (saved[k] !== undefined) state[k] = saved[k];
-    });
+   // AFTER — adminPinHash now restored from local snapshot
+['employees','volunteers','defaultSchedule','schedule',
+ 'volAvailability','absences','leaveRequests','swapRequests',
+ 'holidays','empDaysOff','empHourCap','adminPinHash'].forEach(k => {
+  if (saved[k] !== undefined) state[k] = saved[k];
+});
   }
 
   autoCleanAbsences();
