@@ -31,17 +31,35 @@ function checkAdminPin(e) {
 
 async function submitAdminPin() {
   const pin = document.getElementById('admin-pin-input').value.trim();
-  if (!hasPinSet()) {
-    document.getElementById('admin-pin-error').textContent =
-      'No PIN set. Use Configure Firebase to set one first.';
+  const errEl = document.getElementById('admin-pin-error');
+
+  if (!pin) {
+    errEl.textContent = 'Please enter your PIN.';
     return;
   }
+
+  // If PIN not in localStorage yet, Firebase may still be syncing — wait up to 3s
+  if (!hasPinSet()) {
+    errEl.textContent = 'Syncing with server…';
+    try {
+      await Promise.race([
+        waitForSync(),
+        new Promise(res => setTimeout(res, 3000))
+      ]);
+    } catch(e) {}
+  }
+
+  if (!hasPinSet()) {
+    errEl.textContent = 'No PIN set. Use Configure Firebase to set one first.';
+    return;
+  }
+
   const ok = await verifyPin(pin);
   if (ok) {
     closeModal('admin-login-modal');
     enterAdmin();
   } else {
-    document.getElementById('admin-pin-error').textContent = 'Incorrect PIN. Try again.';
+    errEl.textContent = 'Incorrect PIN. Try again.';
     document.getElementById('admin-pin-input').value = '';
   }
 }
@@ -105,11 +123,25 @@ async function saveFirebaseConfig() {
   }
   const pin = v('fb-pin');
   if (pin) {
-    if (pin.length < 4) { alert('PIN must be at least 4 characters.'); return; }
+    if (pin.length < 4) {
+      alert('PIN must be at least 4 characters.');
+      return;
+    }
     await setPinHash(pin);
-  } else if (!hasPinSet()) {
-    alert('Please set a PIN before saving.');
-    return;
+  } else {
+    // Wait briefly for Firebase sync before checking if PIN exists
+    if (!hasPinSet()) {
+      try {
+        await Promise.race([
+          waitForSync(),
+          new Promise(res => setTimeout(res, 2000))
+        ]);
+      } catch(e) {}
+    }
+    if (!hasPinSet()) {
+      alert('Please set a PIN before saving.');
+      return;
+    }
   }
   localStorage.setItem('smPro_fbConfig', JSON.stringify(cfg));
   closeModal('firebase-modal');
@@ -417,16 +449,25 @@ function resetAllData() {
 
 async function confirmReset() {
   const pin = document.getElementById('reset-pin').value.trim();
-  const ok  = await verifyPin(pin);
+  const ok = await verifyPin(pin);
   if (!ok) {
     document.getElementById('reset-error').textContent = 'Incorrect PIN.';
     return;
   }
-  state.employees = []; state.volunteers = [];
-  state.defaultSchedule = {}; state.schedule = {};
-  state.volAvailability = {}; state.absences = {};
-  state.leaveRequests = []; state.swapRequests = [];
-  state.holidays = {}; state.empDaysOff = {}; state.empHourCap = {};
+  state.employees = [];
+  state.volunteers = [];
+  state.defaultSchedule = {};
+  state.schedule = {};
+  state.volAvailability = {};
+  state.absences = {};
+  state.leaveRequests = [];
+  state.swapRequests = [];
+  state.holidays = {};
+  state.empDaysOff = {};
+  state.empHourCap = {};
+  // Also clear PIN so a fresh setup is required after full reset
+  state.adminPinHash = undefined;
+  localStorage.removeItem('smPro_adminPinHash');
   persistAll();
   closeModal('reset-modal');
   renderAll();
