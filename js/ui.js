@@ -14,10 +14,10 @@ function showPage(name, tabEl) {
   } else {
     wnb.classList.add('hidden');
   }
-  if (name === 'staff')    { renderRoster(); renderVolunteers(); }
-  if (name === 'leave')    { renderLeave(); renderSwaps(); }
-  if (name === 'live')     renderLiveBoard();
-  if (name === 'default')  { renderDowPills(); renderDefaultSchedule(); }
+  if (name === 'staff')   { renderRoster(); renderVolunteers(); }
+  if (name === 'leave')   { renderLeave(); renderSwaps(); }
+  if (name === 'live')    renderLiveBoard();
+  if (name === 'default') { renderDowPills(); renderDefaultSchedule(); }
 }
 
 // ── Week Navigation ───────────────────────────────────────────
@@ -31,15 +31,16 @@ function renderWeekNav() {
   document.getElementById('week-label').textContent = `Week of ${formatWeekLabel(monday)}`;
 
   document.getElementById('day-pills').innerHTML = weekDates.map((d, i) => {
-    const iso    = toDateStr(d);
-    const isSel  = iso === state.currentDateISO;
+    const iso     = toDateStr(d);
+    const isSel   = iso === state.currentDateISO;
     const isToday = iso === todayStr_;
-    const gaps   = countDayGaps(iso);
-    const ovrs   = countDayOverrides(iso);
+    const gaps    = countDayGaps(iso);
+    const ovrs    = countDayOverrides(iso);
     return `<button class="day-pill ${isSel?'active':''} ${isToday?'today':''} ${gaps>0?'has-gap':''} ${ovrs>0?'has-ovr':''}"
-      onclick="switchDay('${iso}')" title="${gaps} gaps, ${ovrs} overrides">
+      onclick="switchDay('${iso}')" title="${gaps} gap(s), ${ovrs} override(s)">
       ${DAYS_SHORT[i]} ${d.getDate()}
-      <span class="gap-dot"></span><span class="ovr-dot"></span>
+      <span class="gap-dot"></span>
+      <span class="ovr-dot"></span>
     </button>`;
   }).join('');
 
@@ -54,8 +55,8 @@ function renderWeekNav() {
 function shiftWeek(delta) {
   const mon = new Date(state.currentWeekMon + 'T00:00:00');
   mon.setDate(mon.getDate() + delta * 7);
-  state.currentWeekMon  = toDateStr(mon);
-  state.currentDateISO  = state.currentWeekMon;
+  state.currentWeekMon = toDateStr(mon);
+  state.currentDateISO = state.currentWeekMon;
   renderWeekNav();
   renderSchedule();
 }
@@ -83,14 +84,14 @@ function jumpToDate(iso) {
 
 function countDayGaps(iso) {
   let g = 0;
-  TIME_SLOTS.forEach((_, si) =>
+  TIME_SLOTS.forEach((_, si) => {
     REQUIRED_LOCS.forEach(loc => {
       const covered = state.employees.some(e =>
         e.status === 'Active' && getResolvedLoc(iso, si, e.id).loc === loc
       );
       if (!covered) g++;
-    })
-  );
+    });
+  });
   return g;
 }
 
@@ -101,7 +102,7 @@ function countDayOverrides(iso) {
   return c;
 }
 
-// ── Default page dow pills ────────────────────────────────────
+// ── Default page dow pills ─────────────────────────────────────
 function renderDowPills() {
   document.getElementById('dow-pills').innerHTML = DAYS_SHORT.map(dow =>
     `<button class="dow-pill ${state.currentDow === dow ? 'active' : ''}"
@@ -115,12 +116,10 @@ function switchDow(dow) {
   renderDefaultSchedule();
 }
 
-// ── Advanced Tools Toggle ─────────────────────────────────────
+// ── Advanced Tools Toggle ──────────────────────────────────────
 function toggleAdv() {
-  const btn  = document.getElementById('adv-toggle');
-  const body = document.getElementById('adv-body');
-  btn.classList.toggle('open');
-  body.classList.toggle('open');
+  document.getElementById('adv-toggle').classList.toggle('open');
+  document.getElementById('adv-body').classList.toggle('open');
 }
 
 function setDensity(mode) {
@@ -130,42 +129,81 @@ function setDensity(mode) {
   renderSchedule();
 }
 
-// ── PIN ───────────────────────────────────────────────────────
-function checkPin(e) { if (e.key === 'Enter') submitPin(); }
+// ── Admin Login Modal ──────────────────────────────────────────
+function openAdminLogin() {
+  // If already admin, log out instead
+  if (state.mode === 'admin') {
+    exitAdminMode();
+    return;
+  }
+  document.getElementById('admin-pin-input').value = '';
+  document.getElementById('admin-pin-error').textContent = '';
+  openModal('admin-login-modal');
+  setTimeout(() => document.getElementById('admin-pin-input').focus(), 100);
+}
 
-function submitPin() {
-  const entered = document.getElementById('pin-input').value;
+function checkAdminPin(e) {
+  if (e.key === 'Enter') submitAdminPin();
+}
+
+function submitAdminPin() {
+  const entered = document.getElementById('admin-pin-input').value;
   const stored  = localStorage.getItem('smPro_pin') || DEFAULT_PIN;
-  if (entered === stored) enterAdminMode();
-  else document.getElementById('pin-error').textContent = 'Incorrect PIN.';
+  if (entered === stored) {
+    closeModal('admin-login-modal');
+    enterAdminMode();
+  } else {
+    document.getElementById('admin-pin-error').textContent = 'Incorrect PIN. Try again.';
+    document.getElementById('admin-pin-input').value = '';
+    document.getElementById('admin-pin-input').focus();
+  }
 }
 
 function enterAdminMode() {
   state.mode = 'admin';
-  document.getElementById('pin-screen').style.display = 'none';
   document.querySelectorAll('.admin-only').forEach(el => {
     el.classList.remove('admin-only');
     el.classList.add('admin-tab-visible');
   });
-  document.getElementById('mode-badge').textContent  = 'ADMIN';
-  document.getElementById('mode-badge').className    = 'mode-chip mode-admin';
+  document.getElementById('mode-badge').textContent = 'ADMIN';
+  document.getElementById('mode-badge').className   = 'mode-chip mode-admin';
+  const btn = document.getElementById('admin-trigger-btn');
+  if (btn) { btn.textContent = '🔓 Admin'; btn.classList.add('active'); }
   renderAll();
 }
 
-function enterLiveMode() {
+function exitAdminMode() {
+  if (!confirm('Exit admin mode?')) return;
   state.mode = 'live';
-  document.getElementById('pin-screen').style.display = 'none';
-  document.getElementById('mode-badge').textContent  = 'VIEW';
-  document.getElementById('mode-badge').className    = 'mode-chip mode-live';
+  document.querySelectorAll('.admin-tab-visible').forEach(el => {
+    el.classList.remove('admin-tab-visible');
+    el.classList.add('admin-only');
+  });
+  document.getElementById('mode-badge').textContent = 'VIEW';
+  document.getElementById('mode-badge').className   = 'mode-chip mode-live';
+  const btn = document.getElementById('admin-trigger-btn');
+  if (btn) { btn.textContent = '🔑 Admin'; btn.classList.remove('active'); }
+  // Return to live board
   showPage('live', document.getElementById('tab-live'));
-  renderAll();
 }
 
-// ── Modals ────────────────────────────────────────────────────
+function switchToFirebaseModal() {
+  closeModal('admin-login-modal');
+  showFirebaseConfig();
+}
+
+// ── Modals ─────────────────────────────────────────────────────
 function openModal(id)  { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-// ── Firebase Config ───────────────────────────────────────────
+// Click outside modal to close
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.add('hidden');
+  }
+});
+
+// ── Firebase Config ────────────────────────────────────────────
 function showFirebaseConfig() {
   const cfg = JSON.parse(localStorage.getItem('smPro_fbConfig') || '{}');
   ['apiKey','authDomain','databaseURL','projectId','appId'].forEach(k => {
@@ -193,18 +231,18 @@ function saveFirebaseConfig() {
   }
 }
 
-// ── Export / Import / Reset ───────────────────────────────────
+// ── Export / Import / Reset ────────────────────────────────────
 function exportData() {
   const data = {
-    employees:      state.employees,
-    volunteers:     state.volunteers,
+    employees:       state.employees,
+    volunteers:      state.volunteers,
     defaultSchedule: state.defaultSchedule,
-    schedule:       state.schedule,
+    schedule:        state.schedule,
     volAvailability: state.volAvailability,
-    leaveRequests:  state.leaveRequests,
-    swapRequests:   state.swapRequests,
+    leaveRequests:   state.leaveRequests,
+    swapRequests:    state.swapRequests,
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
   a.download = `schedulemaker-${todayStr()}.json`;
@@ -250,39 +288,45 @@ function confirmReset() {
   alert('All data deleted.');
 }
 
-// ── Toast / Undo ──────────────────────────────────────────────
+// ── Toast ──────────────────────────────────────────────────────
 let toastTimer = null;
 
-function showToast(msg) {
+function showToast(msg, withUndo = false) {
   const t   = document.getElementById('undo-toast');
   const btn = t.querySelector('.undo-btn');
   document.getElementById('undo-msg').textContent = msg;
-  btn.style.display = 'none';
+  btn.style.display = withUndo ? '' : 'none';
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.classList.remove('show'); btn.style.display = ''; }, 2200);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    btn.style.display = '';
+  }, 2400);
 }
 
 function hideToast() { document.getElementById('undo-toast').classList.remove('show'); }
 
-// ── Clock ─────────────────────────────────────────────────────
+// ── Clock ──────────────────────────────────────────────────────
 function tickClock() {
-  const now = new Date();
-  let h = now.getHours(), m = now.getMinutes();
+  const now  = new Date();
+  let h      = now.getHours();
+  const m    = now.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
   h = h % 12 || 12;
-  document.getElementById('live-clock').textContent =
-    `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-// ── Render All ────────────────────────────────────────────────
+// ── Render All ─────────────────────────────────────────────────
 function renderAll() {
   renderLiveBoard();
   if (state.mode === 'admin') {
-    renderRoster();
-    renderVolunteers();
-    renderLeave();
-    renderSwaps();
+    if (document.getElementById('page-staff').classList.contains('active')) {
+      renderRoster(); renderVolunteers();
+    }
+    if (document.getElementById('page-leave').classList.contains('active')) {
+      renderLeave(); renderSwaps();
+    }
     if (document.getElementById('page-default').classList.contains('active')) {
       renderDowPills(); renderDefaultSchedule();
     }
@@ -292,7 +336,7 @@ function renderAll() {
   }
 }
 
-// ── Helper: read input value ──────────────────────────────────
+// ── Helper utilities ───────────────────────────────────────────
 function v(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : '';
@@ -301,27 +345,39 @@ function v(id) {
 function escH(s) {
   if (!s) return '';
   return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
 }
 
-// ── Init ──────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   initState();
 
-  // Set default week/day
+  // Set default week/day state
   const mon = getWeekMonday(new Date());
   if (!state.currentWeekMon) state.currentWeekMon = toDateStr(mon);
   if (!state.currentDateISO) state.currentDateISO = todayStr();
   if (!state.currentDow)     state.currentDow     = DAYS_SHORT[(new Date().getDay()+6)%7];
-  if (!state.mode)           state.mode           = 'live';
 
-  // Set lookup date default
+  // Always start in live/view mode — no PIN gate
+  state.mode = 'live';
+
+  // Set default lookup date
   const ld = document.getElementById('lookup-date');
   if (ld) ld.value = todayStr();
 
+  // Start clock
   tickClock();
   setInterval(tickClock, 15000);
+
+  // Auto-refresh live board every 30s
   setInterval(() => {
-    if (document.getElementById('page-live').classList.contains('active')) renderLiveBoard();
+    if (document.getElementById('page-live').classList.contains('active')) {
+      renderLiveBoard();
+    }
   }, 30000);
+
+  // Render live board immediately
+  renderLiveBoard();
 });
