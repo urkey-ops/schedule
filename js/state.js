@@ -7,6 +7,9 @@ let state = {
   absences:        {},
   leaveRequests:   [],
   swapRequests:    [],
+  holidays:        {},
+  empDaysOff:      {},
+  empHourCap:      {},
   currentWeekMon:  '',
   currentDateISO:  '',
   currentDow:      '',
@@ -67,36 +70,64 @@ function undoLastChange() {
 
 // ── Helpers ───────────────────────────────────────────────────
 function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
 
-function toDateStr(dateObj) {
-  return dateObj.toISOString().slice(0, 10);
+function toDateStr(d) { return d.toISOString().slice(0,10); }
+function todayStr()   { return toDateStr(new Date()); }
+
+// ── Day Off Helpers ───────────────────────────────────────────
+function getEmpDaysOff(empId) {
+  return state.empDaysOff?.[empId] || [];
 }
 
-function todayStr() {
-  return toDateStr(new Date());
+function isEmpDayOff(empId, iso) {
+  const dow  = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const days = getEmpDaysOff(empId);
+  if (!days.includes(dow)) return false;
+  // Check if a swap overrides this day off
+  const swapped = state.swapRequests?.some(s =>
+    s.empId === empId && s.fromDate === iso
+  );
+  return !swapped;
+}
+
+function getEmpHourCap(empId) {
+  return state.empHourCap?.[empId] || DEFAULT_HRS_CAP;
+}
+
+// ── Absence Helpers ───────────────────────────────────────────
+function autoCleanAbsences() {
+  const today = todayStr();
+  if (!state.absences) { state.absences = {}; return; }
+  Object.keys(state.absences).forEach(iso => {
+    if (iso < today) delete state.absences[iso];
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────
 function initState() {
-  // Load local cache first so app shows instantly
   const saved = loadLocal();
   if (saved) {
     ['employees','volunteers','defaultSchedule','schedule',
-     'volAvailability','absences','leaveRequests','swapRequests'].forEach(k => {
+     'volAvailability','absences','leaveRequests','swapRequests',
+     'holidays','empDaysOff','empHourCap'].forEach(k => {
       if (saved[k] !== undefined) state[k] = saved[k];
     });
   }
 
-  // Always connect Firebase using hardcoded config
-  // If user saved a custom config via UI, use that instead
+  // Auto-clean old absences
+  autoCleanAbsences();
+
+  // Init holidays — merge defaults with saved
+  initHolidays();
+
+  // Connect Firebase
   let cfg = HARDCODED_CONFIG;
   try {
     const savedCfg = localStorage.getItem('smPro_fbConfig');
     if (savedCfg) {
       const parsed = JSON.parse(savedCfg);
-      // Only use saved config if it has a valid key
       if (parsed.apiKey && parsed.databaseURL) cfg = parsed;
     }
   } catch(e) { /* use hardcoded */ }
