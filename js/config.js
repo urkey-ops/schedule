@@ -7,4 +7,5 @@ const APP_VERSION = 'v6';
 // To generate: in browser console run:
 //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpin'))
 //     .then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
-const HARDCODED_PIN_HASH = '2a8610aefdd0028c6bf074dd18721c0ef8bc43241cc7a653d7aedf2036bdf6b3';
+// config.js — change this line
+const HARDCODEDPINHASH = '2a8610aefdd0028c6bf074dd18721c0ef8bc43241cc7a653d7aedf2036bdf6b3';
