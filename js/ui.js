@@ -29,10 +29,15 @@ function checkAdminPin(e) {
   if (e.key === 'Enter') submitAdminPin();
 }
 
-function submitAdminPin() {
-  const pin    = document.getElementById('admin-pin-input').value.trim();
-  const stored = localStorage.getItem('smPro_adminPin') || '1234';
-  if (pin === stored) {
+async function submitAdminPin() {
+  const pin = document.getElementById('admin-pin-input').value.trim();
+  if (!hasPinSet()) {
+    document.getElementById('admin-pin-error').textContent =
+      'No PIN set. Use Configure Firebase to set one first.';
+    return;
+  }
+  const ok = await verifyPin(pin);
+  if (ok) {
     closeModal('admin-login-modal');
     enterAdmin();
   } else {
@@ -43,8 +48,9 @@ function submitAdminPin() {
 
 function enterAdmin() {
   state.mode = 'admin';
-  document.getElementById('mode-badge').textContent  = 'ADMIN';
-  document.getElementById('mode-badge').className    = 'mode-chip mode-admin';
+  sessionStorage.setItem('smPro_adminSession', '1');
+  document.getElementById('mode-badge').textContent = 'ADMIN';
+  document.getElementById('mode-badge').className = 'mode-chip mode-admin';
   document.getElementById('admin-trigger-btn').classList.add('active');
   document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-tab-visible'));
   showPage('live', document.getElementById('tab-live'));
@@ -52,8 +58,9 @@ function enterAdmin() {
 
 function exitAdmin() {
   state.mode = 'live';
-  document.getElementById('mode-badge').textContent  = 'VIEW';
-  document.getElementById('mode-badge').className    = 'mode-chip mode-live';
+  sessionStorage.removeItem('smPro_adminSession');
+  document.getElementById('mode-badge').textContent = 'VIEW';
+  document.getElementById('mode-badge').className = 'mode-chip mode-live';
   document.getElementById('admin-trigger-btn').classList.remove('active');
   document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-tab-visible'));
   showPage('live', document.getElementById('tab-live'));
@@ -77,11 +84,14 @@ function showFirebaseConfig() {
     } catch(e) {}
   }
   const pinEl = document.getElementById('fb-pin');
-  if (pinEl) pinEl.value = localStorage.getItem('smPro_adminPin') || '';
+  if (pinEl) {
+    pinEl.value = '';
+    pinEl.placeholder = hasPinSet() ? '(leave blank to keep current PIN)' : 'Set a new PIN';
+  }
   openModal('firebase-modal');
 }
 
-function saveFirebaseConfig() {
+async function saveFirebaseConfig() {
   const cfg = {
     apiKey:      v('fb-apiKey'),
     authDomain:  v('fb-authDomain'),
@@ -94,7 +104,13 @@ function saveFirebaseConfig() {
     return;
   }
   const pin = v('fb-pin');
-  if (pin) localStorage.setItem('smPro_adminPin', pin);
+  if (pin) {
+    if (pin.length < 4) { alert('PIN must be at least 4 characters.'); return; }
+    await setPinHash(pin);
+  } else if (!hasPinSet()) {
+    alert('Please set a PIN before saving.');
+    return;
+  }
   localStorage.setItem('smPro_fbConfig', JSON.stringify(cfg));
   closeModal('firebase-modal');
   location.reload();
@@ -399,24 +415,18 @@ function resetAllData() {
   openModal('reset-modal');
 }
 
-function confirmReset() {
-  const pin    = document.getElementById('reset-pin').value.trim();
-  const stored = localStorage.getItem('smPro_adminPin') || '1234';
-  if (pin !== stored) {
+async function confirmReset() {
+  const pin = document.getElementById('reset-pin').value.trim();
+  const ok  = await verifyPin(pin);
+  if (!ok) {
     document.getElementById('reset-error').textContent = 'Incorrect PIN.';
     return;
   }
-  state.employees       = [];
-  state.volunteers      = [];
-  state.defaultSchedule = {};
-  state.schedule        = {};
-  state.volAvailability = {};
-  state.absences        = {};
-  state.leaveRequests   = [];
-  state.swapRequests    = [];
-  state.holidays        = {};
-  state.empDaysOff      = {};
-  state.empHourCap      = {};
+  state.employees = []; state.volunteers = [];
+  state.defaultSchedule = {}; state.schedule = {};
+  state.volAvailability = {}; state.absences = {};
+  state.leaveRequests = []; state.swapRequests = [];
+  state.holidays = {}; state.empDaysOff = {}; state.empHourCap = {};
   persistAll();
   closeModal('reset-modal');
   renderAll();
@@ -756,13 +766,13 @@ function isOnLeave(empId, iso) {
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   initState();
-
   const mon = getWeekMonday(new Date());
   if (!state.currentWeekMon) state.currentWeekMon = toDateStr(mon);
   if (!state.currentDateISO) state.currentDateISO = todayStr();
-  if (!state.currentDow)     state.currentDow     = DAYS_SHORT[(new Date().getDay() + 6) % 7];
+  if (!state.currentDow)     state.currentDow = DAYS_SHORT[(new Date().getDay() + 6) % 7];
 
-  state.mode = 'live';
+  if (sessionStorage.getItem('smPro_adminSession')) enterAdmin();
+  else state.mode = 'live';
 
   const ld = document.getElementById('lookup-date');
   if (ld) ld.value = todayStr();
@@ -772,6 +782,8 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(() => {
     if (document.getElementById('page-live')?.classList.contains('active')) renderLiveBoard();
   }, 30000);
+
+  if (window.innerWidth < 640) setLiveView('my');
 
   renderLiveBoard();
 });
