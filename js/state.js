@@ -19,6 +19,33 @@ let state = {
 
 let _undoStack = [];
 
+// ── PIN Hashing (SHA-256 via Web Crypto) ──────────────────────
+async function hashPin(pin) {
+  const buf = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(pin)
+  );
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function setPinHash(pin) {
+  const h = await hashPin(pin);
+  localStorage.setItem('smPro_adminPinHash', h);
+  // Remove legacy plain-text PIN if present
+  localStorage.removeItem('smPro_adminPin');
+}
+
+async function verifyPin(pin) {
+  const stored = localStorage.getItem('smPro_adminPinHash');
+  if (!stored) return false;          // no PIN set yet → reject
+  const h = await hashPin(pin);
+  return h === stored;
+}
+
+function hasPinSet() {
+  return !!localStorage.getItem('smPro_adminPinHash');
+}
+
 // ── Persistence ───────────────────────────────────────────────
 function saveLocal() {
   try {
@@ -48,8 +75,10 @@ function loadLocal() {
   } catch(e) { return null; }
 }
 
-function persistAll() {
+// key is optional — if provided, only that slice is flagged dirty for Firebase
+function persistAll(key) {
   saveLocal();
+  if (key) markDirty(key);
   pushToFirebase();
 }
 
@@ -72,7 +101,6 @@ function undoLastChange() {
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
-
 function toDateStr(d) { return d.toISOString().slice(0,10); }
 function todayStr()   { return toDateStr(new Date()); }
 
@@ -82,13 +110,10 @@ function getEmpDaysOff(empId) {
 }
 
 function isEmpDayOff(empId, iso) {
-  const dow  = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const dow = DAYS_SHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
   const days = getEmpDaysOff(empId);
   if (!days.includes(dow)) return false;
-  // Check if a swap overrides this day off
-  const swapped = state.swapRequests?.some(s =>
-    s.empId === empId && s.fromDate === iso
-  );
+  const swapped = state.swapRequests?.some(s => s.empId === empId && s.fromDate === iso);
   return !swapped;
 }
 
@@ -116,13 +141,12 @@ function initState() {
     });
   }
 
-  // Auto-clean old absences
   autoCleanAbsences();
-
-  // Init holidays — merge defaults with saved
   initHolidays();
 
-  // Connect Firebase
+  // Migrate legacy plain-text PIN to hash (one-time, silent)
+  _migrateLegacyPin();
+
   let cfg = HARDCODED_CONFIG;
   try {
     const savedCfg = localStorage.getItem('smPro_fbConfig');
@@ -132,7 +156,14 @@ function initState() {
     }
   } catch(e) { /* use hardcoded */ }
 
-  if (cfg.apiKey && cfg.databaseURL) {
-    initFirebase(cfg);
+  if (cfg.apiKey && cfg.databaseURL) initFirebase(cfg);
+}
+
+// Migrate old plain-text PIN → hash silently on first load
+async function _migrateLegacyPin() {
+  const legacy = localStorage.getItem('smPro_adminPin');
+  if (legacy && !localStorage.getItem('smPro_adminPinHash')) {
+    await setPinHash(legacy);
   }
+  localStorage.removeItem('smPro_adminPin');
 }
