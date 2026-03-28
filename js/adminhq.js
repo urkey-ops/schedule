@@ -174,3 +174,257 @@ function renderHourWatch() {
       </div>`).join('')}
   </div>`;
 }
+
+// ── Action Queue ──────────────────────────────────────────────
+function renderActionQueue() {
+  const el = document.getElementById('hq-action-queue');
+  if (!el) return;
+
+  const iso    = todayStr();
+  const alerts = scanAlerts(iso).filter(a => !_dismissedAlerts.has(a.key));
+
+  // Deduplicate
+  const seen   = new Set();
+  const unique = alerts.filter(a => {
+    if (seen.has(a.key)) return false;
+    seen.add(a.key); return true;
+  });
+
+  const high = unique.filter(a => a.severity === 'high');
+  const warn = unique.filter(a => a.severity === 'warn');
+  const info = unique.filter(a => a.severity === 'info');
+  const all  = [...high, ...warn, ...info];
+
+  if (!all.length) {
+    el.innerHTML = `<div class="hq-all-clear">
+      ✅ All clear — no actions needed right now
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="hq-action-list">
+    ${all.map(a => `
+      <div class="hq-action-item hq-action-${a.severity}">
+        <span class="hq-action-icon">${severityIcon(a.severity)}</span>
+        <span class="hq-action-msg">${escH(a.msg)}</span>
+        <div class="hq-action-btns">
+          ${a.action === 'fillGap'
+            ? `<button class="btn btn-sm btn-primary"
+                onclick="openFillGapWizard('${a.loc}',${a.si},'${a.iso}')">
+                Fill Gap</button>`
+            : ''}
+          ${a.action === 'clearOverride'
+            ? `<button class="btn btn-sm btn-warn"
+                onclick="clearSingleOverride('${a.iso}',${a.si},'${a.empId}')">
+                Clear Override</button>`
+            : ''}
+          ${a.action === 'viewEmployee'
+            ? `<button class="btn btn-sm btn-ghost"
+                onclick="showPage('staff',document.getElementById('tab-staff'))">
+                View Staff</button>`
+            : ''}
+          ${a.action === 'viewSwap'
+            ? `<button class="btn btn-sm btn-ghost"
+                onclick="showPage('leave',document.getElementById('tab-leave'))">
+                View Swaps</button>`
+            : ''}
+          <button class="btn btn-sm btn-ghost"
+            onclick="dismissAlert('${escH(a.key)}');renderActionQueue();renderHQAlerts()">
+            Dismiss</button>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ── Fill Gap Wizard ───────────────────────────────────────────
+function openFillGapWizard(loc, si, iso) {
+  iso = iso || todayStr();
+  const panel = document.getElementById('fill-gap-panel');
+  if (!panel) return;
+
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+
+  // Available = not day off, not on leave, not absent, not blocked for this loc
+  const available = activeEmps.filter(e => {
+    if (isEmpDayOff(e.id, iso))        return false;
+    if (isOnLeave(e.id, iso))          return false;
+    if (state.absences?.[iso]?.[e.id]) return false;
+    if (e.blocked?.includes(loc))      return false;
+    return true;
+  }).map(e => {
+    const { loc: curLoc } = getResolvedLoc(iso, si, e.id);
+    const hrs = calcScheduledHrsWeek(e.id, getWeekMonStr(iso));
+    const cap = e.hourCap || DEFAULTHRSCAP;
+    return { e, curLoc, hrs, cap, overCap: hrs >= cap };
+  }).sort((a, b) => a.hrs - b.hrs); // least hours first
+
+  panel.innerHTML = `
+    <div class="fill-gap-wizard">
+      <div class="fgw-header">
+        <strong>Fill Gap</strong>
+        <span style="color:${LOCCOLOR[loc]||'#888'};margin-left:8px">
+          ${LOCLABEL[loc]} — ${TIMESLOTS[si]||si}
+        </span>
+        <button class="fgw-close" onclick="closeFillGapPanel()">×</button>
+      </div>
+      ${!available.length
+        ? `<div class="fgw-empty">No available employees for this slot.</div>`
+        : `<div class="fgw-list">
+            ${available.map(({ e, curLoc, hrs, cap, overCap }) => `
+              <div class="fgw-emp-row ${overCap ? 'fgw-overcap' : ''}">
+                <div class="fgw-emp-info">
+                  <span class="fgw-emp-name">${escH(e.name)}</span>
+                  <span class="fgw-emp-cur" style="color:${LOCCOLOR[curLoc]||'var(--muted)'}">
+                    currently: ${LOCLABEL[curLoc]||curLoc}
+                  </span>
+                  <span class="fgw-emp-hrs" style="color:${overCap?'#dc2626':'var(--muted)'}">
+                    ${hrs.toFixed(1)}/${cap}h ${overCap ? '⚠️' : ''}
+                  </span>
+                </div>
+                <button class="btn btn-sm btn-primary ${overCap ? 'btn-warn' : ''}"
+                  onclick="assignGapFill('${e.id}','${iso}',${si},'${loc}')">
+                  Assign
+                </button>
+              </div>`).join('')}
+          </div>`}
+    </div>`;
+
+  panel.classList.remove('hidden');
+}
+
+function closeFillGapPanel() {
+  document.getElementById('fill-gap-panel')?.classList.add('hidden');
+}
+
+function assignGapFill(empId, iso, si, loc) {
+  if (!state.schedule)       state.schedule       = {};
+  if (!state.schedule[iso])  state.schedule[iso]  = {};
+  if (!state.schedule[iso][si]) state.schedule[iso][si] = {};
+  state.schedule[iso][si][empId] = loc;
+  persistAll('schedule');
+  closeFillGapPanel();
+  renderAll();
+  showToast(`Gap filled — ${LOCLABEL[loc]}`);
+}
+
+// ── Quick Actions Panel ───────────────────────────────────────
+function toggleQuickActions() {
+  const panel = document.getElementById('quick-actions-panel');
+  if (!panel) return;
+  panel.classList.toggle('hidden');
+  if (!panel.classList.contains('hidden')) renderQuickActionsPanel();
+}
+
+function renderQuickActionsPanel() {
+  const inner = document.getElementById('qa-inner');
+  if (!inner) return;
+  const iso    = todayStr();
+  const emps   = state.employees.filter(e => e.status === 'Active');
+  const empOpts = emps.map(e =>
+    `<option value="${e.id}">${escH(e.name)}</option>`).join('');
+
+  inner.innerHTML = `
+    <div class="qa-section">
+      <div class="qa-section-title">⚡ Mark Absent</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="qa-absent-emp" style="flex:1;min-width:120px;padding:7px 10px;
+          border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+          <option value="">Select employee…</option>
+          ${empOpts}
+        </select>
+        <input type="date" id="qa-absent-date" value="${iso}"
+          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        <button class="btn btn-sm btn-danger"
+          onclick="qaMarkAbsent()">Mark</button>
+      </div>
+    </div>
+
+    <div class="qa-section">
+      <div class="qa-section-title">🔒 Quick Leave</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="qa-leave-emp" style="flex:1;min-width:120px;padding:7px 10px;
+          border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+          <option value="">Select employee…</option>
+          ${empOpts}
+        </select>
+        <input type="date" id="qa-leave-from" value="${iso}"
+          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        <input type="date" id="qa-leave-to" value="${iso}"
+          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        <button class="btn btn-sm btn-leave"
+          onclick="qaAddLeave()">Add Leave</button>
+      </div>
+    </div>
+
+    <div class="qa-section">
+      <div class="qa-section-title">📋 Apply Default to Week</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--muted);flex:1">
+          Week of ${fmtDate(state.currentWeekMon)}
+        </span>
+        <button class="btn btn-sm btn-warn"
+          onclick="qaApplyDefaultWeek()">Apply</button>
+      </div>
+    </div>
+
+    <div class="qa-section">
+      <div class="qa-section-title">📊 Jump to Today</div>
+      <button class="btn btn-sm btn-primary" style="width:100%;justify-content:center"
+        onclick="jumpToDay('${iso}');toggleQuickActions()">
+        Open Today's Schedule
+      </button>
+    </div>`;
+}
+
+function qaMarkAbsent() {
+  const empId = document.getElementById('qa-absent-emp')?.value;
+  const iso   = document.getElementById('qa-absent-date')?.value;
+  if (!empId || !iso) { showToast('Select employee and date'); return; }
+  if (!state.absences)       state.absences       = {};
+  if (!state.absences[iso])  state.absences[iso]  = {};
+  state.absences[iso][empId] = true;
+  persistAll('absences');
+  renderAll();
+  showToast('Marked absent');
+}
+
+function qaAddLeave() {
+  const empId = document.getElementById('qa-leave-emp')?.value;
+  const from  = document.getElementById('qa-leave-from')?.value;
+  const to    = document.getElementById('qa-leave-to')?.value;
+  if (!empId || !from || !to) { showToast('Fill all leave fields'); return; }
+  if (!state.leaveRequests) state.leaveRequests = [];
+  state.leaveRequests.push({
+    id    : `leave-${Date.now()}`,
+    empId, from, to,
+    type  : 'annual',
+    note  : 'Quick add',
+    status: 'active',
+  });
+  persistAll('leaveRequests');
+  renderAll();
+  showToast('Leave added');
+}
+
+function qaApplyDefaultWeek() {
+  if (!confirm('Apply default schedule to entire current week? This will overwrite existing overrides.')) return;
+  const mon = new Date(state.currentWeekMon + 'T00:00:00');
+  for (let i = 0; i < 7; i++) {
+    const d   = new Date(mon);
+    d.setDate(d.getDate() + i);
+    const iso = toDateStr(d);
+    const dow = DAYSSHORT[i];
+    if (!state.schedule[iso]) state.schedule[iso] = {};
+    const def = state.defaultSchedule?.[dow] || {};
+    TIMESLOTS.forEach((_, si) => {
+      if (!state.schedule[iso][si]) state.schedule[iso][si] = {};
+      Object.keys(def[si] || {}).forEach(empId => {
+        state.schedule[iso][si][empId] = def[si][empId];
+      });
+    });
+  }
+  persistAll('schedule');
+  renderAll();
+  showToast('Default applied to whole week');
+  toggleQuickActions();
+}
