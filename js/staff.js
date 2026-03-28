@@ -14,6 +14,8 @@ function renderRoster() {
   if (!tbody) return;
 
   const iso     = todayStr();
+  // FIX: always derive weekMon from today's date if state.currentWeekMon is
+  // not set, so hour bars are never blank on first load.
   const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
 
   // Apply filter
@@ -32,6 +34,7 @@ function renderRoster() {
       return _rosterSortDir * a.name.localeCompare(b.name);
     }
     if (_rosterSort === 'hours') {
+      // FIX: pass weekMon explicitly — both use the same week so sorting is consistent
       const ha = calcScheduledHrsWeek(a.id, weekMon);
       const hb = calcScheduledHrsWeek(b.id, weekMon);
       return _rosterSortDir * (ha - hb);
@@ -47,6 +50,7 @@ function renderRoster() {
   }
 
   tbody.innerHTML = emps.map((emp, idx) => {
+    // FIX: pass weekMon explicitly
     const used      = calcScheduledHrsWeek(emp.id, weekMon);
     const cap       = emp.hourCap || DEFAULTHRSCAP;
     const pct       = Math.min((used / cap) * 100, 100);
@@ -174,6 +178,7 @@ function toggleEmpDow(empId, dow) {
 function renderHourBar(empId) {
   const emp     = state.employees.find(e => e.id === empId);
   const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
+  // FIX: pass weekMon explicitly
   const used    = calcScheduledHrsWeek(empId, weekMon);
   const cap     = emp?.hourCap || DEFAULTHRSCAP;
   const pct     = Math.min((used/cap)*100, 100);
@@ -256,6 +261,7 @@ function openEditEmployee(empId) {
 
   // Hours summary
   const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
+  // FIX: pass weekMon explicitly
   const used    = calcScheduledHrsWeek(empId, weekMon);
   const cap     = emp.hourCap || DEFAULTHRSCAP;
   const pct     = Math.min((used/cap)*100,100);
@@ -291,6 +297,7 @@ function toggleLoc(loc) {
 function saveEmployee() {
   const name = v('emp-name');
   if (!name) { alert('Please enter a name.'); return; }
+  if (!validateDuplicateEmployee(name, _editEmpId)) return;
 
   const daysOff = ['MON','TUE','WED','THU','FRI','SAT','SUN']
     .filter(d => document.getElementById(`dow-off-${d}`)?.checked);
@@ -310,7 +317,7 @@ function saveEmployee() {
     emp.sickLeave   = parseInt(v('emp-sick'))   || 10;
   } else {
     state.employees.push({
-      id          : `emp-${Date.now()}`,
+      id          : uid(),   // FIX: use uid() instead of Date.now() string
       name,
       fallback    : v('emp-fallback'),
       blocked     : [..._blockedLocs],
@@ -549,7 +556,7 @@ function saveVolunteer() {
     if (vol) { vol.name = name; vol.note = v('vol-note'); }
   } else {
     state.volunteers.push({
-      id  : `vol-${Date.now()}`,
+      id  : uid(),   // FIX: use uid() for consistency
       name,
       note: v('vol-note'),
     });
