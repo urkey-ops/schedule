@@ -554,6 +554,175 @@ function getWeekMonStr(iso) {
   return toDateStr(getWeekMonday(new Date(iso + 'T00:00:00')));
 }
 
+// ── Live View Toggle ──────────────────────────────────────────
+function setLiveView(view) {
+  ['locations','my','history'].forEach(v => {
+    document.getElementById(`view-${v}`)?.classList.toggle('hidden', v !== view);
+    document.getElementById(`lvt-${v}`)?.classList.toggle('active', v === view);
+  });
+  if (view === 'my')      renderMySchedule();
+  if (view === 'history') { renderHistoryToday(); }
+  if (view === 'locations') renderLiveBoard();
+}
+
+// ── Live Board ────────────────────────────────────────────────
+function renderLiveBoard() {
+  const iso        = todayStr();
+  const now        = new Date();
+  const si         = currentSlotIdx();
+
+  // Date label
+  const dl = document.getElementById('live-date-label');
+  if (dl) dl.textContent = now.toLocaleDateString('en-GB', {
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
+
+  // Holiday banner
+  const hb = document.getElementById('live-holiday-banner');
+  if (hb) {
+    const holiday = getHolidayForDate(iso);
+    if (holiday) {
+      hb.innerHTML = `${holiday.emoji} <strong>${escH(holiday.name)}</strong>`;
+      hb.style.background = holiday.color + '22';
+      hb.style.borderColor = holiday.color + '55';
+      hb.style.color = holiday.color;
+      hb.classList.remove('hidden');
+    } else {
+      hb.classList.add('hidden');
+    }
+  }
+
+  renderLiveAlerts();
+  renderLiveVolunteers();
+
+  const board      = document.getElementById('live-board');
+  if (!board) return;
+
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+  if (!activeEmps.length) {
+    board.innerHTML = `<div style="text-align:center;padding:32px;
+      color:var(--muted);font-size:13px">No active employees.</div>`;
+    return;
+  }
+
+  // Group employees by current location
+  const groups = {};
+  ALL_LOCS.forEach(loc => { groups[loc] = []; });
+
+  activeEmps.forEach(e => {
+    if (isEmpDayOff(e.id, iso)) return;
+    if (isOnLeave(e.id, iso))   return;
+    if (state.absences?.[iso]?.[e.id]) return;
+    const { loc } = si >= 0 ? getResolvedLoc(iso, si, e.id)
+                             : { loc: e.fallback || 'off' };
+    if (loc === 'off' || loc === 'vac') return;
+    if (!groups[loc]) groups[loc] = [];
+    groups[loc].push(e);
+  });
+
+  board.innerHTML = ALL_LOCS
+    .filter(loc => groups[loc]?.length)
+    .map(loc => {
+      const color = LOC_COLOR[loc] || '#888';
+      const label = LOC_LABEL[loc] || loc;
+      return `<div class="live-loc-card" style="border-top:3px solid ${color}">
+        <div class="live-loc-title" style="color:${color}">${label}</div>
+        <div class="live-loc-emps">
+          ${groups[loc].map(e =>
+            `<div class="live-emp-chip">${escH(e.name)}</div>`
+          ).join('')}
+        </div>
+      </div>`;
+    }).join('') || `<div style="text-align:center;padding:32px;
+      color:var(--muted);font-size:13px">No assignments for current slot.</div>`;
+
+  if (typeof renderTimeline === 'function') renderTimeline();
+}
+
+// ── My Schedule ───────────────────────────────────────────────
+function renderMySchedule() {
+  const iso     = todayStr();
+  const selEl   = document.getElementById('emp-selector');
+  const bodyEl  = document.getElementById('my-sched-body');
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+
+  if (selEl && !selEl.hasChildNodes()) {
+    selEl.innerHTML = `<option value="">Select name…</option>` +
+      activeEmps.map(e =>
+        `<option value="${e.id}">${escH(e.name)}</option>`).join('');
+  }
+
+  const empId = selEl?.value;
+  if (!empId || !bodyEl) return;
+
+  const si = currentSlotIdx();
+  bodyEl.innerHTML = TIMESLOTS.map((slot, i) => {
+    const { loc } = getResolvedLoc(iso, i, empId);
+    const isCur   = i === si;
+    return `<div class="my-sched-row ${isCur ? 'my-sched-current' : ''}">
+      <span class="my-sched-time">${slot}</span>
+      <span class="loc-select ${LOC_CLS[loc]||''}"
+        style="font-size:12px;font-weight:700;padding:3px 10px;
+               border-radius:5px">${LOC_LABEL[loc]||loc}</span>
+      ${isCur ? '<span style="font-size:10px;color:var(--primary);font-weight:700">▶ NOW</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── History Today ─────────────────────────────────────────────
+function renderHistoryToday() {
+  const iso    = todayStr();
+  const el     = document.getElementById('history-today');
+  if (!el) return;
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+
+  el.innerHTML = TIMESLOTS.map((slot, si) => {
+    const assignments = activeEmps
+      .filter(e => !isEmpDayOff(e.id, iso) && !isOnLeave(e.id, iso))
+      .map(e => {
+        const { loc } = getResolvedLoc(iso, si, e.id);
+        return { e, loc };
+      })
+      .filter(x => x.loc !== 'off' && x.loc !== 'vac');
+
+    return `<div class="history-slot-row">
+      <span class="history-slot-time">${slot}</span>
+      <span style="display:flex;gap:6px;flex-wrap:wrap">
+        ${assignments.map(({ e, loc }) =>
+          `<span class="loc-select ${LOC_CLS[loc]||''}"
+            style="font-size:11px;font-weight:700;padding:2px 8px;
+                   border-radius:4px">${escH(e.name.split(' ')[0])}</span>`
+        ).join('') || '<span style="color:var(--muted);font-size:12px">—</span>'}
+      </span>
+    </div>`;
+  }).join('');
+}
+
+// ── Deep Lookup ───────────────────────────────────────────────
+function renderDeepLookup() {
+  const iso = document.getElementById('lookup-date')?.value;
+  const el  = document.getElementById('deep-lookup-result');
+  if (!iso || !el) return;
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+
+  el.innerHTML = TIMESLOTS.map((slot, si) => {
+    const assignments = activeEmps.map(e => {
+      const { loc, source } = getResolvedLoc(iso, si, e.id);
+      return { e, loc, source };
+    }).filter(x => x.loc !== 'off' && x.loc !== 'vac');
+
+    return `<div class="history-slot-row">
+      <span class="history-slot-time">${slot}</span>
+      <span style="display:flex;gap:6px;flex-wrap:wrap">
+        ${assignments.map(({ e, loc }) =>
+          `<span class="loc-select ${LOC_CLS[loc]||''}"
+            style="font-size:11px;font-weight:700;padding:2px 8px;
+                   border-radius:4px">${escH(e.name.split(' ')[0])}</span>`
+        ).join('') || '<span style="color:var(--muted);font-size:12px">—</span>'}
+      </span>
+    </div>`;
+  }).join('');
+}
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   initState();
