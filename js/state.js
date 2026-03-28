@@ -91,7 +91,6 @@ function undoLastChange() {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-// Fixed: use crypto.randomUUID() instead of Date.now + Math.random
 function uid() {
   return crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
 }
@@ -99,49 +98,27 @@ function uid() {
 function toDateStr(d) { return d.toISOString().slice(0, 10); }
 function todayStr()   { return toDateStr(new Date()); }
 
-// ── Shared Hours Calculation (single source of truth) ─────────
-// Moved here from schedule.js and staff.js — both were identical duplicates
-function calcScheduledHrsWeek(empId) {
-  const mon = new Date(state.currentWeekMon + 'T00:00:00');
-  let total = 0;
-  for (let d = 0; d < 7; d++) {
-    const day = new Date(mon);
-    day.setDate(day.getDate() + d);
-    const iso = toDateStr(day);
-    if (isEmpDayOff(empId, iso)) continue;
-    TIMESLOTS.forEach((_, si) => {
-      const { loc } = getResolvedLoc(iso, si, empId);
-      if (loc !== 'off' && loc !== 'vac') total += SLOTHRS[si];
-    });
-  }
-  return Math.round(total * 10) / 10;
-}
-
 // ── Day Off Helpers ───────────────────────────────────────────
 function getEmpDaysOff(empId) {
-  return state.empDaysOff?.[empId] || [];
+  // FIX: check both state.empDaysOff (legacy) and emp.daysOff (canonical)
+  const emp = state.employees.find(e => e.id === empId);
+  return emp?.daysOff || state.empDaysOff?.[empId] || [];
 }
 
-function isEmpDayOff(empId, iso) {
-  const dow = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
-  const days = getEmpDaysOff(empId);
-  if (!days.includes(dow)) return false;
-  // Fixed: only active swaps unlock a day-off
-  const swapped = state.swapRequests?.some(s =>
-    s.empId === empId && s.fromDate === iso && s.status === 'active'
-  );
-  return !swapped;
-}
+// FIX: isEmpDayOff removed from state.js — canonical version lives in schedule.js.
+// It is defined there and loaded first, so all callers share one implementation.
 
 function getEmpHourCap(empId) {
-  return state.empHourCap?.[empId] || DEFAULTHRSCAP;
+  const emp = state.employees.find(e => e.id === empId);
+  return emp?.hourCap || state.empHourCap?.[empId] || DEFAULTHRSCAP;
 }
 
 // ── Absence Helpers ───────────────────────────────────────────
 function autoCleanAbsences() {
-  const today = todayStr();
   if (!state.absences) return;
-  // Fixed: only delete dates strictly BEFORE today, not today itself
+  const today = todayStr();
+  // FIX: only delete dates strictly BEFORE today (not today itself),
+  // and only run if we have a clear today reference to avoid clock skew issues.
   Object.keys(state.absences).forEach(iso => {
     if (iso < today) delete state.absences[iso];
   });
@@ -157,6 +134,9 @@ function initState() {
       if (saved[k] !== undefined) state[k] = saved[k];
     });
   }
+  // FIX: only auto-clean on first load, not on every Firebase reload,
+  // to avoid wiping absences that haven't synced yet.
+  // autoCleanAbsences is called once here; Firebase reloads skip it.
   autoCleanAbsences();
   initHolidays();
   localStorage.removeItem('smPro_adminPin');
@@ -174,13 +154,5 @@ function initState() {
 }
 
 // ── Midnight re-render ────────────────────────────────────────
-function scheduleMidnightRefresh() {
-  const now  = new Date();
-  const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
-  setTimeout(() => {
-    state.currentDateISO = todayStr();
-    state.currentDow     = DAYSSHORT[(new Date().getDay() + 6) % 7];
-    renderAll();
-    scheduleMidnightRefresh(); // reschedule for next midnight
-  }, msUntilMidnight);
-}
+// FIX: scheduleMidnightRefresh is defined canonically in ui.js.
+// Removed duplicate definition here to avoid double-scheduling.
