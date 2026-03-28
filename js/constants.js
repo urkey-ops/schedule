@@ -13,6 +13,9 @@ const SLOT_START = [6,7,8,9,10,11,12,12.5,13,13.5,14.5,15.5,16.5,17.5,18.5,19.5]
 const SLOT_END   = [7,8,9,10,11,12,12.5,13,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5];
 const SLOT_HRS   = SLOT_START.map((s,i) => SLOT_END[i] - s);
 
+// FIX: SLOT_DURATION mirrors SLOT_HRS — used by schedule.js calcScheduledHrsWeek
+const SLOT_DURATION = SLOT_HRS;
+
 const LUNCH_SLOTS   = [6,7,8];
 const DAY_START     = 6;
 const DAY_END       = 20.5;
@@ -88,6 +91,7 @@ const HINDU_FESTIVALS_DEFAULT = {
 const SLOTSTART      = SLOT_START;
 const SLOTEND        = SLOT_END;
 const SLOTHRS        = SLOT_HRS;
+const SLOTDURATION   = SLOT_DURATION;   // FIX: was missing — used in schedule.js
 const TIMESLOTS      = TIME_SLOTS;
 const DAYSSHORT      = DAYS_SHORT;
 const DAYSFULL       = DAYS_FULL;
@@ -102,5 +106,6 @@ const DAYSTART       = DAY_START;
 const DAYEND         = DAY_END;
 const DEFAULTHRSCAP  = DEFAULT_HRS_CAP;
 const MAXHRSCAP      = MAX_HRS_CAP;
+const ALERTDAYS      = ALERT_DAYS;      // FIX: was missing — live.js uses ALERTDAYS
 const USFEDERALHOLIDAYS     = US_FEDERAL_HOLIDAYS;
 const HINDUFESTIVALSDEFAULT = HINDU_FESTIVALS_DEFAULT;
