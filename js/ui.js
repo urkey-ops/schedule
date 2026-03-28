@@ -48,50 +48,37 @@ function enterAdmin() {
   state.mode = 'admin';
   sessionStorage.setItem('smPro_adminSession', '1');
 
-  // Badge
   const badge = document.getElementById('mode-badge');
   if (badge) { badge.textContent = 'ADMIN'; badge.className = 'mode-chip mode-admin'; }
 
-  // Trigger button
   document.getElementById('admin-trigger-btn')?.classList.add('active');
-
-  // Show admin-only tabs
   document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-tab-visible'));
 
-  // Show quick actions FAB
   const fab = document.getElementById('qa-fab-topbar');
   if (fab) fab.classList.remove('hidden');
 
-  // Default to Admin HQ on login
-  showPage('adminhq', document.getElementById('tab-adminhq'));
-
-  // Render global alerts
+  document.getElementById('global-alerts-bar')?.classList.remove('hidden');
   renderGlobalAlerts();
+
+  showPage('adminhq', document.getElementById('tab-adminhq'));
 }
 
 function exitAdmin() {
   state.mode = 'live';
   sessionStorage.removeItem('smPro_adminSession');
 
-  // Badge
   const badge = document.getElementById('mode-badge');
   if (badge) { badge.textContent = 'VIEW'; badge.className = 'mode-chip mode-live'; }
 
-  // Trigger button
   document.getElementById('admin-trigger-btn')?.classList.remove('active');
-
-  // Hide admin tabs
   document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-tab-visible'));
 
-  // Hide quick actions
   document.getElementById('qa-fab-topbar')?.classList.add('hidden');
   document.getElementById('quick-actions-panel')?.classList.add('hidden');
 
-  // Clear global alerts
   const gb = document.getElementById('global-alerts-bar');
   if (gb) { gb.innerHTML = ''; gb.classList.add('hidden'); }
 
-  // Stop any HQ refresh
   if (typeof stopHQRefresh === 'function') stopHQRefresh();
 
   showPage('live', document.getElementById('tab-live'));
@@ -103,7 +90,7 @@ function switchToFirebaseModal() {
   showFirebaseConfig();
 }
 
-// ── Global Alerts (admin mode — shown across all pages) ───────
+// ── Global Alerts ─────────────────────────────────────────────
 function renderGlobalAlerts() {
   if (state.mode !== 'admin') return;
   const el = document.getElementById('global-alerts-bar');
@@ -149,10 +136,8 @@ function showPage(name, tabEl) {
   const publicPages = ['live', 'grand'];
   if (!publicPages.includes(name) && state.mode !== 'admin') return;
 
-  // Stop grand refresh if leaving grand page
-  if (name !== 'grand' && typeof stopGrandRefresh === 'function') stopGrandRefresh();
-  // Stop HQ refresh if leaving HQ page
-  if (name !== 'adminhq' && typeof stopHQRefresh === 'function') stopHQRefresh();
+  if (name !== 'grand'   && typeof stopGrandRefresh === 'function') stopGrandRefresh();
+  if (name !== 'adminhq' && typeof stopHQRefresh    === 'function') stopHQRefresh();
 
   document.querySelectorAll('.page').forEach(p    => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -181,31 +166,20 @@ function showPage(name, tabEl) {
     wnb?.classList.add('hidden');
   }
 
-  if (name === 'staff') {
-    renderRoster();
-    renderVolunteers();
-    renderAlertsBar('staff-alerts-bar', todayStr());
-  }
-  if (name === 'leave') {
-    renderLeave();
-    renderSwaps();
-    renderAlertsBar('leave-alerts-bar', todayStr());
-  }
+  if (name === 'staff')    { renderRoster(); renderVolunteers(); renderAlertsBar('staff-alerts-bar', todayStr()); }
+  if (name === 'leave')    { renderLeave();  renderSwaps();      renderAlertsBar('leave-alerts-bar', todayStr()); }
   if (name === 'live')     renderLiveBoard();
   if (name === 'grand')    renderGrandView();
   if (name === 'adminhq') {
-    // Update HQ date label
     const dl = document.getElementById('hq-date-label');
     if (dl) dl.textContent = new Date().toLocaleDateString('en-GB', {
       weekday:'long', day:'numeric', month:'long', year:'numeric'
     });
-    // Update week label
     const wl = document.getElementById('hq-week-label');
     if (wl) {
       const mon = new Date(state.currentWeekMon + 'T00:00:00');
       const end = new Date(mon); end.setDate(end.getDate() + 6);
-      wl.textContent = `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${
-        end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
+      wl.textContent = `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
     }
     renderAdminHQ();
   }
@@ -230,236 +204,6 @@ function renderAll() {
   if (grandActive && typeof renderGrandView === 'function') renderGrandView();
 }
 
-// ── Quick Actions Panel ───────────────────## 5 of 8 — `ui.js` — Complete Updated File — Part 1 of 2
-
-```js
-// ── ui.js ─────────────────────────────────────────────────────
-
-// ── Utility ───────────────────────────────────────────────────
-function v(id)    { return document.getElementById(id)?.value?.trim() || ''; }
-function escH(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function openModal(id)  { document.getElementById(id)?.classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-
-// ── Clock ─────────────────────────────────────────────────────
-function tickClock() {
-  const now = new Date();
-  const t   = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const lc  = document.getElementById('live-clock-inline');
-  const gc  = document.getElementById('grand-clock');
-  if (lc) lc.textContent = t;
-  if (gc) gc.textContent = t;
-}
-
-// ── Admin ─────────────────────────────────────────────────────
-function openAdminLogin() {
-  if (state.mode === 'admin') { exitAdmin(); return; }
-  document.getElementById('admin-pin-input').value         = '';
-  document.getElementById('admin-pin-error').textContent   = '';
-  openModal('admin-login-modal');
-  setTimeout(() => document.getElementById('admin-pin-input')?.focus(), 100);
-}
-
-function checkAdminPin(e) { if (e.key === 'Enter') submitAdminPin(); }
-
-async function submitAdminPin() {
-  const pin   = document.getElementById('admin-pin-input').value.trim();
-  const errEl = document.getElementById('admin-pin-error');
-  if (!pin) { errEl.textContent = 'Please enter your PIN.'; return; }
-  if (!hasPinSet()) { errEl.textContent = 'No PIN configured. Contact your administrator.'; return; }
-  const ok = await verifyPin(pin);
-  if (ok) {
-    closeModal('admin-login-modal');
-    enterAdmin();
-  } else {
-    errEl.textContent = 'Incorrect PIN. Try again.';
-    document.getElementById('admin-pin-input').value = '';
-  }
-}
-
-function enterAdmin() {
-  state.mode = 'admin';
-  sessionStorage.setItem('smPro_adminSession', '1');
-
-  // Badge
-  const badge = document.getElementById('mode-badge');
-  badge.textContent = 'ADMIN';
-  badge.className   = 'mode-chip mode-admin';
-
-  // Trigger button
-  document.getElementById('admin-trigger-btn')?.classList.add('active');
-
-  // Show admin-only tabs
-  document.querySelectorAll('.admin-only')
-    .forEach(el => el.classList.add('admin-tab-visible'));
-
-  // Show quick-actions FAB
-  document.getElementById('qa-fab-topbar')?.classList.remove('hidden');
-
-  // Show global alerts bar
-  document.getElementById('global-alerts-bar')?.classList.remove('hidden');
-  renderGlobalAlerts();
-
-  // Default to Admin HQ on login
-  showPage('adminhq', document.getElementById('tab-adminhq'));
-}
-
-function exitAdmin() {
-  state.mode = 'live';
-  sessionStorage.removeItem('smPro_adminSession');
-
-  const badge = document.getElementById('mode-badge');
-  badge.textContent = 'VIEW';
-  badge.className   = 'mode-chip mode-live';
-
-  document.getElementById('admin-trigger-btn')?.classList.remove('active');
-  document.querySelectorAll('.admin-only')
-    .forEach(el => el.classList.remove('admin-tab-visible'));
-
-  // Hide admin-only UI
-  document.getElementById('qa-fab-topbar')?.classList.add('hidden');
-  document.getElementById('quick-actions-panel')?.classList.add('hidden');
-  document.getElementById('global-alerts-bar')?.classList.add('hidden');
-  document.getElementById('global-alerts-bar').innerHTML = '';
-
-  // Stop HQ refresh
-  if (typeof stopHQRefresh === 'function') stopHQRefresh();
-
-  showPage('live', document.getElementById('tab-live'));
-  renderAll();
-}
-
-function switchToFirebaseModal() {
-  closeModal('admin-login-modal');
-  showFirebaseConfig();
-}
-
-// ── Global alerts bar ─────────────────────────────────────────
-function renderGlobalAlerts() {
-  if (state.mode !== 'admin') return;
-  renderAlertsBar('global-alerts-bar', todayStr());
-}
-
-// ── Firebase modal ────────────────────────────────────────────
-function showFirebaseConfig() {
-  const saved = localStorage.getItem('smPro_fbConfig');
-  if (saved) {
-    try {
-      const cfg = JSON.parse(saved);
-      ['apiKey','authDomain','databaseURL','projectId','appId'].forEach(k => {
-        const el = document.getElementById(`fb-${k}`);
-        if (el) el.value = cfg[k] || '';
-      });
-    } catch(e) {}
-  }
-  openModal('firebase-modal');
-}
-
-async function saveFirebaseConfig() {
-  const cfg = {
-    apiKey:     v('fb-apiKey'),
-    authDomain: v('fb-authDomain'),
-    databaseURL:v('fb-databaseURL'),
-    projectId:  v('fb-projectId'),
-    appId:      v('fb-appId'),
-  };
-  if (!cfg.apiKey || !cfg.databaseURL) {
-    alert('API Key and Database URL are required.');
-    return;
-  }
-  localStorage.setItem('smPro_fbConfig', JSON.stringify(cfg));
-  closeModal('firebase-modal');
-  location.reload();
-}
-
-// ── Page navigation ───────────────────────────────────────────
-function showPage(name, tabEl) {
-  const publicPages = ['live','grand'];
-  const adminPages  = ['adminhq','default','schedule','staff','leave','holidays'];
-  if (adminPages.includes(name) && state.mode !== 'admin') return;
-
-  // Stop background refreshes when leaving their page
-  if (name !== 'grand'   && typeof stopGrandRefresh === 'function') stopGrandRefresh();
-  if (name !== 'adminhq' && typeof stopHQRefresh    === 'function') stopHQRefresh();
-
-  document.querySelectorAll('.page').forEach(p    => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-
-  const page = document.getElementById(`page-${name}`);
-  if (page) page.classList.add('active');
-  if (tabEl) tabEl.classList.add('active');
-
-  const wnb = document.getElementById('week-nav-bar');
-
-  // Page-specific init
-  if (name === 'schedule') {
-    wnb?.classList.remove('hidden');
-    renderWeekNav();
-    renderSchedule();
-    renderAlertsBar('schedule-alerts-bar', state.currentDateISO);
-    const rf = document.getElementById('range-fill-weekly');
-    if (rf && !rf.hasChildNodes()) rf.innerHTML = renderRangeFill('weekly');
-  } else if (name === 'default') {
-    wnb?.classList.add('hidden');
-    renderDowPills();
-    renderDefaultSchedule();
-    renderAlertsBar('default-alerts-bar', todayStr());
-    const rf = document.getElementById('range-fill-default');
-    if (rf && !rf.hasChildNodes()) rf.innerHTML = renderRangeFill('default');
-  } else {
-    wnb?.classList.add('hidden');
-  }
-
-  if (name === 'staff') {
-    renderRoster();
-    renderVolunteers();
-    renderAlertsBar('staff-alerts-bar', todayStr());
-  }
-  if (name === 'leave') {
-    renderLeave();
-    renderSwaps();
-    renderAlertsBar('leave-alerts-bar', todayStr());
-  }
-  if (name === 'live')     renderLiveBoard();
-  if (name === 'grand')    renderGrandView();
-  if (name === 'adminhq')  renderAdminHQ();
-  if (name === 'holidays') renderHolidaysPage();
-
-  // Update HQ week label
-  const hwl = document.getElementById('hq-week-label');
-  if (hwl && state.currentWeekMon) {
-    const mon = new Date(state.currentWeekMon + 'T00:00:00');
-    const end = new Date(mon); end.setDate(end.getDate() + 6);
-    hwl.textContent = `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${
-      end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
-  }
-
-  // Update HQ date label
-  const hdl = document.getElementById('hq-date-label');
-  if (hdl) hdl.textContent = new Date().toLocaleDateString('en-GB',{
-    weekday:'long', day:'numeric', month:'long', year:'numeric'
-  });
-}
-
-function renderAll() {
-  renderLiveBoard();
-
-  if (state.mode === 'admin') {
-    renderGlobalAlerts();
-
-    const active = document.querySelector('.page.active')?.id?.replace('page-','');
-    if (active === 'adminhq')  renderAdminHQ();
-    if (active === 'staff')    { renderRoster(); renderVolunteers(); }
-    if (active === 'leave')    { renderLeave(); renderSwaps(); }
-    if (active === 'default')  { renderDowPills(); renderDefaultSchedule(); }
-    if (active === 'schedule') { renderWeekNav(); renderSchedule(); }
-    if (active === 'holidays') renderHolidaysPage();
-  }
-
-  const grandActive = document.getElementById('page-grand')?.classList.contains('active');
-  if (grandActive && typeof renderGrandView === 'function') renderGrandView();
-}
-
 // ── HQ week controls ──────────────────────────────────────────
 function hqShiftWeek(delta) {
   const d = new Date(state.currentWeekMon + 'T00:00:00');
@@ -471,8 +215,7 @@ function hqShiftWeek(delta) {
   if (hwl) {
     const mon = new Date(state.currentWeekMon + 'T00:00:00');
     const end = new Date(mon); end.setDate(end.getDate() + 6);
-    hwl.textContent = `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${
-      end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
+    hwl.textContent = `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
   }
 }
 
@@ -511,8 +254,7 @@ function renderWeekNav() {
   const end = new Date(mon); end.setDate(end.getDate() + 6);
 
   if (wLabel) wLabel.textContent =
-    `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${
-      end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}`;
+    `${mon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}`;
 
   if (!pillsEl) return;
   pillsEl.innerHTML = DAYSSHORT.map((dow, di) => {
@@ -525,13 +267,11 @@ function renderWeekNav() {
     const hasGap  = alerts.some(a => a.type === ALERT_TYPES.GAP);
     const hasOvr  = countDayOverrides(iso) > 0;
 
-    return `<button class="day-pill ${isActive?'active':''} ${isToday?'today':''} ${
-      hasGap?'has-gap':''} ${hasOvr?'has-ovr':''} ${holiday?'has-hday':''}"
+    return `<button class="day-pill ${isActive?'active':''} ${isToday?'today':''} ${hasGap?'has-gap':''} ${hasOvr?'has-ovr':''} ${holiday?'has-hday':''}"
       onclick="selectDay('${iso}','${dow}')">
       <span class="gap-dot"></span>
       <span class="ovr-dot"></span>
-      <span class="hday-dot" ${holiday?`style="background:${holiday.color}"`:''}>
-      </span>
+      <span class="hday-dot" ${holiday?`style="background:${holiday.color}"`:''}></span>
       ${dow} ${d.getDate()}
       ${holiday ? `<span style="font-size:9px;display:block;line-height:1">${holiday.emoji}</span>` : ''}
     </button>`;
@@ -644,7 +384,7 @@ function exportData() {
 function importData() { document.getElementById('import-file')?.click(); }
 
 function handleImportFile(e) {
-  const file = e.target.files; if (!file) return;
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = evt => {
     try {
@@ -715,7 +455,6 @@ function renderLiveBoard() {
   const iso = todayStr();
   const si  = currentSlotIdx();
 
-  // Today strip
   const dl = document.getElementById('live-date-label');
   if (dl) dl.textContent = new Date().toLocaleDateString('en-GB',{
     weekday:'long', day:'numeric', month:'long', year:'numeric'
@@ -733,7 +472,6 @@ function renderLiveBoard() {
             ${holiday.emoji} ${escH(holiday.name)}</span>` : '');
   }
 
-  // Holiday banner
   const holiday = getHolidayForDate(iso);
   const hb = document.getElementById('live-holiday-banner');
   if (hb) {
@@ -784,7 +522,6 @@ function renderLiveBoard() {
 
         const initial = emp.name.charAt(0).toUpperCase();
 
-        // Next change
         let nextHtml = '';
         if (si >= 0 && !isDayOff && !onLeave && !absent) {
           const { loc: curLoc } = getResolvedLoc(iso, si, emp.id);
@@ -792,7 +529,7 @@ function renderLiveBoard() {
             const { loc: nLoc } = getResolvedLoc(iso, i, emp.id);
             if (nLoc !== curLoc) {
               nextHtml = `<div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:5px">
-                Next: ${LOCLABEL[nLoc]||nLoc} @ ${TIMESLOTS[i].split('–')}
+                Next: ${LOCLABEL[nLoc]||nLoc} @ ${TIMESLOTS[i].split('–')[0]}
               </div>`;
               break;
             }
@@ -864,7 +601,7 @@ function renderHistoryToday() {
   el.innerHTML = `<div style="overflow-x:auto"><table class="data-table">
     <thead><tr>
       <th>Time Slot</th>
-      ${activeEmps.map(e=>`<th>${escH(e.name.split(' '))}</th>`).join('')}
+      ${activeEmps.map(e=>`<th>${escH(e.name.split(' ')[0])}</th>`).join('')}
     </tr></thead>
     <tbody>
       ${pastIndices.map(si=>`<tr>
@@ -894,7 +631,7 @@ function renderDeepLookup() {
   html += `<div style="overflow-x:auto"><table class="data-table">
     <thead><tr>
       <th>Time Slot</th>
-      ${activeEmps.map(e=>`<th>${escH(e.name.split(' '))}</th>`).join('')}
+      ${activeEmps.map(e=>`<th>${escH(e.name.split(' ')[0])}</th>`).join('')}
     </tr></thead>
     <tbody>
       ${TIMESLOTS.map((slot,si)=>`<tr>
@@ -948,11 +685,10 @@ function renderMySchedule() {
   const onLeave  = isOnLeave(_myEmpId, iso);
   const absent   = !!state.absences?.[iso]?.[_myEmpId];
 
-  // Big current card
   if (curCard) {
     curCard.classList.remove('hidden');
     let bigLabel = '', bigColor = '#888';
-    if (isDayOff)    { bigLabel='Day Off';   bigColor='#6b7280'; }
+    if (isDayOff)     { bigLabel='Day Off';   bigColor='#6b7280'; }
     else if (onLeave) { bigLabel='On Leave';  bigColor='#7c3aed'; }
     else if (absent)  { bigLabel='Absent';    bigColor='#ef4444'; }
     else if (si < 0)  { bigLabel='Off Hours'; bigColor='#6b7280'; }
@@ -968,7 +704,6 @@ function renderMySchedule() {
       <div class="my-loc-slot">${si>=0 ? TIMESLOTS[si] : ''}</div>`;
   }
 
-  // Next change
   if (nextSlot) {
     let found = false;
     if (si >= 0 && !isDayOff && !onLeave && !absent) {
@@ -982,7 +717,7 @@ function renderMySchedule() {
             <span class="next-arrow">→</span>
             <span class="next-loc" style="color:${nColor}">${LOCLABEL[nLoc]||nLoc}</span>
             <span style="color:var(--muted);font-size:12px">
-              at ${TIMESLOTS[i].split('–')}</span>`;
+              at ${TIMESLOTS[i].split('–')[0]}</span>`;
           found = true; break;
         }
       }
@@ -990,7 +725,6 @@ function renderMySchedule() {
     if (!found) nextSlot.classList.add('hidden');
   }
 
-  // Timeline bar
   if (tlBar && si >= 0 && !isDayOff && !onLeave) {
     tlBar.classList.remove('hidden');
     tlBar.innerHTML = TIMESLOTS.map((_,slotI) => {
@@ -1005,13 +739,11 @@ function renderMySchedule() {
     }).join('');
   } else if (tlBar) { tlBar.classList.add('hidden'); }
 
-  // Week schedule
   const wStart = new Date(_myWeekMon+'T00:00:00');
   const wEnd   = new Date(wStart); wEnd.setDate(wEnd.getDate()+6);
 
   document.getElementById('my-sched-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;
-                margin:14px 0;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap">
       <button class="week-arrow" onclick="shiftMyWeek(-1)">‹</button>
       <span style="font-size:13px;font-weight:600;color:var(--text)">
         ${wStart.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} –
@@ -1034,8 +766,7 @@ function renderMySchedule() {
         : TIMESLOTS.map((slot, slotI) => {
             const { loc } = getResolvedLoc(dayIso, slotI, _myEmpId);
             const isCurSlot = isToday_ && slotI === si;
-            return `<div class="my-slot-row ${loc==='off'?'my-slot-off':''}
-              ${isCurSlot?'find-slot-cur':''}">
+            return `<div class="my-slot-row ${loc==='off'?'my-slot-off':''} ${isCurSlot?'find-slot-cur':''}">
               <span class="my-slot-time">${slot}</span>
               <span class="my-slot-loc ${LOCCLS[loc]||''}">${LOCLABEL[loc]||loc}</span>
             </div>`;
@@ -1045,8 +776,7 @@ function renderMySchedule() {
           <span>${day} <strong>${d.getDate()}</strong></span>
           ${isToday_ ? '<span class="today-badge">TODAY</span>' : ''}
           ${hol ? `<span class="holiday-mini-badge"
-            style="background:${hol.color}18;color:${hol.color};
-                   border-color:${hol.color}40">
+            style="background:${hol.color}18;color:${hol.color};border-color:${hol.color}40">
             ${hol.emoji} ${escH(hol.name)}</span>` : ''}
         </div>
         <div class="my-day-slots">${slots}</div>
@@ -1072,6 +802,154 @@ function goToMyToday() {
   renderMySchedule();
 }
 
+// ── Live Alerts ───────────────────────────────────────────────
+function renderLiveAlerts() {
+  const el  = document.getElementById('live-alert-area');
+  if (!el) return;
+  const iso = todayStr();
+  let html  = '';
+
+  (state.leaveRequests||[])
+    .filter(l => l.status==='active' && iso>=l.from && iso<=l.to)
+    .forEach(l => {
+      const emp = state.employees.find(e => e.id===l.empId);
+      if (!emp) return;
+      html += `<div class="alert-banner leave">
+        🔒 ${escH(emp.name)} is on <strong>${l.type||'annual'}</strong> leave today
+      </div>`;
+    });
+
+  (state.swapRequests||[])
+    .filter(s => s.status==='active' && s.fromDate===iso)
+    .forEach(s => {
+      const emp = state.employees.find(e => e.id===s.empId);
+      if (!emp) return;
+      html += `<div class="alert-banner swap">
+        🔄 ${escH(emp.name)} swapped day off — working today
+      </div>`;
+    });
+
+  el.innerHTML = html;
+}
+
+// ── Live Volunteers ───────────────────────────────────────────
+function renderLiveVolunteers() {
+  const el  = document.getElementById('live-volunteers');
+  if (!el) return;
+  const dow  = DAYSSHORT[(new Date().getDay()+6)%7];
+  const vols = (state.volunteers||[]).filter(vol => {
+    const avail = state.volAvailability?.[vol.id] || {};
+    return avail[dow] !== false;
+  });
+  if (!vols.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--muted);
+                text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">
+      Volunteers available today
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${vols.map(vol =>
+        `<div style="padding:5px 10px;background:var(--surface2);
+                     border:1.5px solid var(--border2);border-radius:8px;
+                     font-size:12px;font-weight:600;color:var(--text)">
+          👤 ${escH(vol.name)}
+          ${vol.note?`<span style="font-size:10px;color:var(--muted);margin-left:4px">
+            ${escH(vol.note)}</span>`:''}
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── Quick Actions Panel ───────────────────────────────────────
+function renderQuickActionsPanel() {
+  const el = document.getElementById('quick-actions-panel');
+  if (!el) return;
+  const iso = todayStr();
+  const activeEmps = state.employees.filter(e => e.status === 'Active');
+
+  el.innerHTML = `
+    <div class="qa-header">
+      <span style="font-weight:700;font-size:13px">Quick Actions</span>
+      <button onclick="toggleQuickActions()"
+        style="background:none;border:none;cursor:pointer;
+               font-size:16px;color:var(--muted)">✕</button>
+    </div>
+    <div class="qa-body">
+
+      <div class="qa-section-title">Mark Absent Today</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${activeEmps.filter(e=>!isEmpDayOff(e.id,iso)&&!isOnLeave(e.id,iso)).map(e => {
+          const absent = !!state.absences?.[iso]?.[e.id];
+          return `<button class="qa-emp-btn ${absent?'qa-absent':''}"
+            onclick="toggleAbsent('${e.id}','${iso}')">
+            <span class="qa-emp-dot" style="background:${absent?'var(--red)':'var(--border2)'}"></span>
+            ${escH(e.name)}
+            <span style="margin-left:auto;font-size:10px;color:${absent?'var(--red)':'var(--muted)'}">
+              ${absent?'Absent':'Present'}
+            </span>
+          </button>`;
+        }).join('')}
+      </div>
+
+      <div class="qa-section-title" style="margin-top:14px">Schedule Actions</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btn btn-sm btn-ghost" style="justify-content:flex-start"
+          onclick="applyDefaultToDay();toggleQuickActions()">
+          📋 Apply Default → Today
+        </button>
+        <button class="btn btn-sm btn-ghost" style="justify-content:flex-start"
+          onclick="clearOverridesForDay();toggleQuickActions()">
+          🗑 Clear Today's Overrides
+        </button>
+        <button class="btn btn-sm btn-ghost" style="justify-content:flex-start"
+          onclick="showPage('schedule',document.getElementById('tab-schedule'));toggleQuickActions()">
+          📅 Go to Schedule
+        </button>
+        <button class="btn btn-sm btn-ghost" style="justify-content:flex-start"
+          onclick="showPage('staff',document.getElementById('tab-staff'));toggleQuickActions()">
+          👥 Go to Staff
+        </button>
+        <button class="btn btn-sm btn-ghost" style="justify-content:flex-start"
+          onclick="showPage('leave',document.getElementById('tab-leave'));toggleQuickActions()">
+          🗓 Go to Leave
+        </button>
+      </div>
+
+      <div class="qa-section-title" style="margin-top:14px">Data</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-ghost" onclick="exportData()">⬇ Export</button>
+        <button class="btn btn-sm btn-ghost" onclick="importData()">⬆ Import</button>
+        <button class="btn btn-sm btn-danger" onclick="resetAllData()">🗑 Reset</button>
+      </div>
+
+    </div>`;
+}
+
+// ── Midnight refresh ──────────────────────────────────────────
+function scheduleMidnightRefresh() {
+  const now  = new Date();
+  const next = new Date(now);
+  next.setHours(24, 0, 30, 0);
+  const ms = next - now;
+  setTimeout(() => {
+    state.currentDateISO = todayStr();
+    state.currentDow     = DAYSSHORT[(new Date().getDay()+6)%7];
+    renderAll();
+    scheduleMidnightRefresh();
+  }, ms);
+}
+
+// ── Utility: format date ──────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+}
+
+function getWeekMonStr(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return toDateStr(getWeekMonday(d));
+}
+
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   initState();
@@ -1081,7 +959,6 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!state.currentDateISO) state.currentDateISO  = todayStr();
   if (!state.currentDow)     state.currentDow      = DAYSSHORT[(new Date().getDay()+6)%7];
 
-  // Restore admin session
   if (sessionStorage.getItem('smPro_adminSession')) {
     enterAdmin();
   } else {
@@ -1096,7 +973,6 @@ window.addEventListener('DOMContentLoaded', () => {
   tickClock();
   setInterval(tickClock, 15000);
 
-  // Auto-refresh live board every 30s
   setInterval(() => {
     if (document.getElementById('page-live')?.classList.contains('active')) {
       renderLiveBoard();
@@ -1105,7 +981,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   scheduleMidnightRefresh();
 
-  // Mobile: default to My Schedule
   if (window.innerWidth < 640) setLiveView('my');
   else                          setLiveView('locations');
 
