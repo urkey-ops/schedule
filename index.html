@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ScheduleMaker Pro v5</title>
+  <link rel="icon" href="data:,">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
@@ -25,7 +26,8 @@
     </div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active"    id="tab-live"     onclick="showPage('live',this)">Live Board</button>
+    <button class="nav-tab active" id="tab-live"      onclick="showPage('live',this)">Live Board</button>
+    <button class="nav-tab"        id="tab-grand"     onclick="showPage('grand',this)">📺 Grand View</button>
     <button class="nav-tab admin-only" id="tab-default"  onclick="showPage('default',this)">Default Schedule</button>
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
     <button class="nav-tab admin-only" id="tab-staff"    onclick="showPage('staff',this)">Staff</button>
@@ -48,37 +50,34 @@
 </div>
 
 
-  <!-- ═══════════════ PAGE: LIVE BOARD ═══════════════ -->
+<!-- ═══════════════ PAGE: LIVE BOARD ═══════════════ -->
 <div class="page active" id="page-live">
 
-  <!-- Top bar: clock + date + view toggle -->
-  <div class="live-top">
-    <div id="live-clock" class="live-clock">00:00</div>
-    <span id="live-date-label" class="live-date-label-text">Loading…</span>
-    <div class="live-view-toggle">
-      <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">📍 Locations</button>
-      <button class="lvt-btn"        id="lvt-my"        onclick="setLiveView('my')">👤 My Schedule</button>
-      <button class="lvt-btn"        id="lvt-history"   onclick="setLiveView('history')">🕑 History</button>
+  <!-- Today Strip -->
+  <div class="today-strip" id="today-strip">
+    <div class="today-strip-left">
+      <span id="live-clock" class="live-clock-inline">00:00</span>
+      <span id="live-date-label" class="live-date-text">Loading…</span>
     </div>
+    <div class="today-strip-right" id="today-strip-right"></div>
   </div>
 
   <!-- Holiday banner -->
-  <div id="live-holiday-banner" class="holiday-banner hidden" style="margin-bottom:12px"></div>
+  <div id="live-holiday-banner" class="holiday-banner hidden"></div>
 
   <!-- Alert area -->
   <div id="live-alert-area" class="alert-area"></div>
 
+  <!-- View toggle -->
+  <div class="live-view-toggle">
+    <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">📍 Locations</button>
+    <button class="lvt-btn"        id="lvt-my"        onclick="setLiveView('my')">👤 My Schedule</button>
+    <button class="lvt-btn"        id="lvt-history"   onclick="setLiveView('history')">🕑 History</button>
+  </div>
+
   <!-- ── Locations view ── -->
   <div id="view-locations">
-    <div class="timeline-section">
-      <div style="position:relative;height:16px;margin-left:70px;margin-bottom:4px;">
-        <div id="tl-labels"></div>
-      </div>
-      <div id="location-timeline"></div>
-    </div>
-
     <div id="live-board" class="live-board"></div>
-
     <div class="card" style="margin-top:12px;padding:14px 16px;">
       <div id="live-volunteers"></div>
     </div>
@@ -91,6 +90,13 @@
         <h3>My Schedule</h3>
         <div class="emp-selector" id="emp-selector"></div>
       </div>
+      <!-- Current location big card -->
+      <div id="my-current-card" class="my-current-card hidden"></div>
+      <!-- Next slot indicator -->
+      <div id="my-next-slot" class="my-next-slot hidden"></div>
+      <!-- Personal timeline bar -->
+      <div id="my-timeline-bar" class="my-timeline-bar hidden"></div>
+      <!-- Full week -->
       <div id="my-sched-body" class="my-sched-body">
         <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">
           Select your name above to see your schedule.
@@ -106,21 +112,101 @@
         onclick="this.classList.toggle('open');document.getElementById('history-today-body').classList.toggle('open')">
         📋 Today's Full Schedule <span class="arr">▾</span>
       </button>
-      <div class="history-body open" id="history-today-body"></div>
+      <div class="history-body open" id="history-today-body">
+        <div id="history-today"></div>
+      </div>
     </div>
     <div class="card">
       <div style="padding:14px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">
         🔍 Deep Lookup
       </div>
       <div style="padding:14px 16px;">
-        <div class="lookup-controls" id="lookup-controls"></div>
-        <div id="lookup-output" style="margin-top:12px;"></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+          <input type="date" id="lookup-date" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);font-size:14px">
+          <button class="btn btn-primary btn-sm" onclick="renderDeepLookup()">Look Up</button>
+        </div>
+        <div id="deep-lookup-result"></div>
       </div>
     </div>
   </div>
 
 </div>
 
+
+<!-- ═══════════════ PAGE: GRAND VIEW ═══════════════ -->
+<div class="page" id="page-grand">
+
+  <!-- Grand View Header -->
+  <div class="grand-header">
+    <div class="grand-header-left">
+      <span id="grand-clock" class="grand-clock">00:00</span>
+      <span id="grand-date" class="grand-date-text">Loading…</span>
+    </div>
+    <div id="grand-summary-strip" class="grand-summary-strip"></div>
+  </div>
+
+  <!-- Grand View Sub-tabs -->
+  <div class="grand-subtabs">
+    <button class="grand-tab active" id="gtab-now"      onclick="setGrandView('now',this)">⚡ Right Now</button>
+    <button class="grand-tab"        id="gtab-timeline" onclick="setGrandView('timeline',this)">📊 Today Timeline</button>
+    <button class="grand-tab"        id="gtab-status"   onclick="setGrandView('status',this)">👥 Staff Status</button>
+    <button class="grand-tab"        id="gtab-lookup"   onclick="setGrandView('lookup',this)">🔍 Date Lookup</button>
+    <button class="grand-tab"        id="gtab-find"     onclick="setGrandView('find',this)">🔎 Find Person</button>
+    <button class="grand-tab"        id="gtab-print"    onclick="triggerPrint()">🖨️ Print</button>
+  </div>
+
+  <!-- Sub-view: Right Now -->
+  <div id="gview-now" class="grand-subview">
+    <div id="grand-now-grid" class="grand-now-grid"></div>
+    <div id="grand-handover-strip" class="grand-handover-strip"></div>
+  </div>
+
+  <!-- Sub-view: Today Timeline -->
+  <div id="gview-timeline" class="grand-subview hidden">
+    <div class="grand-filter-bar">
+      <span style="font-size:12px;font-weight:600;color:var(--muted)">Filter:</span>
+      <select id="grand-tl-filter" onchange="renderGrandTimeline()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        <option value="all">All Employees</option>
+        <option value="location">By Location</option>
+      </select>
+      <select id="grand-tl-loc" onchange="renderGrandTimeline()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px;display:none">
+        <option value="">All Locations</option>
+        <option value="gate">Gate</option>
+        <option value="podium">Podium</option>
+        <option value="mandir">Mandir</option>
+        <option value="field">Field Work</option>
+        <option value="giftshop">Gift Shop</option>
+      </select>
+    </div>
+    <div id="grand-timeline-wrap" style="overflow-x:auto;margin-top:12px"></div>
+  </div>
+
+  <!-- Sub-view: Staff Status -->
+  <div id="gview-status" class="grand-subview hidden">
+    <div id="grand-status-board"></div>
+  </div>
+
+  <!-- Sub-view: Date Lookup -->
+  <div id="gview-lookup" class="grand-subview hidden">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <input type="date" id="grand-lookup-date"
+        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);font-size:14px">
+      <button class="btn btn-primary" onclick="renderGrandLookup()">Look Up</button>
+    </div>
+    <div id="grand-lookup-result"></div>
+  </div>
+
+  <!-- Sub-view: Find Person -->
+  <div id="gview-find" class="grand-subview hidden">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <input type="text" id="grand-find-input" placeholder="Type a name…"
+        oninput="renderFindPerson()"
+        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);font-size:14px;flex:1;min-width:180px">
+    </div>
+    <div id="grand-find-result"></div>
+  </div>
+
+</div>
 
   <!-- ═══════════════ PAGE: DEFAULT SCHEDULE ═══════════════ -->
 <div class="page" id="page-default">
@@ -203,7 +289,7 @@
   <div id="suggest-area" style="margin-top:10px"></div>
 </div>
 
-  <!-- ═══════════════ PAGE: STAFF ═══════════════ -->
+<!-- ═══════════════ PAGE: STAFF ═══════════════ -->
 <div class="page" id="page-staff">
   <div class="page-hdr">
     <div class="page-hdr-text">
@@ -333,7 +419,7 @@
   </div>
 </div>
 
-  <!-- ═══════════════ MODALS ═══════════════ -->
+<!-- ═══════════════ MODALS ═══════════════ -->
 
 <!-- Admin Login Modal -->
 <div class="modal-overlay hidden" id="admin-login-modal">
@@ -388,7 +474,7 @@
       </div>
     </div>
     <div class="form-row">
-      <label>Regular Day Off <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">— select all that apply</span></label>
+      <label>Regular Day Off</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
         <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-MON" style="width:16px;height:16px;cursor:pointer"> MON
@@ -415,7 +501,7 @@
     </div>
     <div class="grid2" style="margin-bottom:12px">
       <div class="form-row" style="margin:0">
-        <label>Weekly Hour Cap <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">(max 60)</span></label>
+        <label>Weekly Hour Cap</label>
         <input type="number" id="emp-hour-cap" placeholder="40" min="1" max="60">
       </div>
       <div class="form-row" style="margin:0">
@@ -595,6 +681,7 @@
 <script src="js/live.js"></script>
 <script src="js/staff.js"></script>
 <script src="js/leave.js"></script>
+<script src="js/grandview.js"></script>
 <script src="js/ui.js"></script>
 </body>
 </html>
