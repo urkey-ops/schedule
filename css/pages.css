@@ -637,3 +637,179 @@
     pointer-events: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GRAND VIEW PAGE LAYOUT
+═══════════════════════════════════════════════════════════════ */
+
+#page-grand {
+  padding-bottom: 40px;
+}
+
+.grand-handover-strip {
+  margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIVE BOARD REDESIGN — PAGE OVERRIDES
+═══════════════════════════════════════════════════════════════ */
+
+.live-view-toggle {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.lvt-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.lvt-btn:hover  { background: var(--surface2); color: var(--text); }
+.lvt-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* My Schedule section */
+.my-schedule-section {
+  padding-bottom: 32px;
+}
+
+.my-sched-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.my-sched-hdr h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* My Day blocks */
+.my-day-block {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.my-day-today {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+
+.my-day-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.today-badge {
+  padding: 2px 8px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.holiday-mini-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.my-day-slots { padding: 8px 14px; }
+
+.my-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.my-slot-row:last-child { border-bottom: none; }
+.my-slot-off { opacity: 0.4; }
+
+.my-slot-time {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+.my-slot-loc {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.my-day-off-block {
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .grand-now-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .grand-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grand-clock { font-size: 22px; }
+  .grand-date-text { font-size: 12px; }
+
+  .grand-subtabs {
+    gap: 4px;
+  }
+
+  .grand-tab {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .my-current-card .my-loc-name { font-size: 26px; }
+  .live-clock-inline { font-size: 18px; }
+
+  .grand-tl-rowlabel { min-width: 70px; font-size: 10px; padding: 6px 6px; }
+  .grand-tl-cell     { min-width: 28px; }
+  .grand-tl-name     { font-size: 8px; }
+}
+
+@media (max-width: 400px) {
+  .grand-now-grid { grid-template-columns: 1fr; }
+}
