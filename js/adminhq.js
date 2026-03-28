@@ -125,14 +125,19 @@ function renderWeekMinimap() {
   </div>`;
 }
 
+// FIX: jumpToDay — showPage already activates the tab element via its second
+// argument, so we must NOT also manually add 'active' to tab-schedule after
+// the call (that caused double-activation / visual glitch).
 function jumpToDay(iso) {
   const d   = new Date(iso + 'T00:00:00');
   const dow = DAYSSHORT[(d.getDay() + 6) % 7];
   state.currentDateISO = iso;
   state.currentDow     = dow;
   state.currentWeekMon = toDateStr(getWeekMonday(d));
-  showPage('schedule', document.getElementById('tab-schedule'));
-  document.getElementById('tab-schedule')?.classList.add('active');
+  // FIX: pass the actual tab element so showPage handles activation correctly.
+  // Do NOT add .active class again afterwards — showPage already does it.
+  const tabEl = document.getElementById('tab-schedule');
+  showPage('schedule', tabEl);
 }
 
 // ── Hour Watch ────────────────────────────────────────────────
@@ -146,6 +151,9 @@ function renderHourWatch() {
     return;
   }
 
+  // FIX: derive weekMon from state.currentWeekMon (controlled by hqShiftWeek),
+  // and pass it explicitly to calcScheduledHrsWeek so hour bars reflect the
+  // currently viewed HQ week, not necessarily today's week.
   const weekMon = state.currentWeekMon;
   const rows    = activeEmps.map(emp => {
     const used = calcScheduledHrsWeek(emp.id, weekMon);
@@ -216,7 +224,7 @@ function renderActionQueue() {
           ${a.action === 'clearOverride'
             ? `<button class="btn btn-sm btn-warn"
                 onclick="clearSingleOverride('${a.iso}',${a.si},'${a.empId}')">
-                Clear Override</button>`
+                Clear</button>`
             : ''}
           ${a.action === 'viewEmployee'
             ? `<button class="btn btn-sm btn-ghost"
@@ -244,6 +252,9 @@ function openFillGapWizard(loc, si, iso) {
 
   const activeEmps = state.employees.filter(e => e.status === 'Active');
 
+  // FIX: derive weekMon from iso so hours shown reflect the correct week
+  const weekMon = getWeekMonStr(iso);
+
   // Available = not day off, not on leave, not absent, not blocked for this loc
   const available = activeEmps.filter(e => {
     if (isEmpDayOff(e.id, iso))        return false;
@@ -253,7 +264,7 @@ function openFillGapWizard(loc, si, iso) {
     return true;
   }).map(e => {
     const { loc: curLoc } = getResolvedLoc(iso, si, e.id);
-    const hrs = calcScheduledHrsWeek(e.id, getWeekMonStr(iso));
+    const hrs = calcScheduledHrsWeek(e.id, weekMon);
     const cap = e.hourCap || DEFAULTHRSCAP;
     return { e, curLoc, hrs, cap, overCap: hrs >= cap };
   }).sort((a, b) => a.hrs - b.hrs); // least hours first
@@ -315,67 +326,6 @@ function toggleQuickActions() {
   if (!panel.classList.contains('hidden')) renderQuickActionsPanel();
 }
 
-function renderQuickActionsPanel() {
-  const inner = document.getElementById('qa-inner');
-  if (!inner) return;
-  const iso    = todayStr();
-  const emps   = state.employees.filter(e => e.status === 'Active');
-  const empOpts = emps.map(e =>
-    `<option value="${e.id}">${escH(e.name)}</option>`).join('');
-
-  inner.innerHTML = `
-    <div class="qa-section">
-      <div class="qa-section-title">⚡ Mark Absent</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="qa-absent-emp" style="flex:1;min-width:120px;padding:7px 10px;
-          border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
-          <option value="">Select employee…</option>
-          ${empOpts}
-        </select>
-        <input type="date" id="qa-absent-date" value="${iso}"
-          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
-        <button class="btn btn-sm btn-danger"
-          onclick="qaMarkAbsent()">Mark</button>
-      </div>
-    </div>
-
-    <div class="qa-section">
-      <div class="qa-section-title">🔒 Quick Leave</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="qa-leave-emp" style="flex:1;min-width:120px;padding:7px 10px;
-          border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
-          <option value="">Select employee…</option>
-          ${empOpts}
-        </select>
-        <input type="date" id="qa-leave-from" value="${iso}"
-          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
-        <input type="date" id="qa-leave-to" value="${iso}"
-          style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
-        <button class="btn btn-sm btn-leave"
-          onclick="qaAddLeave()">Add Leave</button>
-      </div>
-    </div>
-
-    <div class="qa-section">
-      <div class="qa-section-title">📋 Apply Default to Week</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:12px;color:var(--muted);flex:1">
-          Week of ${fmtDate(state.currentWeekMon)}
-        </span>
-        <button class="btn btn-sm btn-warn"
-          onclick="qaApplyDefaultWeek()">Apply</button>
-      </div>
-    </div>
-
-    <div class="qa-section">
-      <div class="qa-section-title">📊 Jump to Today</div>
-      <button class="btn btn-sm btn-primary" style="width:100%;justify-content:center"
-        onclick="jumpToDay('${iso}');toggleQuickActions()">
-        Open Today's Schedule
-      </button>
-    </div>`;
-}
-
 function qaMarkAbsent() {
   const empId = document.getElementById('qa-absent-emp')?.value;
   const iso   = document.getElementById('qa-absent-date')?.value;
@@ -393,9 +343,10 @@ function qaAddLeave() {
   const from  = document.getElementById('qa-leave-from')?.value;
   const to    = document.getElementById('qa-leave-to')?.value;
   if (!empId || !from || !to) { showToast('Fill all leave fields'); return; }
+  if (!validateLeaveOverlap(empId, from, to)) return;
   if (!state.leaveRequests) state.leaveRequests = [];
   state.leaveRequests.push({
-    id    : `leave-${Date.now()}`,
+    id    : uid(),   // FIX: use uid() instead of Date.now() to avoid collisions
     empId, from, to,
     type  : 'annual',
     note  : 'Quick add',
@@ -406,6 +357,8 @@ function qaAddLeave() {
   showToast('Leave added');
 }
 
+// FIX: qaApplyDefaultWeek uses DAYSSHORT[i] to look up defaultSchedule keys,
+// which is correct because saveDefaultCell stores keys by short DOW name.
 function qaApplyDefaultWeek() {
   if (!confirm('Apply default schedule to entire current week? This will overwrite existing overrides.')) return;
   const mon = new Date(state.currentWeekMon + 'T00:00:00');
@@ -413,7 +366,7 @@ function qaApplyDefaultWeek() {
     const d   = new Date(mon);
     d.setDate(d.getDate() + i);
     const iso = toDateStr(d);
-    const dow = DAYSSHORT[i];
+    const dow = DAYSSHORT[i];   // matches keys in state.defaultSchedule
     if (!state.schedule[iso]) state.schedule[iso] = {};
     const def = state.defaultSchedule?.[dow] || {};
     TIMESLOTS.forEach((_, si) => {
