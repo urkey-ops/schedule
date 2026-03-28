@@ -21,6 +21,7 @@ const DAY_START     = 6;
 const DAY_END       = 20.5;
 const DEFAULT_HRS_CAP = 40;
 const MAX_HRS_CAP     = 60;
+const ALERT_DAYS      = 3;   // ← ADD THIS
 
 const LOC_OPTIONS = [
   { val:'gate',     label:'Gate',      cls:'loc-gate'     },
