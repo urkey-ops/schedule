@@ -4,11 +4,17 @@
 const LOC_CYCLE = ['gate','podium','mandir','field','giftshop','lunch','off'];
 
 // ── Helpers ───────────────────────────────────────────────────
+
+// FIX: calcScheduledHrsWeek is the CANONICAL single source of truth.
+// It accepts an explicit weekMon string so callers from any context
+// (adminhq, alerts, staff) can pass the correct week rather than
+// relying on state.currentWeekMon, which may be stale on HQ page.
 function calcScheduledHrsWeek(empId, weekMon) {
-  if (!weekMon) return 0;
+  const mon = weekMon || state.currentWeekMon;
+  if (!mon) return 0;
   let hrs = 0;
   for (let i = 0; i < 7; i++) {
-    const d   = new Date(weekMon + 'T00:00:00');
+    const d   = new Date(mon + 'T00:00:00');
     d.setDate(d.getDate() + i);
     const iso = toDateStr(d);
     if (isEmpDayOff(empId, iso)) continue;
@@ -16,24 +22,29 @@ function calcScheduledHrsWeek(empId, weekMon) {
     TIMESLOTS.forEach((_, si) => {
       const { loc } = getResolvedLoc(iso, si, empId);
       if (loc !== 'off' && loc !== 'vac') {
-        hrs += SLOTDURATION[si] || 0.5;
+        // FIX: use SLOTHRS (now aliased as SLOTDURATION in constants.js)
+        hrs += SLOTHRS[si] || 0;
       }
     });
   }
-  return hrs;
+  return Math.round(hrs * 10) / 10;
 }
 
+// FIX: isEmpDayOff is the CANONICAL single source of truth.
+// state.js previously had a duplicate that read from emp.daysOff differently.
+// This version reads emp.daysOff (the field saved by saveEmployee) and
+// unlocks the day if an active swap exists for that exact date.
 function isEmpDayOff(empId, iso) {
   const emp = state.employees.find(e => e.id === empId);
   if (!emp) return false;
   const d   = new Date(iso + 'T00:00:00');
   const dow = DAYSSHORT[(d.getDay() + 6) % 7];
-  // Check swap — swap overrides regular day off
-  const isSwap = (state.swapRequests||[]).some(s =>
+  // FIX: only active swaps unlock a day-off
+  const isSwap = (state.swapRequests || []).some(s =>
     s.empId === empId && s.fromDate === iso && s.status === 'active'
   );
   if (isSwap) return false;
-  return (emp.daysOff||[]).includes(dow);
+  return (emp.daysOff || []).includes(dow);
 }
 
 function getResolvedLoc(iso, si, empId) {
@@ -44,7 +55,7 @@ function getResolvedLoc(iso, si, empId) {
   // 2. On leave → vac
   if (isOnLeave(empId, iso)) return { loc: 'vac', source: 'leave' };
 
-  // 3. Absent → absent marker
+  // 3. Absent → off marker
   if (state.absences?.[iso]?.[empId]) return { loc: 'off', source: 'absent' };
 
   // 4. Day off
