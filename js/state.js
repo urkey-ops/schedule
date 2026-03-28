@@ -98,6 +98,20 @@ function uid() {
 function toDateStr(d) { return d.toISOString().slice(0, 10); }
 function todayStr()   { return toDateStr(new Date()); }
 
+// ← ADD THESE
+function nowMins() {
+  const n = new Date();
+  return n.getHours() * 60 + n.getMinutes();
+}
+
+function currentSlotIdx() {
+  const nm = nowMins();
+  for (let i = SLOT_START.length - 1; i >= 0; i--) {
+    if (nm >= SLOT_START[i] * 60) return i;
+  }
+  return -1;
+}
+
 // ← ADD THIS
 function getWeekMonday(d) {
   const day = new Date(d);
