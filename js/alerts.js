@@ -64,9 +64,13 @@ function scanAlerts(iso) {
     });
   });
 
+  // FIX: pass the correct weekMon derived from iso, not state.currentWeekMon,
+  // so hour-cap alerts are always evaluated against the right week.
+  const weekMon = getWeekMonStr(iso);
+
   // Hour cap — at or over
   activeEmps.forEach(emp => {
-    const used = calcScheduledHrsWeek(emp.id, getWeekMonStr(iso));
+    const used = calcScheduledHrsWeek(emp.id, weekMon);
     const cap  = emp.hourCap || DEFAULTHRSCAP;
     if (used >= cap) alerts.push({
       type    : ALERT_TYPES.HOUR_CAP,
