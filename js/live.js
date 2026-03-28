@@ -22,7 +22,8 @@ function buildAlerts() {
     }
   });
 
-  // Upcoming leave (next ALERT_DAYS days)
+  // Upcoming leave (next ALERTDAYS days)
+  // FIX: ALERTDAYS alias is now declared in constants.js (was ALERT_DAYS only).
   const soon = new Date();
   soon.setDate(soon.getDate() + ALERTDAYS);
   const soonStr = toDateStr(soon);
