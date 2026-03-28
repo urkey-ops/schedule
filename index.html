@@ -21,13 +21,18 @@
       <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
     </div>
     <div class="topbar-right">
-      <div class="sync-chip" id="sync-indicator"><span class="dot">●</span><span id="sync-text">local</span></div>
+      <button class="qa-fab-topbar hidden" id="qa-fab-topbar"
+        onclick="toggleQuickActions()" title="Quick Actions">⚡</button>
+      <div class="sync-chip" id="sync-indicator">
+        <span class="dot">●</span><span id="sync-text">local</span>
+      </div>
       <div id="mode-badge" class="mode-chip mode-live">VIEW</div>
     </div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" id="tab-live"      onclick="showPage('live',this)">Live Board</button>
-    <button class="nav-tab"        id="tab-grand"     onclick="showPage('grand',this)">📺 Grand View</button>
+    <button class="nav-tab active"    id="tab-live"     onclick="showPage('live',this)">Live Board</button>
+    <button class="nav-tab"           id="tab-grand"    onclick="showPage('grand',this)">📺 Grand View</button>
+    <button class="nav-tab admin-only" id="tab-adminhq" onclick="showPage('adminhq',this)">🏠 Admin HQ</button>
     <button class="nav-tab admin-only" id="tab-default"  onclick="showPage('default',this)">Default Schedule</button>
     <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
     <button class="nav-tab admin-only" id="tab-staff"    onclick="showPage('staff',this)">Staff</button>
@@ -35,6 +40,9 @@
     <button class="nav-tab admin-only" id="tab-holidays" onclick="showPage('holidays',this)">Holidays</button>
   </div>
 </div>
+
+<!-- ADMIN GLOBAL ALERTS BAR -->
+<div id="global-alerts-bar" class="hidden"></div>
 
 <!-- WEEK SUBNAV -->
 <div class="subnav hidden" id="week-nav-bar">
@@ -52,64 +60,47 @@
 
 <!-- ═══════════════ PAGE: LIVE BOARD ═══════════════ -->
 <div class="page active" id="page-live">
-
-  <!-- Today Strip -->
   <div class="today-strip" id="today-strip">
     <div class="today-strip-left">
-      <span id="live-clock" class="live-clock-inline">00:00</span>
+      <span id="live-clock-inline" class="live-clock-inline">00:00</span>
       <span id="live-date-label" class="live-date-text">Loading…</span>
     </div>
     <div class="today-strip-right" id="today-strip-right"></div>
   </div>
-
-  <!-- Holiday banner -->
   <div id="live-holiday-banner" class="holiday-banner hidden"></div>
-
-  <!-- Alert area -->
   <div id="live-alert-area" class="alert-area"></div>
-
-  <!-- View toggle -->
   <div class="live-view-toggle">
     <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">📍 Locations</button>
     <button class="lvt-btn"        id="lvt-my"        onclick="setLiveView('my')">👤 My Schedule</button>
     <button class="lvt-btn"        id="lvt-history"   onclick="setLiveView('history')">🕑 History</button>
   </div>
-
-  <!-- ── Locations view ── -->
   <div id="view-locations">
     <div id="live-board" class="live-board"></div>
     <div class="card" style="margin-top:12px;padding:14px 16px;">
       <div id="live-volunteers"></div>
     </div>
   </div>
-
-  <!-- ── My Schedule view ── -->
   <div id="view-my" class="hidden">
     <div class="my-schedule-section">
       <div class="my-sched-hdr">
         <h3>My Schedule</h3>
         <div class="emp-selector" id="emp-selector"></div>
       </div>
-      <!-- Current location big card -->
       <div id="my-current-card" class="my-current-card hidden"></div>
-      <!-- Next slot indicator -->
-      <div id="my-next-slot" class="my-next-slot hidden"></div>
-      <!-- Personal timeline bar -->
+      <div id="my-next-slot"    class="my-next-slot hidden"></div>
       <div id="my-timeline-bar" class="my-timeline-bar hidden"></div>
-      <!-- Full week -->
-      <div id="my-sched-body" class="my-sched-body">
+      <div id="my-sched-body"   class="my-sched-body">
         <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">
           Select your name above to see your schedule.
         </div>
       </div>
     </div>
   </div>
-
-  <!-- ── History view ── -->
   <div id="view-history" class="hidden">
     <div class="card" style="margin-bottom:12px;">
       <button class="history-toggle open"
-        onclick="this.classList.toggle('open');document.getElementById('history-today-body').classList.toggle('open')">
+        onclick="this.classList.toggle('open');
+                 document.getElementById('history-today-body').classList.toggle('open')">
         📋 Today's Full Schedule <span class="arr">▾</span>
       </button>
       <div class="history-body open" id="history-today-body">
@@ -117,35 +108,33 @@
       </div>
     </div>
     <div class="card">
-      <div style="padding:14px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">
+      <div style="padding:14px 16px;font-size:13px;font-weight:600;
+                  color:var(--text);border-bottom:1px solid var(--border)">
         🔍 Deep Lookup
       </div>
       <div style="padding:14px 16px;">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
-          <input type="date" id="lookup-date" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);font-size:14px">
+          <input type="date" id="lookup-date"
+            style="padding:8px 12px;border-radius:8px;
+                   border:1.5px solid var(--border2);font-size:14px">
           <button class="btn btn-primary btn-sm" onclick="renderDeepLookup()">Look Up</button>
         </div>
         <div id="deep-lookup-result"></div>
       </div>
     </div>
   </div>
-
 </div>
 
 
 <!-- ═══════════════ PAGE: GRAND VIEW ═══════════════ -->
 <div class="page" id="page-grand">
-
-  <!-- Grand View Header -->
   <div class="grand-header">
     <div class="grand-header-left">
       <span id="grand-clock" class="grand-clock">00:00</span>
-      <span id="grand-date" class="grand-date-text">Loading…</span>
+      <span id="grand-date"  class="grand-date-text">Loading…</span>
     </div>
     <div id="grand-summary-strip" class="grand-summary-strip"></div>
   </div>
-
-  <!-- Grand View Sub-tabs -->
   <div class="grand-subtabs">
     <button class="grand-tab active" id="gtab-now"      onclick="setGrandView('now',this)">⚡ Right Now</button>
     <button class="grand-tab"        id="gtab-timeline" onclick="setGrandView('timeline',this)">📊 Today Timeline</button>
@@ -154,22 +143,17 @@
     <button class="grand-tab"        id="gtab-find"     onclick="setGrandView('find',this)">🔎 Find Person</button>
     <button class="grand-tab"        id="gtab-print"    onclick="triggerPrint()">🖨️ Print</button>
   </div>
-
-  <!-- Sub-view: Right Now -->
-  <div id="gview-now" class="grand-subview">
-    <div id="grand-now-grid" class="grand-now-grid"></div>
-    <div id="grand-handover-strip" class="grand-handover-strip"></div>
-  </div>
-
-  <!-- Sub-view: Today Timeline -->
+  <div id="gview-now"      class="grand-subview"><div id="grand-now-grid" class="grand-now-grid"></div><div id="grand-handover-strip" class="grand-handover-strip"></div></div>
   <div id="gview-timeline" class="grand-subview hidden">
     <div class="grand-filter-bar">
       <span style="font-size:12px;font-weight:600;color:var(--muted)">Filter:</span>
-      <select id="grand-tl-filter" onchange="renderGrandTimeline()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+      <select id="grand-tl-filter" onchange="renderGrandTimeline()"
+        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
         <option value="all">All Employees</option>
         <option value="location">By Location</option>
       </select>
-      <select id="grand-tl-loc" onchange="renderGrandTimeline()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px;display:none">
+      <select id="grand-tl-loc" onchange="renderGrandTimeline()"
+        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px;display:none">
         <option value="">All Locations</option>
         <option value="gate">Gate</option>
         <option value="podium">Podium</option>
@@ -180,14 +164,8 @@
     </div>
     <div id="grand-timeline-wrap" style="overflow-x:auto;margin-top:12px"></div>
   </div>
-
-  <!-- Sub-view: Staff Status -->
-  <div id="gview-status" class="grand-subview hidden">
-    <div id="grand-status-board"></div>
-  </div>
-
-  <!-- Sub-view: Date Lookup -->
-  <div id="gview-lookup" class="grand-subview hidden">
+  <div id="gview-status" class="grand-subview hidden"><div id="grand-status-board"></div></div>
+  <div id="gview-lookup"  class="grand-subview hidden">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
       <input type="date" id="grand-lookup-date"
         style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);font-size:14px">
@@ -195,21 +173,118 @@
     </div>
     <div id="grand-lookup-result"></div>
   </div>
-
-  <!-- Sub-view: Find Person -->
   <div id="gview-find" class="grand-subview hidden">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
       <input type="text" id="grand-find-input" placeholder="Type a name…"
         oninput="renderFindPerson()"
-        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);font-size:14px;flex:1;min-width:180px">
+        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);
+               font-size:14px;flex:1;min-width:180px">
     </div>
     <div id="grand-find-result"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PAGE: ADMIN HQ ═══════════════ -->
+<div class="page" id="page-adminhq">
+
+  <!-- HQ Alerts -->
+  <div id="hq-alerts-bar"></div>
+
+  <!-- Today at a Glance -->
+  <div class="hq-section">
+    <div class="hq-section-hdr">
+      <span class="hq-section-title">📊 Today at a Glance</span>
+      <span id="hq-date-label" class="hq-date-label"></span>
+    </div>
+    <div id="hq-today-glance"></div>
+  </div>
+
+  <!-- Two column layout on desktop -->
+  <div class="hq-two-col">
+
+    <!-- Left: Action Queue -->
+    <div class="hq-col">
+      <div class="hq-section">
+        <div class="hq-section-hdr">
+          <span class="hq-section-title">🎯 Action Queue</span>
+          <button class="btn btn-sm btn-ghost"
+            onclick="renderActionQueue();renderHQAlerts()">Refresh</button>
+        </div>
+        <div id="hq-action-queue"></div>
+      </div>
+
+      <!-- Fill Gap Panel — hidden until triggered -->
+      <div id="fill-gap-panel" class="hidden" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Right: Hour Watch + Week Minimap -->
+    <div class="hq-col">
+
+      <div class="hq-section">
+        <div class="hq-section-hdr">
+          <span class="hq-section-title">⏱ Hour Watch</span>
+          <span style="font-size:11px;color:var(--muted)" id="hq-week-label"></span>
+        </div>
+        <div id="hq-hour-watch"></div>
+      </div>
+
+      <div class="hq-section" style="margin-top:14px">
+        <div class="hq-section-hdr">
+          <span class="hq-section-title">🗓 This Week</span>
+          <div style="display:flex;gap:6px">
+            <button class="week-arrow" onclick="hqShiftWeek(-1)">‹</button>
+            <button class="week-arrow" onclick="hqShiftWeek(1)">›</button>
+            <button class="today-btn"  onclick="hqGoToToday()">Today</button>
+          </div>
+        </div>
+        <div id="hq-week-minimap"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Quick Actions inline section -->
+  <div class="hq-section" style="margin-top:14px">
+    <div class="hq-section-hdr">
+      <span class="hq-section-title">⚡ Quick Actions</span>
+    </div>
+    <div id="hq-quick-actions-inline">
+      <div class="qa-inline-grid">
+        <button class="qa-inline-btn" onclick="showPage('schedule',document.getElementById('tab-schedule'))">
+          📅 Weekly Schedule
+        </button>
+        <button class="qa-inline-btn" onclick="showPage('staff',document.getElementById('tab-staff'))">
+          👥 Staff
+        </button>
+        <button class="qa-inline-btn" onclick="showPage('leave',document.getElementById('tab-leave'))">
+          🔒 Leave &amp; Swaps
+        </button>
+        <button class="qa-inline-btn" onclick="showPage('holidays',document.getElementById('tab-holidays'))">
+          🎉 Holidays
+        </button>
+        <button class="qa-inline-btn" onclick="openAddEmployee()">
+          ➕ Add Employee
+        </button>
+        <button class="qa-inline-btn" onclick="openAddLeave()">
+          ➕ Add Leave
+        </button>
+        <button class="qa-inline-btn" onclick="openAddSwap()">
+          🔄 Add Swap
+        </button>
+        <button class="qa-inline-btn" onclick="exportData()">
+          💾 Export JSON
+        </button>
+      </div>
+    </div>
   </div>
 
 </div>
 
-  <!-- ═══════════════ PAGE: DEFAULT SCHEDULE ═══════════════ -->
+
+<!-- ═══════════════ PAGE: DEFAULT SCHEDULE ═══════════════ -->
 <div class="page" id="page-default">
+  <div id="default-alerts-bar"></div>
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Default Schedule</h2>
@@ -239,8 +314,10 @@
   </div>
 </div>
 
+
 <!-- ═══════════════ PAGE: WEEKLY SCHEDULE ═══════════════ -->
 <div class="page" id="page-schedule">
+  <div id="schedule-alerts-bar"></div>
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Weekly Schedule</h2>
@@ -274,9 +351,12 @@
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
       <span class="legend-item" style="margin-left:6px">
-        <span style="display:inline-block;width:9px;height:9px;border-left:2px solid var(--orange);margin-right:3px"></span>Override
+        <span style="display:inline-block;width:9px;height:9px;
+          border-left:2px solid var(--orange);margin-right:3px"></span>Override
       </span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ ok &nbsp;✖ gap &nbsp;🔒 leave &nbsp;striped = day off</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">
+        ✔ ok &nbsp;✖ gap &nbsp;🔒 leave &nbsp;striped = day off
+      </span>
     </div>
     <div class="sched-wrap">
       <div class="scroll-hint">swipe table to scroll →</div>
@@ -289,8 +369,10 @@
   <div id="suggest-area" style="margin-top:10px"></div>
 </div>
 
+
 <!-- ═══════════════ PAGE: STAFF ═══════════════ -->
 <div class="page" id="page-staff">
+  <div id="staff-alerts-bar"></div>
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Staff</h2>
@@ -299,15 +381,27 @@
   </div>
   <div class="section-hdr">
     <span class="section-title">Employees</span>
-    <button class="btn btn-primary btn-sm ml-auto" onclick="openAddEmployee()">+ Add Employee</button>
+    <div style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;align-items:center">
+      <select id="roster-filter" onchange="filterRoster(this.value)"
+        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        <option value="all">All</option>
+        <option value="active">Active Only</option>
+        <option value="leave">On Leave Today</option>
+        <option value="dayoff">Day Off Today</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="openAddEmployee()">+ Add Employee</button>
+    </div>
   </div>
   <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
       <table class="data-table" id="roster-table">
         <thead>
           <tr>
-            <th>#</th><th>Name</th><th>Fallback</th><th>Blocked</th>
-            <th>Status</th><th>This Week</th><th>Day Off</th><th>Leave</th><th>Actions</th>
+            <th>#</th>
+            <th onclick="sortRoster('name')" style="cursor:pointer">Name ↕</th>
+            <th>Fallback</th><th>Blocked</th><th>Status</th>
+            <th onclick="sortRoster('hours')" style="cursor:pointer">This Week ↕</th>
+            <th>Day Off</th><th>Leave</th><th>Actions</th>
           </tr>
         </thead>
         <tbody id="roster-body"></tbody>
@@ -328,12 +422,15 @@
       <button class="btn btn-sm btn-ghost"   onclick="importData()">Import JSON</button>
       <button class="btn btn-sm btn-danger"  onclick="resetAllData()">Delete All</button>
     </div>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
+    <input type="file" id="import-file" accept=".json"
+      style="display:none" onchange="handleImportFile(event)">
   </div>
 </div>
 
+
 <!-- ═══════════════ PAGE: LEAVE & SWAPS ═══════════════ -->
 <div class="page" id="page-leave">
+  <div id="leave-alerts-bar"></div>
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Leave &amp; Day-Off Swaps</h2>
@@ -350,7 +447,8 @@
         <thead>
           <tr>
             <th>Employee</th><th>Type</th><th>From</th><th>To</th>
-            <th>Days</th><th>Note</th><th>Status</th><th>Actions</th>
+            <th>Days</th><th>Remaining</th><th>Note</th>
+            <th>Status</th><th>Conflicts</th><th>Actions</th>
           </tr>
         </thead>
         <tbody id="leave-body"></tbody>
@@ -365,12 +463,13 @@
   <div class="card"><div id="swap-list"></div></div>
 </div>
 
+
 <!-- ═══════════════ PAGE: HOLIDAYS ═══════════════ -->
 <div class="page" id="page-holidays">
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Holidays &amp; Festivals</h2>
-      <p>US Federal + Hindu festivals pre-loaded · edit dates if needed · markers shown on schedule &amp; live board</p>
+      <p>US Federal + Hindu festivals pre-loaded · edit dates if needed</p>
     </div>
   </div>
   <div class="card" style="margin-bottom:16px">
@@ -387,7 +486,8 @@
         </div>
         <div class="form-row" style="margin:0;min-width:80px">
           <label>Emoji</label>
-          <input type="text" id="new-holiday-emoji" placeholder="🪔" style="width:70px;text-align:center;font-size:18px;padding:8px">
+          <input type="text" id="new-holiday-emoji" placeholder="🪔"
+            style="width:70px;text-align:center;font-size:18px;padding:8px">
         </div>
         <div class="form-row" style="margin:0">
           <label>Color</label>
@@ -419,9 +519,10 @@
   </div>
 </div>
 
+
 <!-- ═══════════════ MODALS ═══════════════ -->
 
-<!-- Admin Login Modal -->
+<!-- Admin Login -->
 <div class="modal-overlay hidden" id="admin-login-modal">
   <div class="modal" style="max-width:340px">
     <div class="admin-login-box">
@@ -429,16 +530,18 @@
       <h3>Admin Login</h3>
       <p>Enter your PIN to unlock admin controls and edit schedules.</p>
       <input type="password" class="pin-input-field" id="admin-pin-input"
-        maxlength="20" placeholder="••••"
-        onkeydown="checkAdminPin(event)">
+        maxlength="20" placeholder="••••" onkeydown="checkAdminPin(event)">
       <div class="pin-error" id="admin-pin-error"></div>
-      <button class="btn btn-warn" style="width:100%;justify-content:center;margin-top:16px"
+      <button class="btn btn-warn"
+        style="width:100%;justify-content:center;margin-top:16px"
         onclick="submitAdminPin()">Unlock Admin</button>
-      <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px"
+      <button class="btn btn-ghost"
+        style="width:100%;justify-content:center;margin-top:8px"
         onclick="closeModal('admin-login-modal')">Cancel</button>
     </div>
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center"
+      <button class="btn btn-ghost btn-sm"
+        style="width:100%;justify-content:center"
         onclick="switchToFirebaseModal()">Configure Firebase</button>
     </div>
   </div>
@@ -453,7 +556,10 @@
       <input type="text" id="emp-name" placeholder="e.g. Raj Patel">
     </div>
     <div class="form-row">
-      <label>Fallback Location <span style="color:var(--subtle);font-weight:400;text-transform:none;letter-spacing:0">— when slot is unscheduled</span></label>
+      <label>Fallback Location
+        <span style="color:var(--subtle);font-weight:400;
+          text-transform:none;letter-spacing:0">— when slot is unscheduled</span>
+      </label>
       <select id="emp-fallback">
         <option value="Field Work">Field Work</option>
         <option value="OFF">OFF</option>
@@ -476,32 +582,54 @@
     <div class="form-row">
       <label>Regular Day Off</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-MON" style="width:16px;height:16px;cursor:pointer"> MON
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-MON"
+            style="width:16px;height:16px;cursor:pointer"> MON
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-TUE" style="width:16px;height:16px;cursor:pointer"> TUE
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-TUE"
+            style="width:16px;height:16px;cursor:pointer"> TUE
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-WED" style="width:16px;height:16px;cursor:pointer"> WED
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-WED"
+            style="width:16px;height:16px;cursor:pointer"> WED
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-THU" style="width:16px;height:16px;cursor:pointer"> THU
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-THU"
+            style="width:16px;height:16px;cursor:pointer"> THU
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-FRI" style="width:16px;height:16px;cursor:pointer"> FRI
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-FRI"
+            style="width:16px;height:16px;cursor:pointer"> FRI
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-SAT" style="width:16px;height:16px;cursor:pointer"> SAT
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-SAT"
+            style="width:16px;height:16px;cursor:pointer"> SAT
         </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;border:1.5px solid var(--border2);border-radius:8px">
-          <input type="checkbox" id="dow-off-SUN" style="width:16px;height:16px;cursor:pointer"> SUN
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+          border:1.5px solid var(--border2);border-radius:8px">
+          <input type="checkbox" id="dow-off-SUN"
+            style="width:16px;height:16px;cursor:pointer"> SUN
         </label>
       </div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
       <div class="form-row" style="margin:0">
-        <label>Weekly Hour Cap</label>
+        <label>Weekly Hour Cap <span style="color:var(--subtle);font-weight:400;
+          text-transform:none;letter-spacing:0">(max 60)</span></label>
         <input type="number" id="emp-hour-cap" placeholder="40" min="1" max="60">
       </div>
       <div class="form-row" style="margin:0">
@@ -524,7 +652,10 @@
         <input type="text" id="emp-sick" placeholder="10">
       </div>
     </div>
-    <div id="emp-hrs-summary" style="font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);min-height:20px"></div>
+    <div id="emp-hrs-summary"
+      style="font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 12px;
+             background:var(--surface2);border-radius:8px;border:1px solid var(--border);
+             min-height:20px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost"   onclick="closeModal('emp-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
@@ -540,7 +671,8 @@
       <label>Week</label>
       <div style="display:flex;align-items:center;gap:10px">
         <button class="week-arrow" onclick="planShiftWeek(-1)">‹</button>
-        <span id="plan-week-label" style="font-size:13px;font-weight:600;color:var(--text)"></span>
+        <span id="plan-week-label"
+          style="font-size:13px;font-weight:600;color:var(--text)"></span>
         <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
       </div>
     </div>
@@ -580,8 +712,10 @@
       <select id="leave-emp-id"></select>
     </div>
     <div class="grid2">
-      <div class="form-row"><label>From</label><input type="date" id="leave-from"></div>
-      <div class="form-row"><label>To (inclusive)</label><input type="date" id="leave-to"></div>
+      <div class="form-row"><label>From</label>
+        <input type="date" id="leave-from"></div>
+      <div class="form-row"><label>To (inclusive)</label>
+        <input type="date" id="leave-to"></div>
     </div>
     <div class="form-row">
       <label>Type</label>
@@ -619,8 +753,10 @@
       <select id="swap-emp-id"></select>
     </div>
     <div class="grid2">
-      <div class="form-row"><label>Usual Day Off (date)</label><input type="date" id="swap-from"></div>
-      <div class="form-row"><label>Works Instead On</label><input type="date" id="swap-to"></div>
+      <div class="form-row"><label>Usual Day Off (date)</label>
+        <input type="date" id="swap-from"></div>
+      <div class="form-row"><label>Works Instead On</label>
+        <input type="date" id="swap-to"></div>
     </div>
     <div class="form-row">
       <label>Note</label>
@@ -637,12 +773,19 @@
 <div class="modal-overlay hidden" id="firebase-modal">
   <div class="modal">
     <h3>Firebase Setup</h3>
-    <div class="config-note">Create a free Firebase project → Add web app → copy config. Enable Realtime Database with read/write rules set to true.</div>
-    <div class="form-row"><label>API Key</label><input type="text" id="fb-apiKey" placeholder="AIza…"></div>
-    <div class="form-row"><label>Auth Domain</label><input type="text" id="fb-authDomain"></div>
-    <div class="form-row"><label>Database URL</label><input type="text" id="fb-databaseURL" placeholder="https://your-project-default-rtdb.firebaseio.com"></div>
-    <div class="form-row"><label>Project ID</label><input type="text" id="fb-projectId"></div>
-    <div class="form-row"><label>App ID</label><input type="text" id="fb-appId"></div>
+    <div class="config-note">Create a free Firebase project → Add web app → copy config.
+      Enable Realtime Database with read/write rules set to true.</div>
+    <div class="form-row"><label>API Key</label>
+      <input type="text" id="fb-apiKey" placeholder="AIza…"></div>
+    <div class="form-row"><label>Auth Domain</label>
+      <input type="text" id="fb-authDomain"></div>
+    <div class="form-row"><label>Database URL</label>
+      <input type="text" id="fb-databaseURL"
+        placeholder="https://your-project-default-rtdb.firebaseio.com"></div>
+    <div class="form-row"><label>Project ID</label>
+      <input type="text" id="fb-projectId"></div>
+    <div class="form-row"><label>App ID</label>
+      <input type="text" id="fb-appId"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost"   onclick="closeModal('firebase-modal')">Cancel</button>
       <button class="btn btn-success" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
@@ -654,8 +797,10 @@
 <div class="modal-overlay hidden" id="reset-modal">
   <div class="modal">
     <h3>Delete All Data</h3>
-    <div class="inline-alert danger" style="margin-bottom:16px">Permanently deletes everything. Cannot be undone.</div>
-    <div class="form-row"><label>Admin PIN to confirm</label><input type="password" id="reset-pin" placeholder="PIN"></div>
+    <div class="inline-alert danger" style="margin-bottom:16px">
+      Permanently deletes everything. Cannot be undone.</div>
+    <div class="form-row"><label>Admin PIN to confirm</label>
+      <input type="password" id="reset-pin" placeholder="PIN"></div>
     <div class="pin-error" id="reset-error"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-ghost"  onclick="closeModal('reset-modal')">Cancel</button>
@@ -664,11 +809,32 @@
   </div>
 </div>
 
+
 <!-- UNDO TOAST -->
 <div class="undo-toast" id="undo-toast">
   <span id="undo-msg">Changed</span>
   <button class="undo-btn" onclick="undoLastChange()">Undo</button>
 </div>
+
+<!-- FLOATING QUICK ACTIONS PANEL -->
+<div class="quick-actions-panel hidden" id="quick-actions-panel">
+  <div class="qa-panel-hdr">
+    <span>⚡ Quick Actions</span>
+    <button class="qa-panel-close" onclick="toggleQuickActions()">×</button>
+  </div>
+  <div id="qa-inner"></div>
+</div>
+
+<!-- FILL GAP FLOATING PANEL (used from alerts) -->
+<div class="modal-overlay hidden" id="fill-gap-modal">
+  <div class="modal" style="max-width:420px">
+    <div id="fill-gap-modal-inner"></div>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn btn-ghost" onclick="closeModal('fill-gap-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- SCRIPTS — order matters -->
 <script src="js/constants.js"></script>
@@ -677,11 +843,13 @@
 <script src="js/holidays.js"></script>
 <script src="js/state.js"></script>
 <script src="js/validators.js"></script>
+<script src="js/alerts.js"></script>
 <script src="js/schedule.js"></script>
 <script src="js/live.js"></script>
 <script src="js/staff.js"></script>
 <script src="js/leave.js"></script>
 <script src="js/grandview.js"></script>
+<script src="js/adminhq.js"></script>
 <script src="js/ui.js"></script>
 </body>
 </html>
