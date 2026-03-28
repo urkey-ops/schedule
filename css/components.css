@@ -667,3 +667,719 @@
   padding: inherit;
   font-size: inherit;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIVE BOARD REDESIGN
+═══════════════════════════════════════════════════════════════ */
+
+/* Today Strip */
+.today-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+.today-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-clock-inline {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 2px;
+}
+
+.live-date-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.today-strip-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* My Current Location Card */
+.my-current-card {
+  margin: 12px 0;
+  padding: 20px 24px;
+  border-radius: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  transition: background 0.3s;
+}
+
+.my-current-card .my-loc-label {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.my-current-card .my-loc-name {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.my-current-card .my-loc-slot {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Next Slot Indicator */
+.my-next-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.my-next-slot .next-arrow {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.my-next-slot .next-loc {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Personal Timeline Bar */
+.my-timeline-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  gap: 1px;
+}
+
+.my-tl-seg {
+  flex: 1;
+  transition: opacity 0.2s;
+  border-radius: 2px;
+}
+
+.my-tl-seg.tl-past    { opacity: 0.3; }
+.my-tl-seg.tl-current { outline: 2px solid #fff; outline-offset: 1px; opacity: 1; }
+
+/* Density modes */
+.sched-grid.density-compact td,
+.sched-grid.density-compact th {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+.sched-grid.density-compact .loc-select {
+  padding: 2px;
+  font-size: 9px;
+}
+
+.sched-grid.density-normal td,
+.sched-grid.density-normal th {
+  font-size: inherit;
+  padding: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GRAND VIEW COMPONENTS
+═══════════════════════════════════════════════════════════════ */
+
+/* Header */
+.grand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--surface2);
+  border-radius: 14px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+}
+
+.grand-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.grand-clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 3px;
+}
+
+.grand-date-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* Summary Strip */
+.grand-summary-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.chip-slot     { background: var(--surface3); color: var(--text); }
+.chip-assigned { background: #dcfce7; color: #166534; }
+.chip-gap      { background: #fef3c7; color: #92400e; }
+.chip-absent   { background: #fee2e2; color: #991b1b; }
+.chip-leave    { background: #ede9fe; color: #5b21b6; }
+.chip-off      { background: var(--surface3); color: var(--muted); }
+
+/* Sub-tabs */
+.grand-subtabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.grand-tab {
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.grand-tab:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.grand-tab.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Sub-view container */
+.grand-subview { animation: fadeIn 0.18s ease; }
+
+/* Now Snapshot Grid */
+.grand-now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Location Card */
+.grand-loc-card {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.grand-loc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+}
+
+.grand-loc-critical {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+.grand-loc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.grand-loc-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.grand-loc-count {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  font-family: 'DM Mono', monospace;
+}
+
+.grand-loc-body {
+  padding: 12px 14px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Employee chip inside location card */
+.grand-emp-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grand-emp-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.grand-emp-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Empty / Uncovered */
+.grand-empty {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 4px 0;
+}
+
+.grand-empty-critical {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 800;
+  animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* Next label inside location card */
+.grand-next-label {
+  font-size: 10px;
+  color: var(--subtle);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-weight: 500;
+}
+
+/* Off row at bottom of now grid */
+.grand-off-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.grand-off-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--surface3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.grand-off-reason {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--subtle);
+}
+
+/* Handover Banner */
+.grand-handover-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: #fef3c722;
+  border: 1.5px solid #d9770640;
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+.handover-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+.handover-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: #fff8ec;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid #d9770640;
+}
+
+.handover-loc {
+  font-weight: 800;
+  color: #92400e;
+}
+
+.handover-arrow { color: var(--muted); }
+
+/* Filter bar */
+.grand-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+/* Timeline Table */
+.grand-tl-table {
+  border-collapse: collapse;
+  font-size: 11px;
+  width: 100%;
+  min-width: 600px;
+}
+
+.grand-tl-table thead tr {
+  background: var(--surface2);
+}
+
+.grand-tl-rowlabel {
+  text-align: left;
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 100px;
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  z-index: 2;
+  border-right: 2px solid var(--border2);
+}
+
+.grand-tl-slothdr {
+  padding: 5px 4px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 36px;
+  border-bottom: 2px solid var(--border);
+}
+
+.grand-tl-now-col {
+  background: #fef9ec;
+  color: var(--amber) !important;
+  font-weight: 800 !important;
+}
+
+.grand-tl-cell {
+  padding: 4px 3px;
+  text-align: center;
+  border: 1px solid var(--border);
+  vertical-align: middle;
+  min-width: 36px;
+  transition: background 0.15s;
+}
+
+.grand-tl-cell:hover { filter: brightness(0.95); cursor: default; }
+
+.grand-tl-cur {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.grand-tl-past { opacity: 0.45; }
+
+.grand-tl-name {
+  font-size: 9px;
+  font-weight: 700;
+  display: block;
+}
+
+.grand-tl-empty {
+  font-size: 10px;
+  color: var(--red);
+}
+
+.grand-tl-dayoff  { background: repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 3px,var(--surface) 3px,var(--surface) 6px); }
+.grand-tl-leave   { background: #ede9fe44; }
+.grand-tl-offcell { background: var(--surface2); }
+.grand-tl-off     { font-size: 8px; font-weight: 700; color: var(--subtle); }
+
+/* Status Board Grid */
+.grand-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.grand-status-card {
+  border-radius: 12px;
+  padding: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  transition: transform 0.15s;
+}
+
+.grand-status-card:hover { transform: translateY(-1px); }
+.card-onshift { border-color: var(--border2); }
+.card-off     { opacity: 0.7; }
+
+.status-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.status-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.status-card-info { flex: 1; min-width: 0; }
+
+.status-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-loc {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.status-loc-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Status Dots Timeline */
+.status-dots {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dot-off    { background: var(--surface3) !important; }
+.dot-leave  { background: var(--purple) !important; opacity: 0.5; }
+.dot-current {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
+/* Find Person */
+.grand-find-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.find-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.find-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.find-info { flex: 1; }
+
+.find-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.find-now {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.find-next {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.find-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.find-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: var(--surface2);
+}
+
+.find-slot-row.find-slot-cur {
+  background: var(--surface3);
+  outline: 1.5px solid var(--amber);
+}
+
+.find-slot-row.find-slot-past { opacity: 0.45; }
+
+.find-slot-time {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.find-slot-loc {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Holiday chip in lookup */
+.grand-holiday-chip {
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+
+/* Print mode */
+@media print {
+  .topbar, .grand-subtabs, .grand-header,
+  .grand-filter-bar, .nav-tabs, .subnav,
+  .grand-summary-strip, .undo-toast { display: none !important; }
+  .grand-tl-table { font-size: 10px; }
+  .grand-tl-rowlabel { font-size: 10px; }
+  body { background: #fff !important; }
+  .grand-tl-cell { border: 1px solid #ccc !important; }
+}
