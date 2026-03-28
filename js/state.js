@@ -98,6 +98,16 @@ function uid() {
 function toDateStr(d) { return d.toISOString().slice(0, 10); }
 function todayStr()   { return toDateStr(new Date()); }
 
+// ← ADD THIS
+function getWeekMonday(d) {
+  const day = new Date(d);
+  const dow = (day.getDay() + 6) % 7; // 0=Mon … 6=Sun
+  day.setDate(day.getDate() - dow);
+  day.setHours(0, 0, 0, 0);
+  return day;
+}
+
+
 // ── Day Off Helpers ───────────────────────────────────────────
 function getEmpDaysOff(empId) {
   // FIX: check both state.empDaysOff (legacy) and emp.daysOff (canonical)
