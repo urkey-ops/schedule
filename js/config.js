@@ -1,5 +1,6 @@
-const ALERT_DAYS = 7;       // days ahead to show leave alerts
-const HANDOVER_WARN = 15;   // minutes before slot end to show handover badge
+const ALERT_DAYS = 7;
+const ALERTDAYS  = ALERT_DAYS;   // ← ADD THIS
+const HANDOVER_WARN = 15;
 const APP_VERSION = 'v6';
 
 // ── Admin PIN Hash ─────────────────────────────────────────────
