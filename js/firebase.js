@@ -39,22 +39,27 @@ async function initFirebase(cfg) {
     db    = getDatabase(app);
     fbRef = ref(db, 'smPro');
 
-    onValue(fbRef, snap => {
-      const data = snap.val();
-      if (!data) { setSyncStatus('synced'); return; }
+   onValue(fbRef, snap => {
+  const data = snap.val();
+  if (!data) { setSyncStatus('synced'); return; }
 
-      // Fixed: if admin has local edits in progress, warn instead of overwriting
-      if (_hasLocalEdits && state.mode === 'admin') {
-        showOutOfSyncBanner();
-        return;
-      }
+  if (_hasLocalEdits && state.mode === 'admin') {
+    showOutOfSyncBanner();
+    return;
+  }
 
-      FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
-      saveLocal();
-      renderAll();
-      setSyncStatus('synced');
-    });
+  FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
+  saveLocal();
 
+  // Guard: only render if DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => renderAll(), { once: true });
+  } else {
+    renderAll();
+  }
+
+  setSyncStatus('synced');
+});
     setSyncStatus('synced');
   } catch(e) {
     console.error('Firebase init failed', e);
