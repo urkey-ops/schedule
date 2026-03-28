@@ -9,9 +9,11 @@ function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); 
 // ── Clock ─────────────────────────────────────────────────────
 function tickClock() {
   const now = new Date();
-  const el  = document.getElementById('live-clock');
-  if (el) el.textContent =
-    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const t   = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const el  = document.getElementById('live-clock-inline');
+  if (el) el.textContent = t;
+  const gc  = document.getElementById('grand-clock');
+  if (gc) gc.textContent = t;
 }
 
 // ── Admin ─────────────────────────────────────────────────────
@@ -60,7 +62,7 @@ function exitAdmin() {
   document.getElementById('admin-trigger-btn').classList.remove('active');
   document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-tab-visible'));
   showPage('live', document.getElementById('tab-live'));
-  renderAll(); // Fixed: re-render so admin content clears properly
+  renderAll();
 }
 
 function switchToFirebaseModal() {
@@ -105,7 +107,6 @@ async function saveFirebaseConfig() {
     if (pin.length < 4) { alert('PIN must be at least 4 characters.'); return; }
     await setPinHash(pin);
   } else {
-    // Fixed: removed waitForSync() — was never defined; just check hasPinSet directly
     if (!hasPinSet()) { alert('Please set a PIN before saving.'); return; }
   }
   localStorage.setItem('smPro_fbConfig', JSON.stringify(cfg));
@@ -115,7 +116,12 @@ async function saveFirebaseConfig() {
 
 // ── Page navigation ───────────────────────────────────────────
 function showPage(name, tabEl) {
-  if (name !== 'live' && state.mode !== 'admin') return;
+  // Grand view is public — all others except live require admin
+  const publicPages = ['live', 'grand'];
+  if (!publicPages.includes(name) && state.mode !== 'admin') return;
+
+  // Stop grand view refresh if leaving grand page
+  if (name !== 'grand' && typeof stopGrandRefresh === 'function') stopGrandRefresh();
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -145,11 +151,16 @@ function showPage(name, tabEl) {
   if (name === 'staff')    { renderRoster(); renderVolunteers(); }
   if (name === 'leave')    { renderLeave(); renderSwaps(); }
   if (name === 'live')     renderLiveBoard();
+  if (name === 'grand')    renderGrandView();
   if (name === 'holidays') renderHolidaysPage();
 }
 
 function renderAll() {
   renderLiveBoard();
+  // Refresh grand view if open
+  const grandActive = document.getElementById('page-grand')?.classList.contains('active');
+  if (grandActive && typeof renderGrandView === 'function') renderGrandView();
+
   if (state.mode === 'admin') {
     const active = document.querySelector('.page.active')?.id?.replace('page-','');
     if (active === 'staff')    { renderRoster(); renderVolunteers(); }
@@ -200,7 +211,6 @@ function renderWeekNav() {
     const iso     = toDateStr(d);
     const isToday = iso === todayStr();
     const isActive= iso === state.currentDateISO;
-    // Fixed: call once, reuse result
     const holiday = getHolidayForDate(iso);
     const hasGap  = countDayGaps(iso) > 0;
     const hasOvr  = countDayOverrides(iso) > 0;
@@ -270,8 +280,6 @@ function selectDow(dow) {
 }
 
 // ── Density ───────────────────────────────────────────────────
-// Fixed: use CSS class on table instead of inline styles
-// (inline styles get wiped on every renderSchedule call)
 function setDensity(d) {
   density = d;
   document.querySelectorAll('.density-btn').forEach(b => b.classList.remove('active'));
@@ -293,7 +301,6 @@ function toggleAdv() {
   if (body.classList.contains('open')) {
     const container = document.getElementById('copy-day-btns');
     if (!container) return;
-    // Rebuild every time so days stay current
     const mon = new Date(state.currentWeekMon + 'T00:00:00');
     container.innerHTML = DAYSSHORT.map((dow, di) => {
       const d   = new Date(mon);
@@ -306,14 +313,14 @@ function toggleAdv() {
 }
 
 // ── Live view toggle ──────────────────────────────────────────
-function setLiveView(v) {
+function setLiveView(view) {
   ['locations','my','history'].forEach(id => {
-    document.getElementById(`view-${id}`)?.classList.toggle('hidden', id !== v);
-    document.getElementById(`lvt-${id}`)?.classList.toggle('active', id === v);
+    document.getElementById(`view-${id}`)?.classList.toggle('hidden', id !== view);
+    document.getElementById(`lvt-${id}`)?.classList.toggle('active', id === view);
   });
-  if (v === 'locations') renderLiveBoard();
-  if (v === 'my')        renderMySchedule();
-  if (v === 'history')   { renderHistoryToday(); renderDeepLookup(); }
+  if (view === 'locations') renderLiveBoard();
+  if (view === 'my')        renderMySchedule();
+  if (view === 'history')   { renderHistoryToday(); renderDeepLookup(); }
 }
 
 // ── Toast ─────────────────────────────────────────────────────
@@ -341,9 +348,7 @@ function exportData() {
   a.click();
 }
 
-function importData() {
-  document.getElementById('import-file')?.click();
-}
+function importData() { document.getElementById('import-file')?.click(); }
 
 function handleImportFile(e) {
   const file = e.target.files[0];
@@ -358,17 +363,15 @@ function handleImportFile(e) {
       persistAll();
       renderAll();
       showToast('Data imported successfully');
-    } catch(err) {
-      alert('Invalid JSON file.');
-    }
+    } catch(err) { alert('Invalid JSON file.'); }
   };
   reader.readAsText(file);
 }
 
 // ── Reset ─────────────────────────────────────────────────────
 function resetAllData() {
-  document.getElementById('reset-pin').value          = '';
-  document.getElementById('reset-error').textContent  = '';
+  document.getElementById('reset-pin').value         = '';
+  document.getElementById('reset-error').textContent = '';
   openModal('reset-modal');
 }
 
@@ -376,7 +379,6 @@ async function confirmReset() {
   const pin = document.getElementById('reset-pin').value.trim();
   const ok  = await verifyPin(pin);
   if (!ok) { document.getElementById('reset-error').textContent = 'Incorrect PIN.'; return; }
-  // Fixed: only reset state data — HARDCODEDPINHASH lives in config.js, cannot be cleared from JS
   Object.assign(state, {
     employees: [], volunteers: [], defaultSchedule: {}, schedule: {},
     volAvailability: {}, absences: {}, leaveRequests: [], swapRequests: [],
@@ -388,35 +390,60 @@ async function confirmReset() {
   showToast('All data deleted');
 }
 
-// ── Shared slot assignment helper ─────────────────────────────
-// Single function used by renderHistoryToday AND renderDeepLookup
-// eliminates the duplicated slot-mapping logic between both
+// ── Shared slot helper ────────────────────────────────────────
 function getSlotAssignments(iso, si) {
   return state.employees
     .filter(e => e.status === 'Active')
     .map(e => ({ emp: e, ...getResolvedLoc(iso, si, e.id) }));
 }
 
-// ── Live Board ────────────────────────────────────────────────
-// Canonical version lives here — removed from live.js
-function renderLiveBoard() {
-  const iso  = todayStr();
-  const nm   = nowMins();
-  const si   = currentSlotIdx();
+// ── Schedule alerts ───────────────────────────────────────────
+function renderSchedAlerts() {
+  const area = document.getElementById('sched-alert-area');
+  if (!area) return;
+  const iso = state.currentDateISO;
+  let html  = '';
+  (state.leaveRequests || []).filter(l => l.status === 'active').forEach(l => {
+    const cur = new Date(iso + 'T00:00:00');
+    if (cur >= new Date(l.from + 'T00:00:00') && cur <= new Date(l.to + 'T00:00:00')) {
+      const emp = state.employees.find(e => e.id === l.empId);
+      if (emp) html += `<div class="alert-banner leave">🔒 ${escH(emp.name)} is on ${l.type} leave today</div>`;
+    }
+  });
+  (state.swapRequests || []).forEach(s => {
+    if (s.fromDate === iso && s.status === 'active') {
+      const emp = state.employees.find(e => e.id === s.empId);
+      if (emp) html += `<div class="alert-banner swap">🔄 ${escH(emp.name)} swapped day off — working today</div>`;
+    }
+  });
+  area.innerHTML = html;
+}
 
-  // Date label
+// ── Live Board ────────────────────────────────────────────────
+function renderLiveBoard() {
+  const iso = todayStr();
+  const si  = currentSlotIdx();
+
+  // Today strip date label
   const dl = document.getElementById('live-date-label');
   if (dl) dl.textContent = new Date().toLocaleDateString('en-GB', {
     weekday:'long', day:'numeric', month:'long', year:'numeric'
   });
+
+  // Today strip — current slot chip
+  const tsr = document.getElementById('today-strip-right');
+  if (tsr) {
+    const holiday = getHolidayForDate(iso);
+    tsr.innerHTML = (si >= 0 ? `<span class="summary-chip chip-slot">🕐 ${TIMESLOTS[si]}</span>` : '') +
+      (holiday ? `<span class="summary-chip" style="background:${holiday.color}18;color:${holiday.color}">${holiday.emoji} ${escH(holiday.name)}</span>` : '');
+  }
 
   // Holiday banner
   const holiday = getHolidayForDate(iso);
   const hb = document.getElementById('live-holiday-banner');
   if (hb) {
     if (holiday) {
-      hb.innerHTML = `<div class="holiday-banner"
-        style="background:${holiday.color}18;border-color:${holiday.color}40;color:${holiday.color}">
+      hb.innerHTML = `<div style="padding:9px 14px;background:${holiday.color}18;border:1.5px solid ${holiday.color}40;color:${holiday.color};border-radius:10px;font-size:13px;font-weight:600">
         ${holiday.emoji} <strong>${escH(holiday.name)}</strong> — Have a wonderful day!
       </div>`;
       hb.classList.remove('hidden');
@@ -434,73 +461,68 @@ function renderLiveBoard() {
     </div>`;
     renderLiveAlerts();
     renderLiveVolunteers();
-    renderTimeline();
     return;
   }
 
   if (board) {
-    board.innerHTML = activeEmps.map(emp => {
-      const isDayOff = isEmpDayOff(emp.id, iso);
-      const onLeave  = isOnLeave(emp.id, iso);
-      const absent   = !!state.absences?.[iso]?.[emp.id];
-      // Fixed: check active swap status
-      const isSwap   = (state.swapRequests || []).some(s =>
-        s.empId === emp.id && s.fromDate === iso && s.status === 'active'
-      );
+    board.innerHTML = `<div class="grand-now-grid">` +
+      activeEmps.map(emp => {
+        const isDayOff = isEmpDayOff(emp.id, iso);
+        const onLeave  = isOnLeave(emp.id, iso);
+        const absent   = !!state.absences?.[iso]?.[emp.id];
+        const isSwap   = (state.swapRequests || []).some(s =>
+          s.empId === emp.id && s.fromDate === iso && s.status === 'active'
+        );
 
-      let statusHtml = '';
-      let locHtml    = '';
+        let locLabel = '—', locColor = 'var(--muted)', locCls = '';
+        if (isDayOff && !isSwap) { locLabel = 'Day Off';   locColor = 'var(--muted)'; }
+        else if (onLeave)         { locLabel = 'On Leave';  locColor = 'var(--purple)'; }
+        else if (absent)          { locLabel = 'Absent';    locColor = 'var(--red)'; }
+        else if (si < 0)          { locLabel = 'Off Hours'; locColor = 'var(--muted)'; }
+        else {
+          const { loc } = getResolvedLoc(iso, si, emp.id);
+          locLabel = LOCLABEL[loc] || loc;
+          locColor = LOCCOLOR[loc] || '#888';
+          locCls   = LOCCLS[loc]   || '';
+        }
 
-      if (isDayOff && !isSwap) {
-        statusHtml = `<span class="badge badge-off">Day Off</span>`;
-        locHtml    = `<div class="emp-loc-display loc-off">OFF</div>`;
-      } else if (onLeave) {
-        statusHtml = `<span class="badge badge-annual">On Leave</span>`;
-        locHtml    = `<div class="emp-loc-display loc-vac">VACATION</div>`;
-      } else if (absent) {
-        statusHtml = `<span class="badge badge-sick">Absent</span>`;
-        locHtml    = `<div class="emp-loc-display loc-off">ABSENT</div>`;
-      } else if (si < 0) {
-        statusHtml = `<span class="badge badge-off">Off Hours</span>`;
-        locHtml    = `<div class="emp-loc-display loc-off">—</div>`;
-      } else {
-        const { loc } = getResolvedLoc(iso, si, emp.id);
-        statusHtml    = `<span class="badge badge-active">On Shift</span>`;
-        locHtml       = `<div class="emp-loc-display ${LOCCLS[loc] || ''}">${LOCLABEL[loc] || loc}</div>`;
-      }
+        const initial = emp.name.charAt(0).toUpperCase();
 
-      const hrs = calcScheduledHrsWeek(emp.id);
-      const cap = getEmpHourCap(emp.id);
-      const hrsCls = hrs > cap ? 'hrs-over' : hrs >= cap - 5 ? 'hrs-ok' : 'hrs-under';
-
-      return `<div class="emp-card">
-        <div class="emp-card-top">
-          <div class="emp-avatar">${emp.name.charAt(0).toUpperCase()}</div>
-          <div class="emp-info">
-            <div class="emp-name">${escH(emp.name)}</div>
-            <div class="emp-meta">${statusHtml}</div>
+        return `<div class="grand-loc-card" style="--loc-color:${locColor}">
+          <div class="grand-loc-header" style="background:${locColor}">
+            <span class="grand-loc-name" style="font-size:11px">${escH(emp.name)}</span>
+            ${state.mode === 'admin' && !isDayOff && !onLeave
+              ? `<button class="absent-toggle-sm ${absent ? 'is-absent' : ''}"
+                  onclick="toggleAbsent('${emp.id}','${iso}')"
+                  title="${absent ? 'Mark Present' : 'Mark Absent'}">
+                  ${absent ? '↩' : '✖'}
+                </button>`
+              : ''}
           </div>
-          ${state.mode === 'admin' && !isDayOff && !onLeave
-            ? `<button class="absent-toggle ${absent ? 'is-absent' : ''}"
-                onclick="toggleAbsent('${emp.id}','${iso}')">
-                ${absent ? '✓ Mark Present' : '✖ Mark Absent'}
-              </button>`
-            : ''}
-        </div>
-        ${locHtml}
-        <div class="emp-card-footer">
-          <span class="hrs-chip ${hrsCls}">${hrs}/${cap}h this week</span>
-        </div>
-      </div>`;
-    }).join('');
+          <div class="grand-loc-body" style="align-items:center;justify-content:center;text-align:center;padding:16px 10px">
+            <div class="grand-emp-avatar" style="background:${locColor};width:40px;height:40px;font-size:18px;margin:0 auto 8px">${initial}</div>
+            <div style="font-size:16px;font-weight:800;color:${locColor}">${escH(locLabel)}</div>
+            ${si >= 0 && !isDayOff && !onLeave && !absent ? (() => {
+              // Next change preview
+              const { loc: curLoc } = si >= 0 ? getResolvedLoc(iso, si, emp.id) : { loc: 'off' };
+              for (let i = si + 1; i < TIMESLOTS.length; i++) {
+                const { loc: nLoc } = getResolvedLoc(iso, i, emp.id);
+                if (nLoc !== curLoc) {
+                  return `<div style="font-size:10px;color:var(--muted);margin-top:6px">Next: ${LOCLABEL[nLoc]||nLoc} @ ${TIMESLOTS[i].split('–')[0]}</div>`;
+                }
+              }
+              return '';
+            })() : ''}
+          </div>
+        </div>`;
+      }).join('') + `</div>`;
   }
 
-  renderTimeline();
   renderLiveAlerts();
   renderLiveVolunteers();
 }
 
-// Fixed: canonical argument order (empId, iso) — matches all call sites
+// Fixed: canonical argument order (empId, iso)
 function toggleAbsent(empId, iso) {
   if (!state.absences)      state.absences      = {};
   if (!state.absences[iso]) state.absences[iso] = {};
@@ -514,7 +536,6 @@ function toggleAbsent(empId, iso) {
   renderLiveBoard();
 }
 
-// ── isOnLeave — shared helper ─────────────────────────────────
 function isOnLeave(empId, iso) {
   return (state.leaveRequests || []).some(l =>
     l.empId === empId && l.status === 'active' && iso >= l.from && iso <= l.to
@@ -523,17 +544,14 @@ function isOnLeave(empId, iso) {
 
 // ── History / Lookup ──────────────────────────────────────────
 function renderHistoryToday() {
-  const el   = document.getElementById('history-today');
+  const el  = document.getElementById('history-today');
   if (!el) return;
   const iso  = todayStr();
   const mins = new Date().getHours() * 60 + new Date().getMinutes();
-  // Fixed: index-based to avoid indexOf inside map
   const pastIndices = TIMESLOTS.map((_, si) => si).filter(si => SLOTEND[si] * 60 < mins);
 
   if (!pastIndices.length) {
-    el.innerHTML = `<div class="card-body" style="color:var(--muted);font-size:13px">
-      No completed slots yet today.
-    </div>`;
+    el.innerHTML = `<div style="padding:16px;color:var(--muted);font-size:13px">No completed slots yet today.</div>`;
     return;
   }
 
@@ -546,13 +564,12 @@ function renderHistoryToday() {
     <tbody>
       ${pastIndices.map(si => `<tr>
         <td style="font-size:11px;color:var(--muted);white-space:nowrap">${TIMESLOTS[si]}</td>
-        ${getSlotAssignments(iso, si).map(({ loc }) => {
-          const cls = LOCCLS[loc] || '';
-          return `<td><span class="loc-select ${cls}"
+        ${getSlotAssignments(iso, si).map(({ loc }) =>
+          `<td><span class="loc-select ${LOCCLS[loc]||''}"
             style="display:inline-block;padding:2px 6px;font-size:10px;font-weight:700;border-radius:4px">
-            ${LOCLABEL[loc] || loc}
-          </span></td>`;
-        }).join('')}
+            ${LOCLABEL[loc]||loc}
+          </span></td>`
+        ).join('')}
       </tr>`).join('')}
     </tbody>
   </table></div>`;
@@ -580,13 +597,12 @@ function renderDeepLookup() {
     <tbody>
       ${TIMESLOTS.map((slot, si) => `<tr>
         <td style="font-size:11px;color:var(--muted);white-space:nowrap">${slot}</td>
-        ${getSlotAssignments(iso, si).map(({ loc }) => {
-          const cls = LOCCLS[loc] || '';
-          return `<td><span class="loc-select ${cls}"
+        ${getSlotAssignments(iso, si).map(({ loc }) =>
+          `<td><span class="loc-select ${LOCCLS[loc]||''}"
             style="display:inline-block;padding:2px 6px;font-size:10px;font-weight:700;border-radius:4px">
-            ${LOCLABEL[loc] || loc}
-          </span></td>`;
-        }).join('')}
+            ${LOCLABEL[loc]||loc}
+          </span></td>`
+        ).join('')}
       </tr>`).join('')}
     </tbody>
   </table></div>`;
@@ -595,12 +611,11 @@ function renderDeepLookup() {
 }
 
 // ── My Schedule ───────────────────────────────────────────────
-let _myEmpId   = '';
+let _myEmpId   = localStorage.getItem('smPro_myEmpId') || '';
 let _myWeekMon = '';
 
 function renderMySchedule() {
   const sel = document.getElementById('emp-selector');
-  // Fixed: always rebuild so new/removed staff appear without page reload
   if (sel) {
     sel.innerHTML = `<select id="my-emp-select" onchange="selectMyEmp(this.value)"
       style="padding:8px 12px;font-size:14px;border-radius:8px;border:1.5px solid var(--border2)">
@@ -611,19 +626,97 @@ function renderMySchedule() {
     </select>`;
   }
 
-  if (!_myEmpId) return;
+  // Big current location card
+  const curCard  = document.getElementById('my-current-card');
+  const nextSlot = document.getElementById('my-next-slot');
+  const tlBar    = document.getElementById('my-timeline-bar');
 
-  // Fixed: guard against empty _myWeekMon producing Invalid Date
+  if (!_myEmpId) {
+    curCard?.classList.add('hidden');
+    nextSlot?.classList.add('hidden');
+    tlBar?.classList.add('hidden');
+    return;
+  }
+
   if (!_myWeekMon) _myWeekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
 
-  const wStart = new Date(_myWeekMon + 'T00:00:00');
-  const wEnd   = new Date(wStart);
-  wEnd.setDate(wEnd.getDate() + 6);
   const emp = state.employees.find(e => e.id === _myEmpId);
   if (!emp) return;
 
+  const iso      = todayStr();
+  const si       = currentSlotIdx();
+  const isDayOff = isEmpDayOff(_myEmpId, iso);
+  const onLeave  = isOnLeave(_myEmpId, iso);
+  const absent   = !!state.absences?.[iso]?.[_myEmpId];
+
+  // ── Big current location card ──
+  if (curCard) {
+    curCard.classList.remove('hidden');
+    let bigLoc = '', bigColor = '#888', bigLabel = '';
+
+    if (isDayOff)    { bigLabel = 'Day Off';   bigColor = '#6b7280'; }
+    else if (onLeave) { bigLabel = 'On Leave';  bigColor = '#7c3aed'; }
+    else if (absent)  { bigLabel = 'Absent';    bigColor = '#ef4444'; }
+    else if (si < 0)  { bigLabel = 'Off Hours'; bigColor = '#6b7280'; }
+    else {
+      const { loc } = getResolvedLoc(iso, si, _myEmpId);
+      bigLoc   = loc;
+      bigLabel = LOCLABEL[loc] || loc;
+      bigColor = LOCCOLOR[loc] || '#888';
+    }
+
+    curCard.style.background = bigColor;
+    curCard.innerHTML = `
+      <div class="my-loc-label">You are currently at</div>
+      <div class="my-loc-name">${bigLabel.toUpperCase()}</div>
+      <div class="my-loc-slot">${si >= 0 ? TIMESLOTS[si] : ''}</div>`;
+  }
+
+  // ── Next change indicator ──
+  if (nextSlot) {
+    let found = false;
+    if (si >= 0 && !isDayOff && !onLeave && !absent) {
+      const { loc: curLoc } = getResolvedLoc(iso, si, _myEmpId);
+      for (let i = si + 1; i < TIMESLOTS.length; i++) {
+        const { loc: nLoc } = getResolvedLoc(iso, i, _myEmpId);
+        if (nLoc !== curLoc) {
+          const nColor = LOCCOLOR[nLoc] || '#888';
+          nextSlot.classList.remove('hidden');
+          nextSlot.innerHTML = `<span>Next change</span>
+            <span class="next-arrow">→</span>
+            <span class="next-loc" style="color:${nColor}">${LOCLABEL[nLoc]||nLoc}</span>
+            <span style="color:var(--muted);font-size:12px">at ${TIMESLOTS[i].split('–')[0]}</span>`;
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) nextSlot.classList.add('hidden');
+  }
+
+  // ── Personal timeline bar ──
+  if (tlBar && si >= 0 && !isDayOff && !onLeave) {
+    tlBar.classList.remove('hidden');
+    tlBar.innerHTML = TIMESLOTS.map((_, slotI) => {
+      const { loc } = getResolvedLoc(iso, slotI, _myEmpId);
+      const color   = LOCCOLOR[loc] || 'var(--border2)';
+      const isPast  = SLOTEND[slotI] * 60 < (new Date().getHours() * 60 + new Date().getMinutes());
+      const isCur   = slotI === si;
+      return `<div class="my-tl-seg ${isPast?'tl-past':''} ${isCur?'tl-current':''}"
+        style="background:${loc==='off'?'var(--border2)':color}"
+        title="${TIMESLOTS[slotI]}: ${LOCLABEL[loc]||loc}"></div>`;
+    }).join('');
+  } else if (tlBar) {
+    tlBar.classList.add('hidden');
+  }
+
+  // ── Week schedule ──
+  const wStart = new Date(_myWeekMon + 'T00:00:00');
+  const wEnd   = new Date(wStart);
+  wEnd.setDate(wEnd.getDate() + 6);
+
   document.getElementById('my-sched-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap">
       <button class="week-arrow" onclick="shiftMyWeek(-1)">‹</button>
       <span style="font-size:13px;font-weight:600;color:var(--text)">
         ${wStart.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} –
@@ -635,35 +728,33 @@ function renderMySchedule() {
     ${DAYSFULL.map((day, di) => {
       const d        = new Date(wStart);
       d.setDate(d.getDate() + di);
-      const iso      = toDateStr(d);
-      const isToday_ = iso === todayStr();
-      const isDayOff = isEmpDayOff(_myEmpId, iso);
-      const onLeave  = isOnLeave(_myEmpId, iso);
-      const holiday  = getHolidayForDate(iso);
+      const dayIso   = toDateStr(d);
+      const isToday_ = dayIso === todayStr();
+      const isDO     = isEmpDayOff(_myEmpId, dayIso);
+      const isOL     = isOnLeave(_myEmpId, dayIso);
+      const hol      = getHolidayForDate(dayIso);
 
-      const slots = isDayOff
+      const slots = isDO
         ? `<div class="my-day-off-block">Regular Day Off</div>`
-        : onLeave
+        : isOL
         ? `<div class="my-day-off-block" style="color:var(--purple)">On Leave</div>`
-        : TIMESLOTS.map((slot, si) => {
-            const { loc } = getResolvedLoc(iso, si, _myEmpId);
+        : TIMESLOTS.map((slot, slotI) => {
+            const { loc } = getResolvedLoc(dayIso, slotI, _myEmpId);
             const cls     = LOCCLS[loc] || '';
-            return `<div class="my-slot-row ${loc === 'off' ? 'my-slot-off' : ''}">
+            const isCurSlot = isToday_ && slotI === si;
+            return `<div class="my-slot-row ${loc==='off'?'my-slot-off':''} ${isCurSlot?'find-slot-cur':''}">
               <span class="my-slot-time">${slot}</span>
-              <span class="my-slot-loc ${cls}">${LOCLABEL[loc] || loc}</span>
+              <span class="my-slot-loc ${cls}">${LOCLABEL[loc]||loc}</span>
             </div>`;
           }).join('');
 
-      return `<div class="my-day-block ${isToday_ ? 'my-day-today' : ''}">
+      return `<div class="my-day-block ${isToday_?'my-day-today':''}">
         <div class="my-day-hdr">
           <span>${day} <strong>${d.getDate()}</strong></span>
           ${isToday_ ? '<span class="today-badge">TODAY</span>' : ''}
-          ${holiday
-            ? `<span class="holiday-mini-badge"
-                style="background:${holiday.color}18;color:${holiday.color};border-color:${holiday.color}40">
-                ${holiday.emoji} ${escH(holiday.name)}
-              </span>`
-            : ''}
+          ${hol ? `<span class="holiday-mini-badge"
+            style="background:${hol.color}18;color:${hol.color};border-color:${hol.color}40">
+            ${hol.emoji} ${escH(hol.name)}</span>` : ''}
         </div>
         <div class="my-day-slots">${slots}</div>
       </div>`;
@@ -672,6 +763,8 @@ function renderMySchedule() {
 
 function selectMyEmp(empId) {
   _myEmpId = empId;
+  // Fixed: remember selection in localStorage so it persists across reloads
+  localStorage.setItem('smPro_myEmpId', empId);
   renderMySchedule();
 }
 
@@ -710,10 +803,14 @@ window.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('page-live')?.classList.contains('active')) renderLiveBoard();
   }, 30000);
 
-  // Fixed: midnight re-render so date never goes stale if left open overnight
   scheduleMidnightRefresh();
 
-  if (window.innerWidth < 640) setLiveView('my');
+  // On mobile default to My Schedule view
+  if (window.innerWidth < 640) {
+    setLiveView('my');
+  } else {
+    setLiveView('locations');
+  }
 
   renderLiveBoard();
 });
