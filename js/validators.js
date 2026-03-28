@@ -24,11 +24,12 @@ function validateLeaveOverlap(empId, from, to, excludeId = null) {
 }
 
 function validateSwapDayOff(empId, fromDate) {
-  // Fixed: was DAYS_SHORT (undefined) — must be DAYSSHORT
+  // FIX: was DAYS_SHORT (undefined) — must be DAYSSHORT (the alias from constants.js)
   const dow     = DAYSSHORT[(new Date(fromDate + 'T00:00:00').getDay() + 6) % 7];
-  const daysOff = getEmpDaysOff(empId);
+  const emp     = state.employees.find(e => e.id === empId);
+  const daysOff = emp?.daysOff || [];
   if (!daysOff.includes(dow)) {
-    alert(`${fromDate} is not a registered day-off for this employee (their day-off: ${daysOff.join(', ') || 'none'}).`);
+    alert(`${fromDate} is not a registered day-off for this employee (their days off: ${daysOff.join(', ') || 'none'}).`);
     return false;
   }
   // Check for duplicate swap on same day-off date
