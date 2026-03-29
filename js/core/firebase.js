@@ -13,7 +13,7 @@ const FBSDK = 'https://www.gstatic.com/firebasejs/10.12.0/';
 let db          = null;
 let fbRef       = null;
 let fbInit      = false;
-let _hasLocalEdits = false; // track unsaved local changes
+let _hasLocalEdits = false;
 
 const dirtyKeys = new Set();
 let debounceTimer = null;
@@ -39,27 +39,33 @@ async function initFirebase(cfg) {
     db    = getDatabase(app);
     fbRef = ref(db, 'smPro');
 
-   onValue(fbRef, snap => {
-  const data = snap.val();
-  if (!data) { setSyncStatus('synced'); return; }
+    onValue(fbRef, snap => {
+      const data = snap.val();
+      if (!data) { setSyncStatus('synced'); return; }
 
-  if (_hasLocalEdits && state.mode === 'admin') {
-    showOutOfSyncBanner();
-    return;
-  }
+      if (_hasLocalEdits && state.mode === 'admin') {
+        // FIX: showOutOfSyncBanner signature now matches sync-ui.js (accepts optional msg)
+        showOutOfSyncBanner('New changes available from another device.');
+        return;
+      }
 
-  FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
-  saveLocal();
+      FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
 
-  // Guard: only render if DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => renderAll(), { once: true });
-  } else {
-    renderAll();
-  }
+      // FIX: re-run initHolidays after Firebase loads so defaults are merged
+      // even when Firebase has no holidays key yet.
+      initHolidays();
 
-  setSyncStatus('synced');
-});
+      saveLocal();
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => renderAll(), { once: true });
+      } else {
+        renderAll();
+      }
+
+      setSyncStatus('synced');
+    });
+
     setSyncStatus('synced');
   } catch(e) {
     console.error('Firebase init failed', e);
@@ -81,7 +87,6 @@ function pushToFirebase() {
 
 async function flushDirty() {
   if (!fbRef) return;
-  // Fixed: guard against empty dirtyKeys — never fall back to full write silently
   if (dirtyKeys.size === 0) return;
 
   setSyncStatus('syncing');
@@ -102,30 +107,9 @@ async function flushDirty() {
   }
 }
 
-function setSyncStatus(status) {
-  const chip = document.getElementById('sync-indicator');
-  const text = document.getElementById('sync-text');
-  if (!chip || !text) return;
-  chip.className = `sync-chip ${status}`;
-  text.textContent = status === 'synced' ? 'firebase' : status === 'syncing' ? 'syncing…' : 'error';
-}
-
-function showOutOfSyncBanner() {
-  let banner = document.getElementById('sync-conflict-banner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'sync-conflict-banner';
-    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600';
-    banner.innerHTML = `⚠️ New changes available from another device. 
-      <button onclick="reloadFromFirebase()" style="margin-left:12px;padding:4px 12px;border-radius:6px;border:none;background:#fff;color:#b45309;font-weight:700;cursor:pointer">Sync Now</button>
-      <button onclick="hideOutOfSyncBanner()" style="margin-left:8px;padding:4px 12px;border-radius:6px;border:none;background:transparent;color:#fff;cursor:pointer">Ignore</button>`;
-    document.body.prepend(banner);
-  }
-}
-
-function hideOutOfSyncBanner() {
-  document.getElementById('sync-conflict-banner')?.remove();
-}
+// FIX: setSyncStatus and showOutOfSyncBanner are defined ONLY in sync-ui.js.
+// The duplicate definitions that were here have been removed.
+// hideOutOfSyncBanner is also defined in sync-ui.js.
 
 function reloadFromFirebase() {
   _hasLocalEdits = false;
