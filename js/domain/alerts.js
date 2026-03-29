@@ -24,7 +24,7 @@ function scanAlerts(iso) {
           si,
           slot,
           loc,
-          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,  // ✅ FIXED
+          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,
         });
       }
     });
@@ -55,6 +55,21 @@ function scanAlerts(iso) {
       });
     });
 
+  // FIX: emit OVERHR alerts so adminhq.js GROUPS['overhr'] actually renders.
+  const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
+  activeEmps.forEach(emp => {
+    const used = calcScheduledHrsWeek(emp.id, weekMon);
+    const cap  = emp.hourCap || DEFAULTHRSCAP;
+    if (used > cap) {
+      alerts.push({
+        type  : ALERT_TYPES.OVERHR,
+        iso,
+        empId : emp.id,
+        msg   : `${emp.name} is ${(used - cap).toFixed(1)}h over cap this week`,
+      });
+    }
+  });
+
   return alerts;
 }
 
@@ -67,4 +82,11 @@ function scanWeekAlerts(weekMon) {
     alerts.push(...scanAlerts(iso).map(a => ({ ...a, iso })));
   }
   return alerts;
+}
+
+// FIX: stub for updateDayPillDots — called by holidays.js (addHoliday, deleteHoliday,
+// updateHolidayDate) but was never defined anywhere. Delegates to renderWeekNav
+// which is the function that actually rebuilds the day pills with holiday dots.
+function updateDayPillDots() {
+  if (typeof renderWeekNav === 'function') renderWeekNav();
 }
