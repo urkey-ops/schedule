@@ -9,7 +9,6 @@ function stopGrandRefresh() {
 }
 
 function renderGrandView() {
-  // Update header
   const now = new Date();
   const gc  = document.getElementById('grand-clock');
   const gd  = document.getElementById('grand-date');
@@ -20,7 +19,6 @@ function renderGrandView() {
 
   renderGrandSummaryStrip();
 
-  // Auto-refresh every 60s while grand view is active
   if (!_grandRefTimer) {
     _grandRefTimer = setInterval(() => {
       if (document.getElementById('page-grand')?.classList.contains('active')) {
@@ -31,7 +29,6 @@ function renderGrandView() {
     }, 60000);
   }
 
-  // Render active subview
   if (_grandView === 'now')      renderGrandNow();
   if (_grandView === 'timeline') renderGrandTimeline();
   if (_grandView === 'status')   renderGrandStatus();
@@ -66,7 +63,8 @@ function renderGrandSummaryStrip() {
   const onLeave     = activeEmps.filter(e => isOnLeave(e.id, iso)).length;
   const onDayOff    = activeEmps.filter(e => isEmpDayOff(e.id, iso)).length;
   const absent      = Object.keys(state.absences?.[iso] || {}).length;
-  const working     = activeEmps.length - onLeave - onDayOff;
+  // FIX: absent staff were not subtracted — they appeared as "working"
+  const working     = activeEmps.length - onLeave - onDayOff - absent;
   const gaps        = getDayGapCount(iso);
 
   el.innerHTML = `
@@ -96,7 +94,6 @@ function renderGrandNow() {
     return;
   }
 
-  // Group by location
   const groups = {};
   REQUIREDLOCS.forEach(loc => { groups[loc] = { emps:[], uncovered: false }; });
 
@@ -113,7 +110,6 @@ function renderGrandNow() {
     groups[loc].uncovered = groups[loc].emps.length === 0;
   });
 
-  // Handover check — next slot
   const nextSi    = si + 1;
   const handovers = [];
   if (nextSi < TIMESLOTS.length) {
@@ -166,7 +162,6 @@ function renderGrandNow() {
     </div>`;
   }).join('');
 
-  // Handover strip
   if (hs) {
     hs.innerHTML = handovers.length
       ? `<div class="card" style="padding:12px 16px;margin-top:8px">
@@ -222,13 +217,11 @@ function renderGrandTimeline() {
   const filter     = document.getElementById('grand-tl-filter')?.value || 'all';
   const locFilter  = document.getElementById('grand-tl-loc')?.value    || '';
 
-  // Show/hide loc filter
   const locSel = document.getElementById('grand-tl-loc');
   if (locSel) locSel.style.display = filter === 'location' ? '' : 'none';
 
   const activeEmps = state.employees.filter(e => e.status === 'Active');
 
-  // Timeline bounds — first slot start to last slot end
   const [startH, startM] = parseSlotTime(TIMESLOTS[0]);
   const [endH,   endM  ] = parseSlotTime(TIMESLOTS[TIMESLOTS.length-1]);
   const startMins = startH * 60 + startM;
@@ -239,7 +232,6 @@ function renderGrandTimeline() {
     ((nowMins() - startMins) / totalMins) * 100
   ));
 
-  // Build time labels
   const timeLabels = [];
   for (let m = startMins; m <= endMins; m += 60) {
     const h = Math.floor(m/60);
