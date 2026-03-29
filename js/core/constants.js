@@ -2,9 +2,7 @@
 
 // ── Locations ─────────────────────────────────────────────────
 const LOC_CYCLE = ['gate','podium','mandir','field','giftshop','lunch','off'];
-
-const ALLLOCS = ['gate','podium','mandir','field','giftshop','lunch','off','vac'];
-
+const ALLLOCS   = ['gate','podium','mandir','field','giftshop','lunch','off','vac'];
 const REQUIREDLOCS = ['gate','podium','mandir'];
 
 const LOCLABEL = {
@@ -42,11 +40,12 @@ const LOCCLS = {
 
 // ── Days ──────────────────────────────────────────────────────
 const DAYSSHORT = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-const DAYSFULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAYSFULL  = ['Monday','Tuesday','Wednesday','Thursday',
+                   'Friday','Saturday','Sunday'];
 
 // ── Time slots ────────────────────────────────────────────────
 const SLOT_DURATION_MINS = 30;
-const SLOT_START_MINS    = 9 * 60;   // 09:00
+const SLOT_START_MINS    = 9 * 60; // 09:00
 
 const TIMESLOTS = [
   '09:00–09:30','09:30–10:00','10:00–10:30','10:30–11:00',
@@ -56,22 +55,20 @@ const TIMESLOTS = [
 ];
 
 const SLOT_HRS   = TIMESLOTS.length * (SLOT_DURATION_MINS / 60);
-const LUNCHSLOTS = [6, 7];   // 12:00–13:00 indices
-
-// ✅ FIX: SLOTEND was missing — computed end minute of last slot
-const SLOTEND = SLOT_START_MINS + (TIMESLOTS.length * SLOT_DURATION_MINS);
+const LUNCHSLOTS = [6, 7];
+const SLOTEND    = SLOT_START_MINS + (TIMESLOTS.length * SLOT_DURATION_MINS);
 
 // ── Defaults ──────────────────────────────────────────────────
 const DEFAULTHRSCAP = 40;
 
 // ── Alert types ───────────────────────────────────────────────
 const ALERT_TYPES = {
-  GAP       : 'gap',
-  OVERHR    : 'overhr',
-  ABSENT    : 'absent',
-  LEAVE     : 'leave',
-  SWAP      : 'swap',
-  CONFLICT  : 'conflict',
+  GAP      : 'gap',
+  OVERHR   : 'overhr',
+  ABSENT   : 'absent',
+  LEAVE    : 'leave',
+  SWAP     : 'swap',
+  CONFLICT : 'conflict',
 };
 
 const ALERT_TYPE_LABELS = {
@@ -90,4 +87,62 @@ const ALERT_TYPE_ICONS = {
   leave    : '🔒',
   swap     : '🔄',
   conflict : '⚡',
+};
+
+// ── US Federal Holidays 2025–2026 ─────────────────────────────
+const US_FEDERAL_HOLIDAYS = {
+  '2025-01-01': { name: "New Year's Day",          emoji: '🎆', color: '#4F8EF7' },
+  '2025-01-20': { name: 'Martin Luther King Jr.',  emoji: '✊', color: '#4F8EF7' },
+  '2025-02-17': { name: "Presidents' Day",         emoji: '🇺🇸', color: '#4F8EF7' },
+  '2025-05-26': { name: 'Memorial Day',            emoji: '🎖️', color: '#4F8EF7' },
+  '2025-06-19': { name: 'Juneteenth',              emoji: '✊', color: '#4F8EF7' },
+  '2025-07-04': { name: 'Independence Day',        emoji: '🎇', color: '#4F8EF7' },
+  '2025-09-01': { name: 'Labor Day',               emoji: '🔧', color: '#4F8EF7' },
+  '2025-10-13': { name: 'Columbus Day',            emoji: '⚓', color: '#4F8EF7' },
+  '2025-11-11': { name: 'Veterans Day',            emoji: '🎖️', color: '#4F8EF7' },
+  '2025-11-27': { name: 'Thanksgiving',            emoji: '🦃', color: '#4F8EF7' },
+  '2025-12-25': { name: 'Christmas Day',           emoji: '🎄', color: '#4F8EF7' },
+  '2026-01-01': { name: "New Year's Day",          emoji: '🎆', color: '#4F8EF7' },
+  '2026-01-19': { name: 'Martin Luther King Jr.',  emoji: '✊', color: '#4F8EF7' },
+  '2026-02-16': { name: "Presidents' Day",         emoji: '🇺🇸', color: '#4F8EF7' },
+  '2026-05-25': { name: 'Memorial Day',            emoji: '🎖️', color: '#4F8EF7' },
+  '2026-06-19': { name: 'Juneteenth',              emoji: '✊', color: '#4F8EF7' },
+  '2026-07-04': { name: 'Independence Day',        emoji: '🎇', color: '#4F8EF7' },
+  '2026-09-07': { name: 'Labor Day',               emoji: '🔧', color: '#4F8EF7' },
+  '2026-10-12': { name: 'Columbus Day',            emoji: '⚓', color: '#4F8EF7' },
+  '2026-11-11': { name: 'Veterans Day',            emoji: '🎖️', color: '#4F8EF7' },
+  '2026-11-26': { name: 'Thanksgiving',            emoji: '🦃', color: '#4F8EF7' },
+  '2026-12-25': { name: 'Christmas Day',           emoji: '🎄', color: '#4F8EF7' },
+};
+
+// ── Hindu / Indian Festivals 2025–2026 ────────────────────────
+const HINDU_FESTIVALS_DEFAULT = {
+  '2025-01-14': { name: 'Makar Sankranti',  emoji: '🪁', color: '#EA580C' },
+  '2025-01-29': { name: 'Vasant Panchami',  emoji: '🌸', color: '#EA580C' },
+  '2025-02-26': { name: 'Maha Shivratri',   emoji: '🔱', color: '#7C3AED' },
+  '2025-03-14': { name: 'Holi',             emoji: '🎨', color: '#EA580C' },
+  '2025-03-30': { name: 'Ram Navami',       emoji: '🏹', color: '#EA580C' },
+  '2025-04-06': { name: 'Hanuman Jayanti',  emoji: '🙏', color: '#EA580C' },
+  '2025-08-09': { name: 'Nag Panchami',     emoji: '🐍', color: '#059669' },
+  '2025-08-09': { name: 'Raksha Bandhan',   emoji: '🪢', color: '#EA580C' },
+  '2025-08-16': { name: 'Janmashtami',      emoji: '🦚', color: '#7C3AED' },
+  '2025-09-02': { name: 'Ganesh Chaturthi', emoji: '🐘', color: '#EA580C' },
+  '2025-10-02': { name: 'Gandhi Jayanti',   emoji: '🕊️', color: '#059669' },
+  '2025-10-02': { name: 'Navratri Begins',  emoji: '🌺', color: '#EA580C' },
+  '2025-10-12': { name: 'Dussehra',         emoji: '🏹', color: '#EA580C' },
+  '2025-10-20': { name: 'Diwali',           emoji: '🪔', color: '#D97706' },
+  '2025-10-22': { name: 'Govardhan Puja',   emoji: '🙏', color: '#EA580C' },
+  '2025-10-23': { name: 'Bhai Dooj',        emoji: '👫', color: '#EA580C' },
+  '2025-11-05': { name: 'Chhath Puja',      emoji: '☀️', color: '#EA580C' },
+  '2026-01-14': { name: 'Makar Sankranti',  emoji: '🪁', color: '#EA580C' },
+  '2026-02-15': { name: 'Vasant Panchami',  emoji: '🌸', color: '#EA580C' },
+  '2026-02-17': { name: 'Maha Shivratri',   emoji: '🔱', color: '#7C3AED' },
+  '2026-03-04': { name: 'Holi',             emoji: '🎨', color: '#EA580C' },
+  '2026-03-28': { name: 'Ram Navami',       emoji: '🏹', color: '#EA580C' },
+  '2026-08-28': { name: 'Janmashtami',      emoji: '🦚', color: '#7C3AED' },
+  '2026-08-23': { name: 'Raksha Bandhan',   emoji: '🪢', color: '#EA580C' },
+  '2026-09-19': { name: 'Ganesh Chaturthi', emoji: '🐘', color: '#EA580C' },
+  '2026-10-09': { name: 'Navratri Begins',  emoji: '🌺', color: '#EA580C' },
+  '2026-10-19': { name: 'Dussehra',         emoji: '🏹', color: '#EA580C' },
+  '2026-11-08': { name: 'Diwali',           emoji: '🪔', color: '#D97706' },
 };
