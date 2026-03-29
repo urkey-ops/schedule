@@ -5,26 +5,26 @@ function getDayGapCount(iso) {
 }
 
 function scanAlerts(iso) {
-  const alerts = [];
+  const alerts     = [];
   const activeEmps = state.employees.filter(e => e.status === 'Active');
 
   TIMESLOTS.forEach((slot, si) => {
     REQUIREDLOCS.forEach(loc => {
       const covered = activeEmps.some(e => {
-        if (isEmpDayOff(e.id, iso))           return false;
-        if (isOnLeave(e.id, iso))             return false;
-        if (state.absences?.[iso]?.[e.id])   return false;
+        if (isEmpDayOff(e.id, iso))         return false;
+        if (isOnLeave(e.id, iso))           return false;
+        if (state.absences?.[iso]?.[e.id]) return false;
         const { loc: l } = getResolvedLoc(iso, si, e.id);
         return l === loc;
       });
       if (!covered) {
         alerts.push({
-          type   : ALERT_TYPES.GAP,
+          type : ALERT_TYPES.GAP,
           iso,
           si,
           slot,
           loc,
-          msg    : `${slot} — ${LOC_LABEL[loc]||loc} uncovered`,
+          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,  // ✅ FIXED
         });
       }
     });
@@ -35,23 +35,23 @@ function scanAlerts(iso) {
   absentIds.forEach(empId => {
     const emp = state.employees.find(e => e.id === empId);
     if (emp) alerts.push({
-      type: ALERT_TYPES.ABSENT,
+      type : ALERT_TYPES.ABSENT,
       iso,
       empId,
-      msg : `${emp.name} is absent today`,
+      msg  : `${emp.name} is absent today`,
     });
   });
 
   // Leave
-  (state.leaveRequests||[])
-    .filter(l => l.status==='active' && iso>=l.from && iso<=l.to)
+  (state.leaveRequests || [])
+    .filter(l => l.status === 'active' && iso >= l.from && iso <= l.to)
     .forEach(l => {
       const emp = state.employees.find(e => e.id === l.empId);
       if (emp) alerts.push({
-        type: ALERT_TYPES.LEAVE,
+        type  : ALERT_TYPES.LEAVE,
         iso,
-        empId: l.empId,
-        msg  : `${emp.name} on ${l.type} leave`,
+        empId : l.empId,
+        msg   : `${emp.name} on ${l.type} leave`,
       });
     });
 
@@ -60,9 +60,9 @@ function scanAlerts(iso) {
 
 function scanWeekAlerts(weekMon) {
   const alerts = [];
-  const mon = new Date(weekMon+'T00:00:00');
+  const mon    = new Date(weekMon + 'T00:00:00');
   for (let di = 0; di < 7; di++) {
-    const d   = new Date(mon); d.setDate(d.getDate()+di);
+    const d   = new Date(mon); d.setDate(d.getDate() + di);
     const iso = toDateStr(d);
     alerts.push(...scanAlerts(iso).map(a => ({ ...a, iso })));
   }
