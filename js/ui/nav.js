@@ -74,7 +74,7 @@ function renderAll() {
   if (grandActive && typeof renderGrandView === 'function') renderGrandView();
 }
 
-// ── Week nav (schedule page) ──────────────────────────────────
+// ── Week nav ──────────────────────────────────────────────────
 
 function shiftWeek(delta) {
   const d = new Date(state.currentWeekMon+'T00:00:00');
@@ -140,7 +140,7 @@ function selectDay(iso, dow) {
   renderAlertsBar('schedule-alerts-bar', iso);
 }
 
-// ── DOW pills (default schedule page) ────────────────────────
+// ── DOW pills ─────────────────────────────────────────────────
 
 function renderDowPills() {
   const container = document.getElementById('dow-pills');
@@ -191,7 +191,7 @@ function setDensity(d) {
   });
 }
 
-// ── Advanced tools toggle (schedule page) ────────────────────
+// ── Advanced tools toggle ─────────────────────────────────────
 
 function toggleAdv() {
   const body = document.getElementById('adv-body');
@@ -223,23 +223,6 @@ function setLiveView(view) {
   if (view === 'my')        renderMySchedule();
   if (view === 'history')   renderHistoryToday();
   if (view === 'locations') renderLiveBoard();
-}
-
-// ── Grand view tab ────────────────────────────────────────────
-
-function setGrandView(view, tabEl) {
-  document.querySelectorAll('.grand-subview').forEach(el =>
-    el.classList.add('hidden'));
-  document.querySelectorAll('.grand-tab').forEach(t =>
-    t.classList.remove('active'));
-  document.getElementById(`gview-${view}`)?.classList.remove('hidden');
-  tabEl?.classList.add('active');
-
-  if (view === 'now')      renderGrandNow();
-  if (view === 'timeline') renderGrandTimeline();
-  if (view === 'status')   renderGrandStatus();
-  if (view === 'lookup')   {} // triggered by button
-  if (view === 'find')     {} // triggered by input
 }
 
 // ── Midnight refresh ──────────────────────────────────────────
