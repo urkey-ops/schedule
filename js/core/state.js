@@ -17,6 +17,12 @@ let state = {
   currentDow      : null,
   mode            : 'live',
   meta            : {},
+  // ── Schedule Wizard ──────────────────────────────────────────
+  draftSchedule   : {},   // iso → { blocks[], score, gaps[], locked }
+  draftBlocks     : {},   // iso → Block[] working copy
+  lunchWaves      : {},   // iso → { wave1: [empId], wave2: [empId] }
+  wizardEarlyGate : {},   // iso → empId  (who does 6-9am Gate)
+  wizardMaintenance: null, // empId or null
 };
 
 let undoStack = [];
