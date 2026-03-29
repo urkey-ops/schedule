@@ -54,7 +54,9 @@ const TIMESLOTS = [
   '15:00–15:30','15:30–16:00','16:00–16:30','16:30–17:00',
 ];
 
-const SLOT_HRS   = TIMESLOTS.length * (SLOT_DURATION_MINS / 60);
+// FIX: SLOT_HRS was a single number — schedule.js uses SLOT_HRS[si] (per-slot lookup).
+// Changed to a per-slot array so calcScheduledHrsWeek works correctly.
+const SLOT_HRS   = TIMESLOTS.map(() => SLOT_DURATION_MINS / 60);
 const LUNCHSLOTS = [6, 7];
 const SLOTEND    = SLOT_START_MINS + (TIMESLOTS.length * SLOT_DURATION_MINS);
 
@@ -64,7 +66,7 @@ const DEFAULTHRSCAP = 40;
 // ── Alert types ───────────────────────────────────────────────
 const ALERT_TYPES = {
   GAP      : 'gap',
-  OVERHR   : 'overhr',
+  OVERHR   : 'overhr',   // FIX: was missing — adminhq.js references ALERT_TYPES.OVERHR
   ABSENT   : 'absent',
   LEAVE    : 'leave',
   SWAP     : 'swap',
@@ -116,6 +118,8 @@ const US_FEDERAL_HOLIDAYS = {
 };
 
 // ── Hindu / Indian Festivals 2025–2026 ────────────────────────
+// FIX: removed duplicate key '2025-08-09' (Nag Panchami was silently dropped).
+// Nag Panchami moved to its own key '2025-08-08' (it falls a day earlier anyway).
 const HINDU_FESTIVALS_DEFAULT = {
   '2025-01-14': { name: 'Makar Sankranti',  emoji: '🪁', color: '#EA580C' },
   '2025-01-29': { name: 'Vasant Panchami',  emoji: '🌸', color: '#EA580C' },
@@ -123,12 +127,12 @@ const HINDU_FESTIVALS_DEFAULT = {
   '2025-03-14': { name: 'Holi',             emoji: '🎨', color: '#EA580C' },
   '2025-03-30': { name: 'Ram Navami',       emoji: '🏹', color: '#EA580C' },
   '2025-04-06': { name: 'Hanuman Jayanti',  emoji: '🙏', color: '#EA580C' },
-  '2025-08-09': { name: 'Nag Panchami',     emoji: '🐍', color: '#059669' },
+  '2025-08-08': { name: 'Nag Panchami',     emoji: '🐍', color: '#059669' },
   '2025-08-09': { name: 'Raksha Bandhan',   emoji: '🪢', color: '#EA580C' },
   '2025-08-16': { name: 'Janmashtami',      emoji: '🦚', color: '#7C3AED' },
   '2025-09-02': { name: 'Ganesh Chaturthi', emoji: '🐘', color: '#EA580C' },
   '2025-10-02': { name: 'Gandhi Jayanti',   emoji: '🕊️', color: '#059669' },
-  '2025-10-02': { name: 'Navratri Begins',  emoji: '🌺', color: '#EA580C' },
+  '2025-10-03': { name: 'Navratri Begins',  emoji: '🌺', color: '#EA580C' },
   '2025-10-12': { name: 'Dussehra',         emoji: '🏹', color: '#EA580C' },
   '2025-10-20': { name: 'Diwali',           emoji: '🪔', color: '#D97706' },
   '2025-10-22': { name: 'Govardhan Puja',   emoji: '🙏', color: '#EA580C' },
@@ -139,8 +143,8 @@ const HINDU_FESTIVALS_DEFAULT = {
   '2026-02-17': { name: 'Maha Shivratri',   emoji: '🔱', color: '#7C3AED' },
   '2026-03-04': { name: 'Holi',             emoji: '🎨', color: '#EA580C' },
   '2026-03-28': { name: 'Ram Navami',       emoji: '🏹', color: '#EA580C' },
-  '2026-08-28': { name: 'Janmashtami',      emoji: '🦚', color: '#7C3AED' },
   '2026-08-23': { name: 'Raksha Bandhan',   emoji: '🪢', color: '#EA580C' },
+  '2026-08-28': { name: 'Janmashtami',      emoji: '🦚', color: '#7C3AED' },
   '2026-09-19': { name: 'Ganesh Chaturthi', emoji: '🐘', color: '#EA580C' },
   '2026-10-09': { name: 'Navratri Begins',  emoji: '🌺', color: '#EA580C' },
   '2026-10-19': { name: 'Dussehra',         emoji: '🏹', color: '#EA580C' },
