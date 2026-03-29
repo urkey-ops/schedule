@@ -64,8 +64,7 @@ function scanAlerts(iso) {
     });
   });
 
-  // FIX: pass the correct weekMon derived from iso, not state.currentWeekMon,
-  // so hour-cap alerts are always evaluated against the right week.
+  // FIX: pass the correct weekMon derived from iso, not state.currentWeekMon
   const weekMon = getWeekMonStr(iso);
 
   // Hour cap — at or over
@@ -142,7 +141,7 @@ function getDayGapCount(iso) {
   return scanAlerts(iso).filter(a => a.type === ALERT_TYPES.GAP).length;
 }
 
-// ── Render alerts bar ─────────────────────────────────────────
+// ── Dismissed alerts store ────────────────────────────────────
 const _dismissedAlerts = new Set(
   JSON.parse(sessionStorage.getItem('smPro_dismissed') || '[]')
 );
@@ -154,45 +153,108 @@ function dismissAlert(key) {
   document.getElementById(`alert-chip-${CSS.escape(key)}`)?.remove();
 }
 
+function dismissAlertGroup(keys, containerId, iso) {
+  keys.forEach(k => _dismissedAlerts.add(k));
+  sessionStorage.setItem('smPro_dismissed',
+    JSON.stringify([..._dismissedAlerts]));
+  renderAlertsBar(containerId, iso);
+}
+
+function toggleAlertGroup(groupId) {
+  const body = document.getElementById(groupId);
+  const arr  = document.getElementById(`${groupId}-arr`);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'flex';
+  if (arr) arr.textContent = isOpen ? '▾' : '▴';
+}
+
+// ── Render alerts bar (grouped) ───────────────────────────────
 function renderAlertsBar(containerId, iso) {
   const el = document.getElementById(containerId);
   if (!el) return;
+
   const alerts = scanAlerts(iso || todayStr())
     .filter(a => !_dismissedAlerts.has(a.key));
+
   if (!alerts.length) { el.innerHTML = ''; return; }
 
   // Deduplicate by key
-  const seen = new Set();
+  const seen   = new Set();
   const unique = alerts.filter(a => {
     if (seen.has(a.key)) return false;
     seen.add(a.key); return true;
   });
 
-  // Group by severity
-  const high  = unique.filter(a => a.severity === 'high');
-  const warn  = unique.filter(a => a.severity === 'warn');
-  const info  = unique.filter(a => a.severity === 'info');
-  const sorted = [...high, ...warn, ...info];
+  // Group by type
+  const groups = {
+    [ALERT_TYPES.GAP]            : { label:'Coverage Gaps',     icon:'🚨', severity:'high', items:[] },
+    [ALERT_TYPES.ABSENT_NO_COVER]: { label:'Absent — No Cover', icon:'🚨', severity:'high', items:[] },
+    [ALERT_TYPES.LEAVE_CONFLICT] : { label:'Leave Conflicts',    icon:'⚠️', severity:'warn', items:[] },
+    [ALERT_TYPES.HOUR_CAP]       : { label:'Hour Cap Warnings',  icon:'⚠️', severity:'warn', items:[] },
+    [ALERT_TYPES.SWAP_PENDING]   : { label:'Active Swaps',       icon:'ℹ️', severity:'info', items:[] },
+    [ALERT_TYPES.HOLIDAY]        : { label:'Holidays',           icon:'ℹ️', severity:'info', items:[] },
+  };
+
+  unique.forEach(a => {
+    if (groups[a.type]) groups[a.type].items.push(a);
+  });
+
+  const activeGroups = Object.entries(groups)
+    .filter(([_, g]) => g.items.length > 0)
+    .sort((a, b) => {
+      const order = { high:0, warn:1, info:2 };
+      return order[a[1].severity] - order[b[1].severity];
+    });
+
+  if (!activeGroups.length) { el.innerHTML = ''; return; }
 
   el.innerHTML = `<div class="admin-alerts-bar">
-    ${sorted.map(a => `
-      <div class="alert-chip alert-${a.severity}" id="alert-chip-${escH(a.key)}">
-        <span class="alert-chip-icon">${severityIcon(a.severity)}</span>
-        <span class="alert-chip-msg">${escH(a.msg)}</span>
-        ${a.action === 'fillGap'
-          ? `<button class="alert-chip-action"
-              onclick="openFillGapWizard('${a.loc}',${a.si},'${a.iso}')">Fill</button>`
-          : ''}
-        ${a.action === 'clearOverride'
-          ? `<button class="alert-chip-action"
-              onclick="clearSingleOverride('${a.iso}',${a.si},'${a.empId}')">Clear</button>`
-          : ''}
-        <button class="alert-chip-dismiss" onclick="dismissAlert('${escH(a.key)}')"
-          title="Dismiss">×</button>
-      </div>`).join('')}
+    ${activeGroups.map(([type, group]) => {
+      const groupId = `ag-${containerId}-${type}`;
+      return `
+        <div class="alert-group alert-group-${group.severity}">
+          <div class="alert-group-hdr"
+            onclick="toggleAlertGroup('${groupId}')">
+            <span class="alert-chip-icon">${group.icon}</span>
+            <span class="alert-group-label">${group.label}</span>
+            <span class="alert-group-count alert-${group.severity}">
+              ${group.items.length}
+            </span>
+            <span class="alert-group-arr"
+              id="${groupId}-arr">▾</span>
+            <button class="alert-chip-dismiss"
+              onclick="event.stopPropagation();dismissAlertGroup(${JSON.stringify(group.items.map(a => a.key))},'${containerId}','${iso || todayStr()}')"
+              title="Dismiss all in group">×</button>
+          </div>
+          <div class="alert-group-body"
+            id="${groupId}" style="display:none">
+            ${group.items.map(a => `
+              <div class="alert-group-item alert-${a.severity}">
+                <span class="alert-chip-msg">${escH(a.msg)}</span>
+                <div style="display:flex;gap:6px;flex-shrink:0">
+                  ${a.action === 'fillGap'
+                    ? `<button class="alert-chip-action"
+                        onclick="openFillGapWizard('${a.loc}',${a.si},'${a.iso}')">
+                        Fill</button>`
+                    : ''}
+                  ${a.action === 'clearOverride'
+                    ? `<button class="alert-chip-action"
+                        onclick="clearSingleOverride('${a.iso}',${a.si},'${a.empId}')">
+                        Clear</button>`
+                    : ''}
+                  <button class="alert-chip-dismiss"
+                    onclick="dismissAlert('${escH(a.key)}')"
+                    title="Dismiss">×</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }).join('')}
   </div>`;
 }
 
+// ── Severity icon ─────────────────────────────────────────────
 function severityIcon(s) {
   return s === 'high' ? '🚨' : s === 'warn' ? '⚠️' : 'ℹ️';
 }
@@ -212,8 +274,10 @@ function getWeekMonStr(iso) {
 function clearSingleOverride(iso, si, empId) {
   if (!state.schedule?.[iso]?.[si]) return;
   delete state.schedule[iso][si][empId];
-  if (!Object.keys(state.schedule[iso][si]).length) delete state.schedule[iso][si];
-  if (!Object.keys(state.schedule[iso]).length)     delete state.schedule[iso];
+  if (!Object.keys(state.schedule[iso][si]).length)
+    delete state.schedule[iso][si];
+  if (!Object.keys(state.schedule[iso]).length)
+    delete state.schedule[iso];
   persistAll('schedule');
   renderAll();
   showToast('Override cleared');
