@@ -1,5 +1,7 @@
 // ── ui/alerts-bar.js ──────────────────────────────────────────
 // Renders the dismissible alert bar UI — depends on domain/alerts.js
+// FIX: toggleAlertGroup(id) uses string ID — the conflicting DOM-element version
+// that was in adminhq.js has been removed.
 
 function renderAlertsBar(containerId, iso) {
   const el = document.getElementById(containerId);
@@ -43,6 +45,8 @@ function renderAlertsBar(containerId, iso) {
   }).join('');
 }
 
+// FIX: canonical toggleAlertGroup — accepts element ID string.
+// The conflicting version in adminhq.js (which accepted a DOM element) is removed.
 function toggleAlertGroup(id) {
   const el = document.getElementById(id);
   el?.classList.toggle('collapsed');
