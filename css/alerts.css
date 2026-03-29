@@ -9,109 +9,9 @@
   padding: 10px 0;
 }
 
-.alert-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  border: 1.5px solid transparent;
-  font-size: 12px;
-  font-weight: 600;
-  animation: slideDown 0.18s ease;
-}
-
 @keyframes slideDown {
   from { opacity:0; transform:translateY(-6px); }
   to   { opacity:1; transform:translateY(0); }
-}
-
-.alert-high {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #991b1b;
-}
-
-.alert-warn {
-  background: #fef3c7;
-  border-color: #fcd34d;
-  color: #92400e;
-}
-
-.alert-info {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e40af;
-}
-
-.alert-chip-icon { font-size: 14px; flex-shrink: 0; }
-
-.alert-chip-msg {
-  flex: 1;
-  line-height: 1.4;
-}
-
-.alert-chip-action {
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1.5px solid currentColor;
-  background: transparent;
-  color: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-  flex-shrink: 0;
-}
-
-.alert-chip-action:hover { background: rgba(0,0,0,0.07); }
-
-.alert-chip-dismiss {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0,0,0,0.1);
-  color: inherit;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-
-.alert-chip-dismiss:hover { background: rgba(0,0,0,0.2); }
-
-/* ═══════════════════════════════════════════════════════════════
-   ABSENT TOGGLE SMALL (inside live board cards)
-═══════════════════════════════════════════════════════════════ */
-
-.absent-toggle-sm {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: 1.5px solid rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.absent-toggle-sm:hover { background: rgba(255,255,255,0.3); }
-.absent-toggle-sm.is-absent {
-  background: rgba(220,38,38,0.7);
-  border-color: rgba(255,255,255,0.3);
 }
 
 /* ── Alert Groups ── */
@@ -120,7 +20,9 @@
   border: 1.5px solid transparent;
   overflow: hidden;
   margin-bottom: 4px;
+  animation: slideDown 0.18s ease;
 }
+
 .alert-group-high { border-color: #fca5a5; background: #fff5f5; }
 .alert-group-warn { border-color: #fcd34d; background: #fffbeb; }
 .alert-group-info { border-color: #bfdbfe; background: #eff6ff; }
@@ -150,18 +52,28 @@
   border-radius: 10px;
 }
 
+/* Count badge colors per severity */
+.alert-group-high .alert-group-count { background: #fca5a5; color: #991b1b; }
+.alert-group-warn .alert-group-count { background: #fcd34d; color: #92400e; }
+.alert-group-info .alert-group-count { background: #bfdbfe; color: #1e40af; }
+
 .alert-group-arr {
   font-size: 11px;
   color: var(--muted);
   transition: transform 0.15s;
 }
+.alert-group.open .alert-group-arr { transform: rotate(180deg); }
 
 .alert-group-body {
+  display: none;
   flex-direction: column;
   gap: 1px;
   border-top: 1px solid rgba(0,0,0,0.06);
   max-height: 260px;
   overflow-y: auto;
+}
+.alert-group-body.open {
+  display: flex;
 }
 
 .alert-group-item {
@@ -172,5 +84,53 @@
   font-size: 12px;
   font-weight: 500;
   border-bottom: 1px solid rgba(0,0,0,0.04);
+  color: var(--text);
 }
 .alert-group-item:last-child { border-bottom: none; }
+
+.alert-group-item-icon { font-size: 13px; flex-shrink: 0; }
+
+.alert-group-item-msg { flex: 1; line-height: 1.4; }
+
+.alert-group-item-action {
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
+  transition: background 0.15s;
+}
+.alert-group-item-action:hover { background: rgba(0,0,0,0.07); }
+
+/* ═══════════════════════════════════════════════════════════════
+   ABSENT TOGGLE SMALL (inside live board cards)
+═══════════════════════════════════════════════════════════════ */
+
+.absent-toggle-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.absent-toggle-sm:hover { background: rgba(255,255,255,0.3); }
+.absent-toggle-sm.is-absent {
+  background: rgba(220,38,38,0.7);
+  border-color: rgba(255,255,255,0.3);
+}
