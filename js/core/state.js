@@ -25,8 +25,6 @@ let state = {
   wizardMaintenance: null, // empId or null
 };
 
-let undoStack = [];
-
 // ── PIN Auth ──────────────────────────────────────────────────
 async function hashPin(pin) {
   const buf = await crypto.subtle.digest(
@@ -84,24 +82,6 @@ function persistAll(key) {
   pushToFirebase();
 }
 
-// ── Undo ──────────────────────────────────────────────────────
-function pushUndo(label, snapshot) {
-  undoStack.push({
-    label,
-    snapshot: JSON.parse(JSON.stringify(snapshot))
-  });
-  if (undoStack.length > 20) undoStack.shift();
-}
-
-function undoLastChange() {
-  if (!undoStack.length) return;
-  const { snapshot } = undoStack.pop();
-  Object.assign(state, snapshot);
-  persistAll();
-  renderAll();
-  hideToast();
-}
-
 // ── Day Off helpers ───────────────────────────────────────────
 function getEmpDaysOff(empId) {
   const emp = state.employees.find(e => e.id === empId);
@@ -133,19 +113,19 @@ function initState() {
     });
   }
 
-  // ── Restore unfinished wizard draft from localStorage ─────────
-try {
-  const savedDraft = localStorage.getItem('smPro_draft_nextweek');
-  if (savedDraft) {
-    const parsed = JSON.parse(savedDraft);
-    if (parsed.draftSchedule) state.draftSchedule  = parsed.draftSchedule;
-    if (parsed.draftBlocks)   state.draftBlocks    = parsed.draftBlocks;
-    if (parsed.lunchWaves)    state.lunchWaves     = parsed.lunchWaves;
-    if (parsed.wizardEarlyGate) state.wizardEarlyGate = parsed.wizardEarlyGate;
-    if (parsed.wizardMaintenance !== undefined)
-      state.wizardMaintenance = parsed.wizardMaintenance;
-  }
-} catch(e) {}
+  // ── Restore unfinished wizard draft from localStorage ────────
+  try {
+    const savedDraft = localStorage.getItem('smPro_draft_nextweek');
+    if (savedDraft) {
+      const parsed = JSON.parse(savedDraft);
+      if (parsed.draftSchedule) state.draftSchedule  = parsed.draftSchedule;
+      if (parsed.draftBlocks)   state.draftBlocks    = parsed.draftBlocks;
+      if (parsed.lunchWaves)    state.lunchWaves     = parsed.lunchWaves;
+      if (parsed.wizardEarlyGate) state.wizardEarlyGate = parsed.wizardEarlyGate;
+      if (parsed.wizardMaintenance !== undefined)
+        state.wizardMaintenance = parsed.wizardMaintenance;
+    }
+  } catch(e) {}
 
   // ✅ Guard: ensure currentWeekMon is always valid before any render
   if (!state.currentWeekMon) {
@@ -159,6 +139,9 @@ try {
   }
 
   autoCleanAbsences();
+
+  // FIX: initHolidays is called AFTER Firebase resolves (in onValue callback).
+  // Call it here only as a fallback seed; Firebase sync will re-merge on load.
   initHolidays();
 
   localStorage.removeItem('smPro_adminPin');
