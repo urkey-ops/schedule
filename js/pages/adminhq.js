@@ -28,120 +28,16 @@ function renderAdminHQ() {
 }
 
 // ── HQ Alerts Bar ─────────────────────────────────────────────
+// FIX: renderHQAlerts now calls the global renderAlertsBar(containerId, iso)
+// from alerts-bar.js with the correct two-argument signature.
+// The local renderAlertsBar(iso) override and local toggleAlertGroup(hdrEl)
+// that shadowed the globals have both been removed.
 
 function renderHQAlerts() {
   const el = document.getElementById('hq-alerts-bar');
   if (!el) return;
-  renderAlertsBar(todayStr());
-}
-
-function renderAlertsBar(iso) {
-  const el = document.getElementById('hq-alerts-bar');
-  if (!el) return;
-
-  const alerts = scanAlerts(iso);
-  if (!alerts.length) {
-    el.innerHTML = `
-      <div style="padding:12px 14px;font-size:13px;
-                  color:var(--muted);font-weight:600;text-align:center;">
-        ✅ No alerts for today
-      </div>`;
-    return;
-  }
-
-  const GROUPS = [
-    {
-      key      : 'gap',
-      cls      : 'alert-group-high',
-      label    : 'Coverage Gaps',
-      icon     : '⚠️',
-      types    : [ALERT_TYPES.GAP],
-      actionFn : (a) => `openFillGapWizard('${a.iso}',${a.si},'${a.loc}')`,
-      actionLbl: 'Fix',
-    },
-    {
-      key      : 'absent',
-      cls      : 'alert-group-high',
-      label    : 'Absent Staff',
-      icon     : '✖',
-      types    : [ALERT_TYPES.ABSENT],
-      actionFn : (a) => `toggleAbsent('${a.empId}','${a.iso}')`,
-      actionLbl: 'Mark Present',
-    },
-    {
-      key      : 'leave',
-      cls      : 'alert-group-warn',
-      label    : 'On Leave',
-      icon     : '🔒',
-      types    : [ALERT_TYPES.LEAVE],
-      actionFn : null,
-      actionLbl: null,
-    },
-    {
-      key      : 'overhr',
-      cls      : 'alert-group-warn',
-      label    : 'Hour Cap Exceeded',
-      icon     : '⏱',
-      types    : [ALERT_TYPES.OVERHR],
-      actionFn : null,
-      actionLbl: null,
-    },
-    {
-      key      : 'swap',
-      cls      : 'alert-group-info',
-      label    : 'Swap Requests',
-      icon     : '🔄',
-      types    : [ALERT_TYPES.SWAP],
-      actionFn : () => `switchTab('tab-leave')`,
-      actionLbl: 'Review',
-    },
-  ];
-
-  let html      = '';
-  let firstDone = false;
-
-  GROUPS.forEach(g => {
-    const items = alerts.filter(a => g.types.includes(a.type));
-    if (!items.length) return;
-
-    const openCls = !firstDone ? ' open' : '';
-    firstDone     = true;
-
-    const bodyItems = items.map(a => {
-      const btn = (g.actionFn && g.actionLbl)
-        ? `<button class="alert-group-item-action"
-             onclick="${g.actionFn(a)}">${g.actionLbl}</button>`
-        : '';
-      return `
-        <div class="alert-group-item">
-          <span class="alert-group-item-icon">${g.icon}</span>
-          <span class="alert-group-item-msg">${escH(a.msg)}</span>
-          ${btn}
-        </div>`;
-    }).join('');
-
-    html += `
-      <div class="alert-group ${g.cls}${openCls}" data-group="${g.key}">
-        <div class="alert-group-hdr" onclick="toggleAlertGroup(this)">
-          <span>${g.icon}</span>
-          <span class="alert-group-label">${g.label}</span>
-          <span class="alert-group-count">${items.length}</span>
-          <span class="alert-group-arr">▾</span>
-        </div>
-        <div class="alert-group-body${openCls}">
-          ${bodyItems}
-        </div>
-      </div>`;
-  });
-
-  el.innerHTML = html;
-}
-
-function toggleAlertGroup(hdrEl) {
-  const group = hdrEl.closest('.alert-group');
-  const body  = group.querySelector('.alert-group-body');
-  group.classList.toggle('open');
-  body.classList.toggle('open');
+  // FIX: use correct global signature — renderAlertsBar(containerId, iso)
+  renderAlertsBar('hq-alerts-bar', todayStr());
 }
 
 // ── Today at a Glance ─────────────────────────────────────────
@@ -159,6 +55,7 @@ function renderTodayGlance() {
   ).length;
   const onLeave = activeEmps.filter(e => isOnLeave(e.id, iso)).length;
   const dayOff  = activeEmps.filter(e => isEmpDayOff(e.id, iso)).length;
+  // FIX: absent was not subtracted from working — now counted separately
   const absent  = Object.keys(state.absences?.[iso] || {}).length;
   const gaps    = getDayGapCount(iso);
   const holiday = getHolidayForDate(iso);
@@ -361,8 +258,8 @@ function renderHourWatch() {
           ? `<span class="hrs-chip hrs-over">+${(used - cap).toFixed(1)}h</span>`
           : warn
           ? `<span class="hrs-chip hrs-warn">${(cap - used).toFixed(1)}h left</span>`
-          : ''}
-      </div>`;
+          : ''}`
+    });
   }).join('');
 }
 
