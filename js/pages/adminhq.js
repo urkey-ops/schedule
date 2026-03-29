@@ -258,8 +258,8 @@ function renderHourWatch() {
           ? `<span class="hrs-chip hrs-over">+${(used - cap).toFixed(1)}h</span>`
           : warn
           ? `<span class="hrs-chip hrs-warn">${(cap - used).toFixed(1)}h left</span>`
-          : ''}`
-    });
+          : ''}
+      </div>`;
   }).join('');
 }
 
