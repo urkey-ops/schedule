@@ -49,8 +49,11 @@ function calcScheduledHrsWeek(empId, weekMon) {
     const d   = new Date(mon); d.setDate(d.getDate() + di);
     const iso = toDateStr(d);
     if (isEmpDayOff(empId, iso) || isOnLeave(empId, iso)) continue;
+    // FIX: also skip absent days — absent staff were being counted before
+    if (state.absences?.[iso]?.[empId]) continue;
     TIMESLOTS.forEach((slot, si) => {
       const { loc } = getResolvedLoc(iso, si, empId);
+      // FIX: SLOT_HRS is now a per-slot array (constants.js fix); index by si
       if (loc !== 'off' && loc !== 'vac') total += SLOT_HRS[si] || 0;
     });
   }
@@ -70,16 +73,12 @@ function countDayOverrides(iso) {
 }
 
 // ── Wizard: convert block sequence → slot map ─────────────────
-// Merges draft blocks into state.schedule[iso] shape
-// Call this after approveAndApplyDraft() to make schedule
-// render functions work without any changes
-
 function blocksToSlotMap(iso) {
   const blocks = state.draftBlocks[iso] || [];
   const slotMap = {};
 
   blocks.forEach(block => {
-    if (block.type === 'lunch') return; // lunch not written to schedule
+    if (block.type === 'lunch') return;
     for (let si = block.siStart; si <= block.siEnd; si++) {
       if (!slotMap[si]) slotMap[si] = {};
       slotMap[si][block.empId] = block.loc;
