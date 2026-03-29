@@ -133,6 +133,20 @@ function initState() {
     });
   }
 
+  // ── Restore unfinished wizard draft from localStorage ─────────
+try {
+  const savedDraft = localStorage.getItem('smPro_draft_nextweek');
+  if (savedDraft) {
+    const parsed = JSON.parse(savedDraft);
+    if (parsed.draftSchedule) state.draftSchedule  = parsed.draftSchedule;
+    if (parsed.draftBlocks)   state.draftBlocks    = parsed.draftBlocks;
+    if (parsed.lunchWaves)    state.lunchWaves     = parsed.lunchWaves;
+    if (parsed.wizardEarlyGate) state.wizardEarlyGate = parsed.wizardEarlyGate;
+    if (parsed.wizardMaintenance !== undefined)
+      state.wizardMaintenance = parsed.wizardMaintenance;
+  }
+} catch(e) {}
+
   // ✅ Guard: ensure currentWeekMon is always valid before any render
   if (!state.currentWeekMon) {
     state.currentWeekMon = toDateStr(getWeekMonday(new Date()));
