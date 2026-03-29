@@ -1,0 +1,32 @@
+/* ═══════════════════════════════════════════════════════════════
+   STAFF — HOUR BAR INLINE
+═══════════════════════════════════════════════════════════════ */
+
+.roster-hr-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.roster-hr-track {
+  flex: 1;
+  height: 6px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.roster-hr-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.roster-hr-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+}
