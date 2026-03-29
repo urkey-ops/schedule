@@ -1,0 +1,165 @@
+/* ── Density modes ─────────────────────────────────────────────
+   Applied as class on .sched-grid by setDensity() in ui.js
+   Replaces the old inline-style approach that got wiped on
+   every renderSchedule() call                               */
+
+.sched-grid.density-compact td,
+.sched-grid.density-compact th {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+.sched-grid.density-compact .loc-select {
+  padding: 2px;
+  font-size: 9px;
+}
+
+.sched-grid.density-normal td,
+.sched-grid.density-normal th {
+  font-size: inherit;
+  padding: inherit;
+}
+
+.sched-grid.density-normal .loc-select {
+  padding: inherit;
+  font-size: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WEEK MINIMAP
+═══════════════════════════════════════════════════════════════ */
+
+.week-minimap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 12px 16px;
+}
+
+.minimap-day {
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  padding: 8px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.minimap-day:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.minimap-today {
+  border-color: var(--primary) !important;
+  background: #eef2ff !important;
+}
+
+.minimap-dow {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.minimap-date {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.minimap-badges {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 16px;
+  margin-bottom: 3px;
+}
+
+.minimap-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.badge-gap { background: #fee2e2; color: #dc2626; }
+.badge-ovr { background: #fef3c7; color: #92400e; }
+.badge-hol { background: transparent; }
+
+.minimap-assigned {
+  font-size: 9px;
+  color: var(--subtle);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCHEDULE — STICKY COLUMNS + HOURS COL + CONFLICT CELLS
+═══════════════════════════════════════════════════════════════ */
+
+.sched-grid .sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--surface);
+  border-right: 2px solid var(--border2);
+}
+
+.sched-grid thead .sticky-col {
+  background: var(--surface2);
+  z-index: 4;
+}
+
+.sched-grid .hrs-col {
+  position: sticky;
+  right: 0;
+  z-index: 3;
+  background: var(--surface);
+  border-left: 2px solid var(--border2);
+  min-width: 64px;
+  text-align: center;
+}
+
+.sched-grid thead .hrs-col {
+  background: var(--surface2);
+  z-index: 4;
+}
+
+.hrs-chip {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+}
+
+.hrs-ok     { background: #dcfce7; color: #166534; }
+.hrs-warn   { background: #fef3c7; color: #92400e; }
+.hrs-over   { background: #fee2e2; color: #991b1b; }
+
+.cell-conflict {
+  outline: 2px solid var(--orange) !important;
+  outline-offset: -2px;
+}
+
+.cell-leave {
+  background: #ede9fe44 !important;
+}
+
+.cell-gap {
+  background: #fee2e244 !important;
+}
+
+.cell-gap .loc-select {
+  border: 1.5px dashed #dc2626 !important;
+}
