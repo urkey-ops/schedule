@@ -2,11 +2,11 @@
 // Schedule Suggestion Wizard — Engine + State helpers
 
 // ── Constants ─────────────────────────────────────────────────
-const EARLY_GATE_SI_END  = 5;   // slots 0-5 = 9:00-11:30 (your slot range proxy for early)
-const LUNCH_WAVE1_SLOTS  = [6, 7];   // 12:00-13:00
-const LUNCH_WAVE2_SLOTS  = [8, 9];   // 13:00-14:00
-const MIN_BLOCK_SLOTS    = 4;   // 2h minimum per block
-const MAX_BLOCK_SLOTS    = 6;   // 3h maximum per block
+const EARLY_GATE_SI_END  = 5;
+const LUNCH_WAVE1_SLOTS  = [6, 7];
+const LUNCH_WAVE2_SLOTS  = [8, 9];
+const MIN_BLOCK_SLOTS    = 4;
+const MAX_BLOCK_SLOTS    = 6;
 
 // ── Draft persistence ─────────────────────────────────────────
 function saveDraftLocal() {
@@ -44,7 +44,6 @@ function getNextWeekDates() {
 }
 
 // ── Availability Matrix ───────────────────────────────────────
-// Returns { empId: { iso: 'available'|'leave'|'dayoff'|'swap' } }
 function buildAvailabilityMatrix(isoDates) {
   const matrix = {};
   const activeEmps = state.employees.filter(e => e.status === 'Active');
@@ -55,10 +54,10 @@ function buildAvailabilityMatrix(isoDates) {
       if (isOnLeave(e.id, iso)) {
         matrix[e.id][iso] = 'leave';
       } else if (isEmpDayOff(e.id, iso)) {
-        // check if swapped back in
+        // FIX: swap status is 'active', not 'approved' — 'approved' never exists
+        // in the data model. Also match on toDate (the new work day) not newWorkDay.
         const swapped = (state.swapRequests || []).some(s =>
-          s.empId === e.id && s.status === 'approved' &&
-          s.newWorkDay === iso
+          s.empId === e.id && s.status === 'active' && s.toDate === iso
         );
         matrix[e.id][iso] = swapped ? 'available' : 'dayoff';
       } else if (state.absences?.[iso]?.[e.id]) {
@@ -73,14 +72,11 @@ function buildAvailabilityMatrix(isoDates) {
 }
 
 // ── Lunch Wave Assignment ─────────────────────────────────────
-// Splits available staff into 2 waves per day, alternating from prev week
 function assignLunchWaves(iso, availableEmpIds) {
-  const half    = Math.ceil(availableEmpIds.length / 2);
-  // Try to flip waves from previous week
+  const half      = Math.ceil(availableEmpIds.length / 2);
   const prevWaves = state.lunchWaves;
   const prevWave2 = Object.values(prevWaves).flatMap(w => w.wave2 || []);
 
-  // Staff who were wave2 last week → wave1 this week (rotation)
   const preferWave1 = availableEmpIds.filter(id => prevWave2.includes(id));
   const preferWave2 = availableEmpIds.filter(id => !prevWave2.includes(id));
 
@@ -96,33 +92,27 @@ function buildEmpDayBlocks(empId, iso, waves, isEarlyGate, isMaintenance) {
   const blocks = [];
   const { wave1, wave2 } = waves;
   const lunchSlots = wave1.includes(empId) ? LUNCH_WAVE1_SLOTS : LUNCH_WAVE2_SLOTS;
-  const lunchSi    = lunchSlots[0]; // start of lunch
+  const lunchSi    = lunchSlots[0];
 
-  // ── Early Gate (6-9am proxy: slots 0 to EARLY_GATE_SI_END) ──
   if (isEarlyGate) {
     blocks.push({
       empId, loc: 'gate', siStart: 0, siEnd: EARLY_GATE_SI_END,
       locked: true, type: 'work', source: 'early-gate'
     });
-    // After early gate, treat remaining slots as normal rotation
-    // starting after EARLY_GATE_SI_END+1
     const afterEarly = buildRotationBlocks(
       empId, iso, EARLY_GATE_SI_END + 1, lunchSi, 'gate', isMaintenance
     );
     blocks.push(...afterEarly);
   } else if (isMaintenance) {
-    // Full day maintenance
     blocks.push({
       empId, loc: 'maintenance', siStart: 0, siEnd: TIMESLOTS.length - 1,
       locked: true, type: 'maintenance', source: 'maintenance'
     });
   } else {
-    // Normal rotation: pre-lunch blocks
     const preLunch = buildRotationBlocks(empId, iso, 0, lunchSi, null, false);
     blocks.push(...preLunch);
   }
 
-  // ── Lunch block ───────────────────────────────────────────────
   if (!isMaintenance) {
     blocks.push({
       empId, loc: 'lunch', siStart: lunchSlots[0], siEnd: lunchSlots[1],
@@ -130,7 +120,6 @@ function buildEmpDayBlocks(empId, iso, waves, isEarlyGate, isMaintenance) {
     });
   }
 
-  // ── Post-lunch blocks ─────────────────────────────────────────
   if (!isMaintenance) {
     const afterLunch = lunchSlots[1] + 1;
     const postLunch  = buildRotationBlocks(
@@ -143,14 +132,12 @@ function buildEmpDayBlocks(empId, iso, waves, isEarlyGate, isMaintenance) {
 }
 
 // ── Build rotation blocks for a slot range ────────────────────
-// lastLoc = location to avoid repeating first
 function buildRotationBlocks(empId, iso, siFrom, siTo, lastLoc, isMaint) {
   if (siFrom > siTo) return [];
   const blocks  = [];
   let   cursor  = siFrom;
   let   prevLoc = lastLoc;
 
-  // Location priority order for rotation
   const rotOrder = [...REQUIREDLOCS, 'field', 'giftshop'];
 
   while (cursor <= siTo) {
@@ -162,13 +149,11 @@ function buildRotationBlocks(empId, iso, siFrom, siTo, lastLoc, isMaint) {
       Math.floor(Math.random() * (MAX_BLOCK_SLOTS - MIN_BLOCK_SLOTS + 1)) + MIN_BLOCK_SLOTS
     );
 
-    // Pick next location — avoid repeating prevLoc, avoid blocked locs
-    const blocked  = state.employees.find(e => e.id === empId)?.blocked || [];
+    const blocked   = state.employees.find(e => e.id === empId)?.blocked || [];
     const available = rotOrder.filter(l =>
       l !== prevLoc && !blocked.includes(l)
     );
 
-    // Prefer location that has a gap in this range
     let loc = pickBestLoc(available, iso, cursor, cursor + blockLen - 1, empId);
 
     blocks.push({
@@ -189,16 +174,12 @@ function buildRotationBlocks(empId, iso, siFrom, siTo, lastLoc, isMaint) {
 }
 
 // ── Pick best location from available list ────────────────────
-// Prefers required locations that are currently uncovered in range
 function pickBestLoc(available, iso, siFrom, siTo, empId) {
   if (!available.length) return 'off';
 
-  // Score each candidate
   const scored = available.map(loc => {
     let score = 0;
-    // Prefer required locations
     if (REQUIREDLOCS.includes(loc)) score += 10;
-    // Prefer locations this emp did last week (continuity)
     const lastWeekMon = toDateStr(
       new Date(new Date(state.currentWeekMon + 'T00:00:00').setDate(
         new Date(state.currentWeekMon + 'T00:00:00').getDate() - 7
@@ -213,7 +194,6 @@ function pickBestLoc(available, iso, siFrom, siTo, empId) {
     const lastWeekLoc = state.schedule?.[lastWeekIso]?.[siFrom]?.[empId];
     if (lastWeekLoc === loc) score += 6;
 
-    // Prefer uncovered required locations
     for (let si = siFrom; si <= siTo; si++) {
       const alreadyCovered = Object.values(state.draftBlocks[iso] || [])
         .some(b => b.loc === loc && b.siStart <= si && b.siEnd >= si);
@@ -248,8 +228,6 @@ function generateDraft(earlyGateMap, maintenanceEmpId) {
     if (!availIds.length) return;
 
     const waves = assignLunchWaves(iso, availIds);
-
-    // Ensure Gate is covered during both lunch waves
     patchLunchGateCoverage(iso, waves, maintenanceEmpId);
 
     availIds.forEach(empId => {
@@ -259,7 +237,6 @@ function generateDraft(earlyGateMap, maintenanceEmpId) {
       state.draftBlocks[iso].push(...blocks);
     });
 
-    // Build slot map for this day
     state.draftSchedule[iso] = {
       blocks  : state.draftBlocks[iso],
       score   : 0,
@@ -268,7 +245,6 @@ function generateDraft(earlyGateMap, maintenanceEmpId) {
     };
   });
 
-  // Score and validate all days
   isoDates.forEach(iso => {
     const { score, gaps } = validateAndScoreDay(iso);
     state.draftSchedule[iso].score = score;
@@ -292,7 +268,6 @@ function patchLunchGateCoverage(iso, waves, maintenanceEmpId) {
       );
 
       if (!gateAlreadyCovered) {
-        // Pull maintenance person for this slot if available
         if (maintenanceEmpId && !waveEmpIds.includes(maintenanceEmpId)) {
           state.draftBlocks[iso] = (state.draftBlocks[iso] || []).filter(b =>
             !(b.empId === maintenanceEmpId && b.siStart <= si && b.siEnd >= si)
@@ -306,8 +281,6 @@ function patchLunchGateCoverage(iso, waves, maintenanceEmpId) {
             source  : 'lunch-patch',
           });
         }
-        // Otherwise mark as acceptable Podium gap (not Gate)
-        // Gate gap = critical, will show in validation
       }
     });
   };
@@ -334,7 +307,6 @@ function validateAndScoreDay(iso) {
     });
   });
 
-  // Over-cap check
   const activeEmps = state.employees.filter(e => e.status === 'Active');
   activeEmps.forEach(e => {
     const empBlocks = (state.draftBlocks[iso] || [])
@@ -342,8 +314,6 @@ function validateAndScoreDay(iso) {
     const hrs = empBlocks.reduce((sum, b) =>
       sum + (b.siEnd - b.siStart + 1) * (SLOT_DURATION_MINS / 60), 0
     );
-    const weekMon  = getNextWeekDates()[0];
-    // rough weekly check — just flag daily over 8h
     if (hrs > 8) score -= 3;
   });
 
@@ -357,7 +327,6 @@ function overrideDraftBlock(iso, blockIdx, newLoc, newEmpId) {
   blocks[blockIdx].loc    = newLoc    || blocks[blockIdx].loc;
   blocks[blockIdx].empId  = newEmpId  || blocks[blockIdx].empId;
   blocks[blockIdx].locked = true;
-  // Re-score
   const { score, gaps }   = validateAndScoreDay(iso);
   state.draftSchedule[iso].score = score;
   state.draftSchedule[iso].gaps  = gaps;
@@ -378,7 +347,6 @@ function regenerateDraftDay(iso, earlyGateEmpId, maintenanceEmpId) {
   patchLunchGateCoverage(iso, waves, maintenanceEmpId);
 
   availIds.forEach(empId => {
-    // skip if already has locked blocks for today
     const alreadyLocked = lockedBlocks.some(b => b.empId === empId);
     if (alreadyLocked) return;
     const isEarlyGate   = earlyGateEmpId === empId;
@@ -424,7 +392,6 @@ function openScheduleWizard() {
   const modal = document.getElementById('schedule-wizard-modal');
   if (!modal) return;
 
-  // Check for existing draft
   if (hasSavedDraft() &&
       Object.keys(state.draftBlocks).length &&
       getNextWeekDates().some(iso => state.draftBlocks[iso]?.length)) {
@@ -466,7 +433,6 @@ function renderWizardScreen1() {
   const statusTip  = { available:'Available', leave:'On Leave',
                        dayoff:'Day Off', absent:'Absent', swap:'Swapped Off' };
 
-  // Build per-day available counts
   const dayCounts = isoDates.map(iso =>
     activeEmps.filter(e => matrix[e.id]?.[iso] === 'available').length
   );
@@ -487,7 +453,6 @@ function renderWizardScreen1() {
     </div>
 
     <div class="wiz-body">
-      <!-- Availability table -->
       <div style="overflow-x:auto;margin-bottom:18px">
         <table class="wiz-avail-table">
           <thead>
@@ -532,7 +497,6 @@ function renderWizardScreen1() {
         </table>
       </div>
 
-      <!-- Early Gate assignments -->
       <div class="wiz-section-title">🌅 Who opens Gate 6–9am each day?</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
         ${isoDates.map((iso, di) => {
@@ -557,7 +521,6 @@ function renderWizardScreen1() {
         }).join('')}
       </div>
 
-      <!-- Maintenance assignment -->
       <div class="wiz-section-title">🔧 Maintenance this week? (optional)</div>
       <select class="wiz-select" id="maintenance-emp" style="width:100%;margin-bottom:20px">
         <option value="">— No maintenance assignment —</option>
@@ -582,7 +545,6 @@ function renderWizardScreen1() {
 function wizardGenerateAndNext() {
   const isoDates = getNextWeekDates();
 
-  // Read early gate selections
   const earlyGateMap = {};
   isoDates.forEach(iso => {
     const val = document.getElementById(`early-gate-${iso}`)?.value;
@@ -600,14 +562,12 @@ function renderWizardScreen2() {
   const isoDates   = getNextWeekDates();
   const activeEmps = state.employees.filter(e => e.status === 'Active');
 
-  // Overall draft score
   const totalScore = isoDates.reduce((sum, iso) =>
     sum + (state.draftSchedule[iso]?.score || 0), 0
   );
   const avgScore = Math.round(totalScore / 7);
   const scoreColor = avgScore >= 90 ? 'var(--green)' : avgScore >= 70 ? 'var(--amber)' : 'var(--red)';
 
-  // Total critical gaps
   const critGaps = isoDates.reduce((sum, iso) =>
     sum + (state.draftSchedule[iso]?.gaps || [])
       .filter(g => g.severity === 'critical').length, 0
@@ -638,7 +598,6 @@ function renderWizardScreen2() {
     </div>
 
     <div class="wiz-body" style="padding:0">
-      <!-- Day tabs -->
       <div class="wiz-day-tabs">
         ${isoDates.map((iso, di) => {
           const dayGaps   = (state.draftSchedule[iso]?.gaps || []);
@@ -661,7 +620,6 @@ function renderWizardScreen2() {
         }).join('')}
       </div>
 
-      <!-- Active day view -->
       <div id="wiz-day-view" style="padding:14px">
         ${renderWizardDayView(isoDates[0])}
       </div>
@@ -694,11 +652,6 @@ function renderWizardDayView(iso) {
   const waves      = state.lunchWaves[iso] || { wave1: [], wave2: [] };
   const holiday    = getHolidayForDate(iso);
 
-  if (holiday) {
-    // still show schedule even on holidays
-  }
-
-  // Group blocks by empId
   const byEmp = {};
   blocks.forEach(b => {
     if (!byEmp[b.empId]) byEmp[b.empId] = [];
@@ -707,7 +660,6 @@ function renderWizardDayView(iso) {
 
   let html = '';
 
-  // Holiday banner
   if (holiday) {
     html += `<div style="padding:8px 12px;border-radius:8px;
       background:${holiday.color}22;border:1.5px solid ${holiday.color}55;
@@ -716,7 +668,6 @@ function renderWizardDayView(iso) {
     </div>`;
   }
 
-  // Lunch wave labels
   html += `<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <span style="font-size:11px;font-weight:700;color:var(--muted)">Lunch waves:</span>
     <span class="wiz-wave-chip wave1">
@@ -731,20 +682,18 @@ function renderWizardDayView(iso) {
     </span>
   </div>`;
 
-  // Gaps summary for this day
   if (gaps.length) {
     html += `<div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
       ${gaps.map(g => `
         <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;
           background:${g.severity==='critical'?'#fee2e2':g.severity==='warn'?'#fef3c7':'#eff6ff'};
           color:${g.severity==='critical'?'#991b1b':g.severity==='warn'?'#92400e':'#1e40af'}">
-          ${g.severity==='critical'?'🔴':'g.severity==='warn'?'🟡':'🔵'}
+          ${g.severity==='critical'?'🔴':g.severity==='warn'?'🟡':'🔵'}
           ${LOCLABEL[g.loc]||g.loc} ${g.slot} uncovered
         </span>`).join('')}
     </div>`;
   }
 
-  // Employee rows
   activeEmps.forEach(e => {
     const status = matrix[e.id]?.[iso];
     if (status !== 'available') {
@@ -805,7 +754,6 @@ function renderWizardDayView(iso) {
     </div>`;
   });
 
-  // Hour totals sidebar strip
   html += `<div class="wiz-hrs-strip">
     ${activeEmps.map(e => {
       const wkHrs = calcDraftWeekHrs(e.id);
@@ -841,7 +789,6 @@ function wizardGoToConflicts() {
   const criticals = allGaps.filter(g => g.severity === 'critical');
 
   if (!criticals.length) {
-    // Skip conflict screen — go straight to approve
     showWizardStep(4);
   } else {
     showWizardStep(3);
@@ -859,7 +806,6 @@ function renderWizardScreen3() {
     });
   });
 
-  // Over-cap warnings
   state.employees.filter(e => e.status === 'Active').forEach(e => {
     const wkHrs = calcDraftWeekHrs(e.id);
     const cap   = e.hourCap || DEFAULTHRSCAP;
@@ -1048,7 +994,7 @@ function renderWizardScreen4() {
     </div>`;
 }
 
-// ── Block Editor (inline popover) ────────────────────────────
+// ── Block Editor ──────────────────────────────────────────────
 function openBlockEditor(iso, blockIdx) {
   const block = state.draftBlocks[iso]?.[blockIdx];
   if (!block) return;
@@ -1071,7 +1017,7 @@ function openBlockEditor(iso, blockIdx) {
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="block-loc-toggles">
         ${allLocs.map(loc => `
           <button class="loc-toggle ${block.loc === loc ? 'selected' : ''}"
-            style="background:${block.loc===loc?(LOCCOLOR[loc]||'#888')+'22':''}; 
+            style="background:${block.loc===loc?(LOCCOLOR[loc]||'#888')+'22':''};
                    border-color:${block.loc===loc?(LOCCOLOR[loc]||'#888')+'88':'var(--border2)'};
                    color:${block.loc===loc?(LOCCOLOR[loc]||'#888'):'var(--muted)'}"
             onclick="selectBlockLoc(this,'${loc}','${iso}',${blockIdx})">
@@ -1104,9 +1050,9 @@ function selectBlockLoc(btn, loc, iso, blockIdx) {
   document.querySelectorAll('#block-loc-toggles .loc-toggle')
     .forEach(b => {
       b.classList.remove('selected');
-      b.style.background = '';
+      b.style.background  = '';
       b.style.borderColor = 'var(--border2)';
-      b.style.color = 'var(--muted)';
+      b.style.color       = 'var(--muted)';
     });
   btn.classList.add('selected');
   btn.style.background   = (LOCCOLOR[loc] || '#888') + '22';
@@ -1117,11 +1063,10 @@ function selectBlockLoc(btn, loc, iso, blockIdx) {
 
 function saveBlockEdit(iso, blockIdx) {
   const selectedLocBtn = document.querySelector('#block-loc-toggles .loc-toggle.selected');
-  const newLoc  = selectedLocBtn?.dataset.loc || selectedLocBtn?.textContent?.trim();
+  const newLoc   = selectedLocBtn?.dataset.loc || selectedLocBtn?.textContent?.trim();
   const newEmpId = document.getElementById('block-emp-select')?.value;
   overrideDraftBlock(iso, blockIdx, newLoc, newEmpId);
   closeModal('block-editor-modal');
-  // Refresh day view
   const activeTab = document.querySelector('.wiz-day-tab.active');
   if (activeTab) {
     document.getElementById('wiz-day-view').innerHTML =
