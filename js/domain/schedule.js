@@ -68,3 +68,32 @@ function countDayOverrides(iso) {
   return Object.values(ovrs).reduce((acc, slot) =>
     acc + Object.keys(slot).length, 0);
 }
+
+// ── Wizard: convert block sequence → slot map ─────────────────
+// Merges draft blocks into state.schedule[iso] shape
+// Call this after approveAndApplyDraft() to make schedule
+// render functions work without any changes
+
+function blocksToSlotMap(iso) {
+  const blocks = state.draftBlocks[iso] || [];
+  const slotMap = {};
+
+  blocks.forEach(block => {
+    if (block.type === 'lunch') return; // lunch not written to schedule
+    for (let si = block.siStart; si <= block.siEnd; si++) {
+      if (!slotMap[si]) slotMap[si] = {};
+      slotMap[si][block.empId] = block.loc;
+    }
+  });
+
+  return slotMap;
+}
+
+function applyDraftToSchedule(isoList) {
+  isoList.forEach(iso => {
+    const slotMap = blocksToSlotMap(iso);
+    if (Object.keys(slotMap).length) {
+      state.schedule[iso] = slotMap;
+    }
+  });
+}
