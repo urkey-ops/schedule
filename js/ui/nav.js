@@ -238,3 +238,10 @@ function scheduleMidnightRefresh() {
     scheduleMidnightRefresh();
   }, next - now);
 }
+
+// ── Alias used by holidays.js ─────────────────────────────────
+// holidays.js calls updateDayPillDots() after mutating state.holidays.
+// It re-renders the week nav pills so holiday dots refresh immediately.
+function updateDayPillDots() {
+  renderWeekNav();
+}
