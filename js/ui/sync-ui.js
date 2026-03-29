@@ -1,4 +1,6 @@
 // ── ui/sync-ui.js ─────────────────────────────────────────────
+// FIX: this is the ONLY file that defines setSyncStatus, showOutOfSyncBanner,
+// and hideOutOfSyncBanner. The duplicate definitions in firebase.js are removed.
 
 function setSyncStatus(status) {
   // status: 'local' | 'synced' | 'syncing' | 'error'
@@ -19,7 +21,7 @@ function setSyncStatus(status) {
 function showOutOfSyncBanner(msg) {
   const bar = document.getElementById('global-alerts-bar');
   if (!bar) return;
-  const id  = 'out-of-sync-banner';
+  const id = 'out-of-sync-banner';
   if (document.getElementById(id)) return; // already shown
 
   const div = document.createElement('div');
@@ -29,8 +31,12 @@ function showOutOfSyncBanner(msg) {
   div.innerHTML = `
     <span>⚠️ ${escH(msg || 'Data may be out of sync.')}</span>
     <button class="btn btn-sm btn-ghost" style="margin-left:auto"
-      onclick="location.reload()">Reload</button>
+      onclick="reloadFromFirebase()">Sync Now</button>
     <button class="btn btn-sm btn-ghost"
-      onclick="document.getElementById('${id}')?.remove()">✕</button>`;
+      onclick="hideOutOfSyncBanner()">Ignore</button>`;
   bar.prepend(div);
+}
+
+function hideOutOfSyncBanner() {
+  document.getElementById('out-of-sync-banner')?.remove();
 }
