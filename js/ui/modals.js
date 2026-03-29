@@ -261,6 +261,13 @@ function saveSwap() {
   if (!empId || !fromDate || !toDate) {
     alert('Please fill all required fields.'); return;
   }
+
+  // FIX: validateSwapDayOff was defined in leave.js but never called here —
+  // invalid swaps (non-day-off dates, duplicate active swaps) were silently accepted.
+  if (!_editSwapId) {
+    if (!validateSwapDayOff(empId, fromDate)) return;
+  }
+
   if (!state.swapRequests) state.swapRequests = [];
 
   if (_editSwapId) {
