@@ -1,0 +1,124 @@
+/* ═══════════════════════════════════════════════════════════════
+   LIVE BOARD
+═══════════════════════════════════════════════════════════════ */
+
+/* Today Strip */
+.today-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+.today-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-clock-inline {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 2px;
+}
+
+.live-date-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.today-strip-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* My Current Location Card */
+.my-current-card {
+  margin: 12px 0;
+  padding: 20px 24px;
+  border-radius: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  transition: background 0.3s;
+}
+
+.my-current-card .my-loc-label {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.my-current-card .my-loc-name {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.my-current-card .my-loc-slot {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Next Slot Indicator */
+.my-next-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.my-next-slot .next-arrow {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.my-next-slot .next-loc {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Personal Timeline Bar */
+.my-timeline-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  gap: 1px;
+}
+
+.my-tl-seg {
+  flex: 1;
+  transition: opacity 0.2s;
+  border-radius: 2px;
+}
+
+.my-tl-seg.tl-past    { opacity: 0.3; }
+.my-tl-seg.tl-current { outline: 2px solid #fff; outline-offset: 1px; opacity: 1; }
