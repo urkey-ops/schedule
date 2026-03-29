@@ -24,7 +24,7 @@ function scanAlerts(iso) {
           si,
           slot,
           loc,
-          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,  // ✅ FIXED
+          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,
         });
       }
     });
@@ -35,10 +35,10 @@ function scanAlerts(iso) {
   absentIds.forEach(empId => {
     const emp = state.employees.find(e => e.id === empId);
     if (emp) alerts.push({
-      type : ALERT_TYPES.ABSENT,
+      type  : ALERT_TYPES.ABSENT,
       iso,
       empId,
-      msg  : `${emp.name} is absent today`,
+      msg   : `${emp.name} is absent today`,
     });
   });
 
