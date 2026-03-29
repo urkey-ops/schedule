@@ -6,26 +6,29 @@
   <title>ScheduleMaker Pro v5</title>
   <link rel="icon" href="data:,">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/topbar.css">
-<link rel="stylesheet" href="css/forms.css">
-<link rel="stylesheet" href="css/modal.css">
-<link rel="stylesheet" href="css/toast.css">
-<link rel="stylesheet" href="css/alerts.css">
-<link rel="stylesheet" href="css/live.css">
-<link rel="stylesheet" href="css/grandview.css">
-<link rel="stylesheet" href="css/adminhq.css">
-<link rel="stylesheet" href="css/schedule.css">
-<link rel="stylesheet" href="css/staff.css">
-<link rel="stylesheet" href="css/leave.css">
-<link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/toast.css">
+  <link rel="stylesheet" href="css/alerts.css">
+  <link rel="stylesheet" href="css/live.css">
+  <link rel="stylesheet" href="css/grandview.css">
+  <link rel="stylesheet" href="css/adminhq.css">
+  <link rel="stylesheet" href="css/schedule.css">
+  <link rel="stylesheet" href="css/staff.css">
+  <link rel="stylesheet" href="css/leave.css">
+  <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
 
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-row1">
-    <button class="admin-trigger-btn" id="admin-trigger-btn" onclick="openAdminLogin()">🔑 Admin</button>
+    <button class="admin-trigger-btn" id="admin-trigger-btn"
+      onclick="openAdminLogin()">🔑 Admin</button>
     <div class="logo">
       <div class="logo-mark">📅</div>
       <span class="logo-text">ScheduleMaker<span class="logo-v">v5</span></span>
@@ -40,14 +43,22 @@
     </div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active"    id="tab-live"     onclick="showPage('live',this)">Live Board</button>
-    <button class="nav-tab"           id="tab-grand"    onclick="showPage('grand',this)">📺 Grand View</button>
-    <button class="nav-tab admin-only" id="tab-adminhq" onclick="showPage('adminhq',this)">🏠 Admin HQ</button>
-    <button class="nav-tab admin-only" id="tab-default"  onclick="showPage('default',this)">Default Schedule</button>
-    <button class="nav-tab admin-only" id="tab-schedule" onclick="showPage('schedule',this)">Weekly Schedule</button>
-    <button class="nav-tab admin-only" id="tab-staff"    onclick="showPage('staff',this)">Staff</button>
-    <button class="nav-tab admin-only" id="tab-leave"    onclick="showPage('leave',this)">Leave &amp; Swaps</button>
-    <button class="nav-tab admin-only" id="tab-holidays" onclick="showPage('holidays',this)">Holidays</button>
+    <button class="nav-tab active" id="tab-live"
+      onclick="showPage('live',this)">Live Board</button>
+    <button class="nav-tab" id="tab-grand"
+      onclick="showPage('grand',this)">📺 Grand View</button>
+    <button class="nav-tab admin-only" id="tab-adminhq"
+      onclick="showPage('adminhq',this)">🏠 Admin HQ</button>
+    <button class="nav-tab admin-only" id="tab-default"
+      onclick="showPage('default',this)">Default Schedule</button>
+    <button class="nav-tab admin-only" id="tab-schedule"
+      onclick="showPage('schedule',this)">Weekly Schedule</button>
+    <button class="nav-tab admin-only" id="tab-staff"
+      onclick="showPage('staff',this)">Staff</button>
+    <button class="nav-tab admin-only" id="tab-leave"
+      onclick="showPage('leave',this)">Leave &amp; Swaps</button>
+    <button class="nav-tab admin-only" id="tab-holidays"
+      onclick="showPage('holidays',this)">Holidays</button>
   </div>
 </div>
 
@@ -62,8 +73,10 @@
   <button class="today-btn" onclick="goToToday()">Today</button>
   <div class="day-pills" id="day-pills"></div>
   <div class="density-sw">
-    <button class="density-btn active" id="density-normal"  onclick="setDensity('normal')">Normal</button>
-    <button class="density-btn"        id="density-compact" onclick="setDensity('compact')">Compact</button>
+    <button class="density-btn active" id="density-normal"
+      onclick="setDensity('normal')">Normal</button>
+    <button class="density-btn" id="density-compact"
+      onclick="setDensity('compact')">Compact</button>
   </div>
 </div>
 
@@ -80,13 +93,16 @@
   <div id="live-holiday-banner" class="holiday-banner hidden"></div>
   <div id="live-alert-area" class="alert-area"></div>
   <div class="live-view-toggle">
-    <button class="lvt-btn active" id="lvt-locations" onclick="setLiveView('locations')">📍 Locations</button>
-    <button class="lvt-btn"        id="lvt-my"        onclick="setLiveView('my')">👤 My Schedule</button>
-    <button class="lvt-btn"        id="lvt-history"   onclick="setLiveView('history')">🕑 History</button>
+    <button class="lvt-btn active" id="lvt-locations"
+      onclick="setLiveView('locations')">📍 Locations</button>
+    <button class="lvt-btn" id="lvt-my"
+      onclick="setLiveView('my')">👤 My Schedule</button>
+    <button class="lvt-btn" id="lvt-history"
+      onclick="setLiveView('history')">🕑 History</button>
   </div>
   <div id="view-locations">
     <div id="live-board" class="live-board"></div>
-    <div class="card" style="margin-top:12px;padding:14px 16px;">
+    <div class="card" style="margin-top:12px;padding:14px 16px">
       <div id="live-volunteers"></div>
     </div>
   </div>
@@ -97,9 +113,7 @@
         <div class="emp-selector" id="emp-selector"></div>
       </div>
       <div id="my-current-card" class="my-current-card hidden"></div>
-      <div id="my-next-slot"    class="my-next-slot hidden"></div>
-      <div id="my-timeline-bar" class="my-timeline-bar hidden"></div>
-      <div id="my-sched-body"   class="my-sched-body">
+      <div id="my-sched-body" class="my-sched-body">
         <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">
           Select your name above to see your schedule.
         </div>
@@ -107,7 +121,7 @@
     </div>
   </div>
   <div id="view-history" class="hidden">
-    <div class="card" style="margin-bottom:12px;">
+    <div class="card" style="margin-bottom:12px">
       <button class="history-toggle open"
         onclick="this.classList.toggle('open');
                  document.getElementById('history-today-body').classList.toggle('open')">
@@ -122,12 +136,14 @@
                   color:var(--text);border-bottom:1px solid var(--border)">
         🔍 Deep Lookup
       </div>
-      <div style="padding:14px 16px;">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <div style="padding:14px 16px">
+        <div style="display:flex;gap:10px;align-items:center;
+                    flex-wrap:wrap;margin-bottom:14px">
           <input type="date" id="lookup-date"
             style="padding:8px 12px;border-radius:8px;
                    border:1.5px solid var(--border2);font-size:14px">
-          <button class="btn btn-primary btn-sm" onclick="renderDeepLookup()">Look Up</button>
+          <button class="btn btn-primary btn-sm"
+            onclick="renderDeepLookup()">Look Up</button>
         </div>
         <div id="deep-lookup-result"></div>
       </div>
@@ -141,29 +157,40 @@
   <div class="grand-header">
     <div class="grand-header-left">
       <span id="grand-clock" class="grand-clock">00:00</span>
-      <span id="grand-date"  class="grand-date-text">Loading…</span>
+      <span id="grand-date" class="grand-date-text">Loading…</span>
     </div>
     <div id="grand-summary-strip" class="grand-summary-strip"></div>
   </div>
   <div class="grand-subtabs">
-    <button class="grand-tab active" id="gtab-now"      onclick="setGrandView('now',this)">⚡ Right Now</button>
-    <button class="grand-tab"        id="gtab-timeline" onclick="setGrandView('timeline',this)">📊 Today Timeline</button>
-    <button class="grand-tab"        id="gtab-status"   onclick="setGrandView('status',this)">👥 Staff Status</button>
-    <button class="grand-tab"        id="gtab-lookup"   onclick="setGrandView('lookup',this)">🔍 Date Lookup</button>
-    <button class="grand-tab"        id="gtab-find"     onclick="setGrandView('find',this)">🔎 Find Person</button>
-    <button class="grand-tab"        id="gtab-print"    onclick="triggerPrint()">🖨️ Print</button>
+    <button class="grand-tab active" id="gtab-now"
+      onclick="setGrandView('now',this)">⚡ Right Now</button>
+    <button class="grand-tab" id="gtab-timeline"
+      onclick="setGrandView('timeline',this)">📊 Today Timeline</button>
+    <button class="grand-tab" id="gtab-status"
+      onclick="setGrandView('status',this)">👥 Staff Status</button>
+    <button class="grand-tab" id="gtab-lookup"
+      onclick="setGrandView('lookup',this)">🔍 Date Lookup</button>
+    <button class="grand-tab" id="gtab-find"
+      onclick="setGrandView('find',this)">🔎 Find Person</button>
+    <button class="grand-tab" id="gtab-print"
+      onclick="triggerPrint()">🖨️ Print</button>
   </div>
-  <div id="gview-now"      class="grand-subview"><div id="grand-now-grid" class="grand-now-grid"></div><div id="grand-handover-strip" class="grand-handover-strip"></div></div>
+  <div id="gview-now" class="grand-subview">
+    <div id="grand-now-grid" class="grand-now-grid"></div>
+    <div id="grand-handover-strip" class="grand-handover-strip"></div>
+  </div>
   <div id="gview-timeline" class="grand-subview hidden">
     <div class="grand-filter-bar">
       <span style="font-size:12px;font-weight:600;color:var(--muted)">Filter:</span>
       <select id="grand-tl-filter" onchange="renderGrandTimeline()"
-        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        style="padding:6px 10px;border-radius:8px;
+               border:1.5px solid var(--border2);font-size:13px">
         <option value="all">All Employees</option>
         <option value="location">By Location</option>
       </select>
       <select id="grand-tl-loc" onchange="renderGrandTimeline()"
-        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px;display:none">
+        style="padding:6px 10px;border-radius:8px;
+               border:1.5px solid var(--border2);font-size:13px;display:none">
         <option value="">All Locations</option>
         <option value="gate">Gate</option>
         <option value="podium">Podium</option>
@@ -174,21 +201,27 @@
     </div>
     <div id="grand-timeline-wrap" style="overflow-x:auto;margin-top:12px"></div>
   </div>
-  <div id="gview-status" class="grand-subview hidden"><div id="grand-status-board"></div></div>
-  <div id="gview-lookup"  class="grand-subview hidden">
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+  <div id="gview-status" class="grand-subview hidden">
+    <div id="grand-status-board"></div>
+  </div>
+  <div id="gview-lookup" class="grand-subview hidden">
+    <div style="display:flex;gap:10px;align-items:center;
+                flex-wrap:wrap;margin-bottom:16px">
       <input type="date" id="grand-lookup-date"
-        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);font-size:14px">
+        style="padding:9px 14px;border-radius:10px;
+               border:1.5px solid var(--border2);font-size:14px">
       <button class="btn btn-primary" onclick="renderGrandLookup()">Look Up</button>
     </div>
     <div id="grand-lookup-result"></div>
   </div>
   <div id="gview-find" class="grand-subview hidden">
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <div style="display:flex;gap:10px;align-items:center;
+                flex-wrap:wrap;margin-bottom:16px">
       <input type="text" id="grand-find-input" placeholder="Type a name…"
         oninput="renderFindPerson()"
-        style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);
-               font-size:14px;flex:1;min-width:180px">
+        style="padding:9px 14px;border-radius:10px;
+               border:1.5px solid var(--border2);font-size:14px;
+               flex:1;min-width:180px">
     </div>
     <div id="grand-find-result"></div>
   </div>
@@ -197,11 +230,7 @@
 
 <!-- ═══════════════ PAGE: ADMIN HQ ═══════════════ -->
 <div class="page" id="page-adminhq">
-
-  <!-- HQ Alerts -->
   <div id="hq-alerts-bar"></div>
-
-  <!-- Today at a Glance -->
   <div class="hq-section">
     <div class="hq-section-hdr">
       <span class="hq-section-title">📊 Today at a Glance</span>
@@ -209,11 +238,7 @@
     </div>
     <div id="hq-today-glance"></div>
   </div>
-
-  <!-- Two column layout on desktop -->
   <div class="hq-two-col">
-
-    <!-- Left: Action Queue -->
     <div class="hq-col">
       <div class="hq-section">
         <div class="hq-section-hdr">
@@ -223,14 +248,9 @@
         </div>
         <div id="hq-action-queue"></div>
       </div>
-
-      <!-- Fill Gap Panel — hidden until triggered -->
       <div id="fill-gap-panel" class="hidden" style="margin-top:10px"></div>
     </div>
-
-    <!-- Right: Hour Watch + Week Minimap -->
     <div class="hq-col">
-
       <div class="hq-section">
         <div class="hq-section-hdr">
           <span class="hq-section-title">⏱ Hour Watch</span>
@@ -238,57 +258,46 @@
         </div>
         <div id="hq-hour-watch"></div>
       </div>
-
       <div class="hq-section" style="margin-top:14px">
         <div class="hq-section-hdr">
           <span class="hq-section-title">🗓 This Week</span>
           <div style="display:flex;gap:6px">
             <button class="week-arrow" onclick="hqShiftWeek(-1)">‹</button>
             <button class="week-arrow" onclick="hqShiftWeek(1)">›</button>
-            <button class="today-btn"  onclick="hqGoToToday()">Today</button>
+            <button class="today-btn" onclick="hqGoToToday()">Today</button>
           </div>
         </div>
         <div id="hq-week-minimap"></div>
       </div>
-
     </div>
   </div>
-
-  <!-- Quick Actions inline section -->
   <div class="hq-section" style="margin-top:14px">
     <div class="hq-section-hdr">
       <span class="hq-section-title">⚡ Quick Actions</span>
     </div>
-    <div id="hq-quick-actions-inline">
-      <div class="qa-inline-grid">
-        <button class="qa-inline-btn" onclick="showPage('schedule',document.getElementById('tab-schedule'))">
-          📅 Weekly Schedule
-        </button>
-        <button class="qa-inline-btn" onclick="showPage('staff',document.getElementById('tab-staff'))">
-          👥 Staff
-        </button>
-        <button class="qa-inline-btn" onclick="showPage('leave',document.getElementById('tab-leave'))">
-          🔒 Leave &amp; Swaps
-        </button>
-        <button class="qa-inline-btn" onclick="showPage('holidays',document.getElementById('tab-holidays'))">
-          🎉 Holidays
-        </button>
-        <button class="qa-inline-btn" onclick="openAddEmployee()">
-          ➕ Add Employee
-        </button>
-        <button class="qa-inline-btn" onclick="openAddLeave()">
-          ➕ Add Leave
-        </button>
-        <button class="qa-inline-btn" onclick="openAddSwap()">
-          🔄 Add Swap
-        </button>
-        <button class="qa-inline-btn" onclick="exportData()">
-          💾 Export JSON
-        </button>
-      </div>
+    <div class="qa-inline-grid">
+      <button class="qa-inline-btn"
+        onclick="showPage('schedule',document.getElementById('tab-schedule'))">
+        📅 Weekly Schedule</button>
+      <button class="qa-inline-btn"
+        onclick="showPage('staff',document.getElementById('tab-staff'))">
+        👥 Staff</button>
+      <button class="qa-inline-btn"
+        onclick="showPage('leave',document.getElementById('tab-leave'))">
+        🔒 Leave &amp; Swaps</button>
+      <button class="qa-inline-btn"
+        onclick="showPage('holidays',document.getElementById('tab-holidays'))">
+        🎉 Holidays</button>
+      <button class="qa-inline-btn" onclick="openAddEmployee()">
+        ➕ Add Employee</button>
+      <button class="qa-inline-btn" onclick="openAddLeave()">
+        ➕ Add Leave</button>
+      <button class="qa-inline-btn" onclick="openAddSwap()">
+        🔄 Add Swap</button>
+      <button class="qa-inline-btn" onclick="exportData()">
+        💾 Export JSON</button>
     </div>
   </div>
-
 </div>
 
 
@@ -298,21 +307,31 @@
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Default Schedule</h2>
-      <p>Baseline per day of week · day off employees locked · unset slots use fallback location</p>
+      <p>Baseline per day of week · day off employees locked ·
+         unset slots use fallback location</p>
     </div>
-    <button class="btn btn-success ml-auto" onclick="saveDefault()">Save Default</button>
+    <button class="btn btn-success ml-auto" onclick="saveDefault()">
+      Save Default</button>
   </div>
-  <div class="inline-alert info">Changes here affect all future weeks unless overridden in Weekly Schedule.</div>
+  <div class="inline-alert info">
+    Changes here affect all future weeks unless overridden in Weekly Schedule.
+  </div>
   <div id="range-fill-default"></div>
   <div class="dow-pills" id="dow-pills"></div>
   <div class="card">
     <div class="sched-legend" id="default-legend">
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">✔ covered &nbsp;✖ missing</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--subtle)">
+        ✔ covered &nbsp;✖ missing</span>
     </div>
     <div class="sched-wrap">
       <div class="scroll-hint">swipe table to scroll →</div>
@@ -331,7 +350,8 @@
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Weekly Schedule</h2>
-      <p>Overrides layer on top of defaults · orange border = changed · 🔒 leave · ✖ absent · striped = day off</p>
+      <p>Overrides layer on top of defaults · orange border = changed ·
+         🔒 leave · ✖ absent · striped = day off</p>
     </div>
   </div>
   <div id="sched-holiday-banner" class="hidden" style="margin-bottom:10px"></div>
@@ -344,29 +364,37 @@
     </button>
     <div class="adv-body" id="adv-body">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:12px;font-weight:600;color:var(--muted)">Copy day to</span>
+        <span style="font-size:12px;font-weight:600;color:var(--muted)">
+          Copy day to</span>
         <div id="copy-day-btns" style="display:flex;gap:4px;flex-wrap:wrap"></div>
-        <span style="margin-left:10px;font-size:12px;font-weight:600;color:var(--muted)">Apply default</span>
-        <button class="btn btn-sm btn-warn"  onclick="applyDefaultToDay()">Apply Default to This Day</button>
-        <button class="btn btn-sm btn-ghost" onclick="clearOverridesForDay()">Clear Overrides</button>
+        <span style="margin-left:10px;font-size:12px;font-weight:600;
+                     color:var(--muted)">Apply default</span>
+        <button class="btn btn-sm btn-warn"
+          onclick="applyDefaultToDay()">Apply Default to This Day</button>
+        <button class="btn btn-sm btn-ghost"
+          onclick="clearOverridesForDay()">Clear Overrides</button>
       </div>
     </div>
   </div>
   <div class="card">
     <div id="sched-hrs-row"></div>
     <div class="sched-legend">
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-gate)"></span>Gate</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-podium)"></span>Podium</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-mandir)"></span>Mandir</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-field)"></span>Field Work</span>
+      <span class="legend-item">
+        <span class="legend-dot" style="background:var(--loc-giftshop)"></span>Gift Shop</span>
       <span class="legend-item" style="margin-left:6px">
         <span style="display:inline-block;width:9px;height:9px;
           border-left:2px solid var(--orange);margin-right:3px"></span>Override
       </span>
       <span style="margin-left:auto;font-size:10px;color:var(--subtle)">
-        ✔ ok &nbsp;✖ gap &nbsp;🔒 leave &nbsp;striped = day off
-      </span>
+        ✔ ok &nbsp;✖ gap &nbsp;🔒 leave &nbsp;striped = day off</span>
     </div>
     <div class="sched-wrap">
       <div class="scroll-hint">swipe table to scroll →</div>
@@ -393,13 +421,15 @@
     <span class="section-title">Employees</span>
     <div style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;align-items:center">
       <select id="roster-filter" onchange="filterRoster(this.value)"
-        style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px">
+        style="padding:6px 10px;border-radius:8px;
+               border:1.5px solid var(--border2);font-size:13px">
         <option value="all">All</option>
         <option value="active">Active Only</option>
         <option value="leave">On Leave Today</option>
         <option value="dayoff">Day Off Today</option>
       </select>
-      <button class="btn btn-primary btn-sm" onclick="openAddEmployee()">+ Add Employee</button>
+      <button class="btn btn-primary btn-sm"
+        onclick="openAddEmployee()">+ Add Employee</button>
     </div>
   </div>
   <div class="card" style="margin-bottom:18px">
@@ -421,16 +451,21 @@
   <hr class="section-divider">
   <div class="section-hdr">
     <span class="section-title">Volunteers</span>
-    <button class="btn btn-primary btn-sm ml-auto" onclick="openAddVolunteer()">+ Add Volunteer</button>
+    <button class="btn btn-primary btn-sm ml-auto"
+      onclick="openAddVolunteer()">+ Add Volunteer</button>
   </div>
   <div id="volunteer-list"></div>
   <div class="admin-tools">
     <h3>Admin Tools</h3>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-ghost"   onclick="showFirebaseConfig()">Firebase</button>
-      <button class="btn btn-sm btn-success" onclick="exportData()">Export JSON</button>
-      <button class="btn btn-sm btn-ghost"   onclick="importData()">Import JSON</button>
-      <button class="btn btn-sm btn-danger"  onclick="resetAllData()">Delete All</button>
+      <button class="btn btn-sm btn-ghost"
+        onclick="showFirebaseConfig()">Firebase</button>
+      <button class="btn btn-sm btn-success"
+        onclick="exportData()">Export JSON</button>
+      <button class="btn btn-sm btn-ghost"
+        onclick="importData()">Import JSON</button>
+      <button class="btn btn-sm btn-danger"
+        onclick="resetAllData()">Delete All</button>
     </div>
     <input type="file" id="import-file" accept=".json"
       style="display:none" onchange="handleImportFile(event)">
@@ -444,12 +479,14 @@
   <div class="page-hdr">
     <div class="page-hdr-text">
       <h2>Leave &amp; Day-Off Swaps</h2>
-      <p>Active leave locks slots to VACATION · swaps temporarily unlock regular day offs</p>
+      <p>Active leave locks slots to VACATION ·
+         swaps temporarily unlock regular day offs</p>
     </div>
   </div>
   <div class="section-hdr">
     <span class="section-title">Leave Records</span>
-    <button class="btn btn-leave btn-sm ml-auto" onclick="openAddLeave()">+ Add Leave</button>
+    <button class="btn btn-leave btn-sm ml-auto"
+      onclick="openAddLeave()">+ Add Leave</button>
   </div>
   <div class="card" style="margin-bottom:18px">
     <div style="overflow-x:auto">
@@ -468,7 +505,8 @@
   <hr class="section-divider">
   <div class="section-hdr">
     <span class="section-title">Day-Off Swaps</span>
-    <button class="btn btn-warn btn-sm ml-auto" onclick="openAddSwap()">+ Add Swap</button>
+    <button class="btn btn-warn btn-sm ml-auto"
+      onclick="openAddSwap()">+ Add Swap</button>
   </div>
   <div class="card"><div id="swap-list"></div></div>
 </div>
@@ -492,7 +530,8 @@
         </div>
         <div class="form-row" style="margin:0;flex:2;min-width:160px">
           <label>Name</label>
-          <input type="text" id="new-holiday-name" placeholder="e.g. Raksha Bandhan">
+          <input type="text" id="new-holiday-name"
+            placeholder="e.g. Raksha Bandhan">
         </div>
         <div class="form-row" style="margin:0;min-width:80px">
           <label>Emoji</label>
@@ -540,7 +579,8 @@
       <h3>Admin Login</h3>
       <p>Enter your PIN to unlock admin controls and edit schedules.</p>
       <input type="password" class="pin-input-field" id="admin-pin-input"
-        maxlength="20" placeholder="••••" onkeydown="checkAdminPin(event)">
+        maxlength="20" placeholder="••••"
+        onkeydown="checkAdminPin(event)">
       <div class="pin-error" id="admin-pin-error"></div>
       <button class="btn btn-warn"
         style="width:100%;justify-content:center;margin-top:16px"
@@ -566,10 +606,7 @@
       <input type="text" id="emp-name" placeholder="e.g. Raj Patel">
     </div>
     <div class="form-row">
-      <label>Fallback Location
-        <span style="color:var(--subtle);font-weight:400;
-          text-transform:none;letter-spacing:0">— when slot is unscheduled</span>
-      </label>
+      <label>Fallback Location</label>
       <select id="emp-fallback">
         <option value="Field Work">Field Work</option>
         <option value="OFF">OFF</option>
@@ -582,64 +619,61 @@
     <div class="form-row">
       <label>Blocked Locations</label>
       <div class="loc-toggles">
-        <button class="loc-toggle" id="tog-gate"     onclick="toggleLoc('gate')">Gate</button>
-        <button class="loc-toggle" id="tog-podium"   onclick="toggleLoc('podium')">Podium</button>
-        <button class="loc-toggle" id="tog-mandir"   onclick="toggleLoc('mandir')">Mandir</button>
-        <button class="loc-toggle" id="tog-field"    onclick="toggleLoc('field')">Field Work</button>
-        <button class="loc-toggle" id="tog-giftshop" onclick="toggleLoc('giftshop')">Gift Shop</button>
+        <button class="loc-toggle" id="tog-gate"
+          onclick="toggleLoc('gate')">Gate</button>
+        <button class="loc-toggle" id="tog-podium"
+          onclick="toggleLoc('podium')">Podium</button>
+        <button class="loc-toggle" id="tog-mandir"
+          onclick="toggleLoc('mandir')">Mandir</button>
+        <button class="loc-toggle" id="tog-field"
+          onclick="toggleLoc('field')">Field Work</button>
+        <button class="loc-toggle" id="tog-giftshop"
+          onclick="toggleLoc('giftshop')">Gift Shop</button>
       </div>
     </div>
     <div class="form-row">
       <label>Regular Day Off</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-MON"
-            style="width:16px;height:16px;cursor:pointer"> MON
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> MON</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-TUE"
-            style="width:16px;height:16px;cursor:pointer"> TUE
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> TUE</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-WED"
-            style="width:16px;height:16px;cursor:pointer"> WED
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> WED</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-THU"
-            style="width:16px;height:16px;cursor:pointer"> THU
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> THU</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-FRI"
-            style="width:16px;height:16px;cursor:pointer"> FRI
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> FRI</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-SAT"
-            style="width:16px;height:16px;cursor:pointer"> SAT
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
-          color:var(--text);cursor:pointer;min-height:44px;padding:0 6px;
+            style="width:16px;height:16px;cursor:pointer"> SAT</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;
+          font-weight:600;cursor:pointer;min-height:44px;padding:0 6px;
           border:1.5px solid var(--border2);border-radius:8px">
           <input type="checkbox" id="dow-off-SUN"
-            style="width:16px;height:16px;cursor:pointer"> SUN
-        </label>
+            style="width:16px;height:16px;cursor:pointer"> SUN</label>
       </div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
       <div class="form-row" style="margin:0">
-        <label>Weekly Hour Cap <span style="color:var(--subtle);font-weight:400;
-          text-transform:none;letter-spacing:0">(max 60)</span></label>
+        <label>Weekly Hour Cap</label>
         <input type="number" id="emp-hour-cap" placeholder="40" min="1" max="60">
       </div>
       <div class="form-row" style="margin:0">
@@ -663,12 +697,14 @@
       </div>
     </div>
     <div id="emp-hrs-summary"
-      style="font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 12px;
-             background:var(--surface2);border-radius:8px;border:1px solid var(--border);
-             min-height:20px"></div>
+      style="font-size:12px;color:var(--muted);margin-bottom:16px;
+             padding:10px 12px;background:var(--surface2);border-radius:8px;
+             border:1px solid var(--border);min-height:20px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost"   onclick="closeModal('emp-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="btn btn-primary"
+        onclick="saveEmployee()">Save Employee</button>
     </div>
   </div>
 </div>
@@ -686,10 +722,13 @@
         <button class="week-arrow" onclick="planShiftWeek(1)">›</button>
       </div>
     </div>
-    <div id="plan-days-container" style="max-height:55vh;overflow-y:auto"></div>
+    <div id="plan-days-container"
+      style="max-height:55vh;overflow-y:auto"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
-      <button class="btn btn-ghost"   onclick="closeModal('plan-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="savePlanSchedule()">Save Week</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('plan-modal')">Cancel</button>
+      <button class="btn btn-primary"
+        onclick="savePlanSchedule()">Save Week</button>
     </div>
   </div>
 </div>
@@ -704,11 +743,14 @@
     </div>
     <div class="form-row">
       <label>Note</label>
-      <input type="text" id="vol-note" placeholder="e.g. Available afternoons only">
+      <input type="text" id="vol-note"
+        placeholder="e.g. Available afternoons only">
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost"   onclick="closeModal('vol-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveVolunteer()">Save</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('vol-modal')">Cancel</button>
+      <button class="btn btn-primary"
+        onclick="saveVolunteer()">Save</button>
     </div>
   </div>
 </div>
@@ -748,8 +790,10 @@
       </select>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost"   onclick="closeModal('leave-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveLeave()">Save</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('leave-modal')">Cancel</button>
+      <button class="btn btn-primary"
+        onclick="saveLeave()">Save</button>
     </div>
   </div>
 </div>
@@ -770,11 +814,14 @@
     </div>
     <div class="form-row">
       <label>Note</label>
-      <input type="text" id="swap-note" placeholder="e.g. Coverage for Diwali">
+      <input type="text" id="swap-note"
+        placeholder="e.g. Coverage for Diwali">
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost"   onclick="closeModal('swap-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSwap()">Save</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('swap-modal')">Cancel</button>
+      <button class="btn btn-primary"
+        onclick="saveSwap()">Save</button>
     </div>
   </div>
 </div>
@@ -783,8 +830,10 @@
 <div class="modal-overlay hidden" id="firebase-modal">
   <div class="modal">
     <h3>Firebase Setup</h3>
-    <div class="config-note">Create a free Firebase project → Add web app → copy config.
-      Enable Realtime Database with read/write rules set to true.</div>
+    <div class="config-note">
+      Create a free Firebase project → Add web app → copy config.
+      Enable Realtime Database with read/write rules set to true.
+    </div>
     <div class="form-row"><label>API Key</label>
       <input type="text" id="fb-apiKey" placeholder="AIza…"></div>
     <div class="form-row"><label>Auth Domain</label>
@@ -797,8 +846,10 @@
     <div class="form-row"><label>App ID</label>
       <input type="text" id="fb-appId"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost"   onclick="closeModal('firebase-modal')">Cancel</button>
-      <button class="btn btn-success" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('firebase-modal')">Cancel</button>
+      <button class="btn btn-success"
+        onclick="saveFirebaseConfig()">Save &amp; Connect</button>
     </div>
   </div>
 </div>
@@ -813,12 +864,24 @@
       <input type="password" id="reset-pin" placeholder="PIN"></div>
     <div class="pin-error" id="reset-error"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-      <button class="btn btn-ghost"  onclick="closeModal('reset-modal')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmReset()">Delete Everything</button>
+      <button class="btn btn-ghost"
+        onclick="closeModal('reset-modal')">Cancel</button>
+      <button class="btn btn-danger"
+        onclick="confirmReset()">Delete Everything</button>
     </div>
   </div>
 </div>
 
+<!-- Fill Gap Modal -->
+<div class="modal-overlay hidden" id="fill-gap-modal">
+  <div class="modal" style="max-width:420px">
+    <div id="fill-gap-modal-inner"></div>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn btn-ghost"
+        onclick="closeModal('fill-gap-modal')">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- UNDO TOAST -->
 <div class="undo-toast" id="undo-toast">
@@ -827,39 +890,129 @@
 </div>
 
 <!-- FLOATING QUICK ACTIONS PANEL -->
-<div class="quick-actions-panel hidden" id="quick-actions-panel">
-  <div class="qa-panel-hdr">
-    <span>⚡ Quick Actions</span>
-    <button class="qa-panel-close" onclick="toggleQuickActions()">×</button>
-  </div>
-  <div id="qa-inner"></div>
-</div>
-
-<!-- FILL GAP FLOATING PANEL (used from alerts) -->
-<div class="modal-overlay hidden" id="fill-gap-modal">
-  <div class="modal" style="max-width:420px">
-    <div id="fill-gap-modal-inner"></div>
-    <div style="margin-top:12px;text-align:right">
-      <button class="btn btn-ghost" onclick="closeModal('fill-gap-modal')">Close</button>
-    </div>
-  </div>
-</div>
+<div class="quick-actions-panel hidden" id="quick-actions-panel"></div>
 
 
-<!-- SCRIPTS — order matters -->
-<script src="js/constants.js"></script>
-<script src="js/config.js"></script>
-<script src="js/state.js"></script>
-<script src="js/validators.js"></script>
-<script src="js/alerts.js"></script>
-<script src="js/holidays.js"></script>
-<script src="js/schedule.js"></script>
-<script src="js/staff.js"></script>
-<script src="js/leave.js"></script>
-<script src="js/live.js"></script>
-<script src="js/grandview.js"></script>
-<script src="js/adminhq.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/firebase.js"></script>
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+
+<!-- core — no DOM, no rendering -->
+<script src="js/core/constants.js"></script>
+<script src="js/core/config.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/firebase.js"></script>
+
+<!-- domain — business logic, no rendering -->
+<script src="js/domain/schedule.js"></script>
+<script src="js/domain/holidays.js"></script>
+<script src="js/domain/staff.js"></script>
+<script src="js/domain/leave.js"></script>
+<script src="js/domain/alerts.js"></script>
+
+<!-- ui — chrome, navigation, modals -->
+<script src="js/ui/sync-ui.js"></script>
+<script src="js/ui/toast.js"></script>
+<script src="js/ui/nav.js"></script>
+<script src="js/ui/modals.js"></script>
+<script src="js/ui/alerts-bar.js"></script>
+
+<!-- pages — page renderers -->
+<script src="js/pages/live.js"></script>
+<script src="js/pages/schedule-page.js"></script>
+<script src="js/pages/staff-page.js"></script>
+<script src="js/pages/leave-page.js"></script>
+<script src="js/pages/grandview.js"></script>
+<script src="js/pages/adminhq.js"></script>
+
+<!-- init -->
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  initState();
+
+  if (!state.currentWeekMon)
+    state.currentWeekMon = toDateStr(getWeekMonday(new Date()));
+  if (!state.currentDateISO) state.currentDateISO = todayStr();
+  if (!state.currentDow)
+    state.currentDow = DAYSSHORT[(new Date().getDay()+6)%7];
+
+  if (sessionStorage.getItem('smPro_adminSession')) {
+    enterAdmin();
+  } else {
+    state.mode = 'live';
+    document.getElementById('global-alerts-bar')?.classList.add('hidden');
+    document.getElementById('qa-fab-topbar')?.classList.add('hidden');
+  }
+
+  const ld = document.getElementById('lookup-date');
+  if (ld) ld.value = todayStr();
+
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  setInterval(() => {
+    if (document.getElementById('page-live')?.classList.contains('active')) {
+      renderLiveBoard();
+    }
+  }, 30000);
+
+  scheduleMidnightRefresh();
+
+  if (window.innerWidth < 640) setLiveView('my');
+  else                          setLiveView('locations');
+
+  renderLiveBoard();
+});
+
+function tickClock() {
+  const now = new Date();
+  const t   = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const lc  = document.getElementById('live-clock-inline');
+  const gc  = document.getElementById('grand-clock');
+  if (lc) lc.textContent = t;
+  if (gc) gc.textContent = t;
+}
+
+function enterAdmin() {
+  state.mode = 'admin';
+  sessionStorage.setItem('smPro_adminSession', '1');
+  const badge = document.getElementById('mode-badge');
+  if (badge) { badge.textContent = 'ADMIN'; badge.className = 'mode-chip mode-admin'; }
+  document.getElementById('admin-trigger-btn')?.classList.add('active');
+  document.querySelectorAll('.admin-only').forEach(el =>
+    el.classList.add('admin-tab-visible'));
+  document.getElementById('qa-fab-topbar')?.classList.remove('hidden');
+  document.getElementById('global-alerts-bar')?.classList.remove('hidden');
+  renderGlobalAlerts();
+  showPage('adminhq', document.getElementById('tab-adminhq'));
+}
+
+function exitAdmin() {
+  state.mode = 'live';
+  sessionStorage.removeItem('smPro_adminSession');
+  const badge = document.getElementById('mode-badge');
+  if (badge) { badge.textContent = 'VIEW'; badge.className = 'mode-chip mode-live'; }
+  document.getElementById('admin-trigger-btn')?.classList.remove('active');
+  document.querySelectorAll('.admin-only').forEach(el =>
+    el.classList.remove('admin-tab-visible'));
+  document.getElementById('qa-fab-topbar')?.classList.add('hidden');
+  document.getElementById('quick-actions-panel')?.classList.add('hidden');
+  const gb = document.getElementById('global-alerts-bar');
+  if (gb) { gb.innerHTML = ''; gb.classList.add('hidden'); }
+  if (typeof stopHQRefresh === 'function') stopHQRefresh();
+  showPage('live', document.getElementById('tab-live'));
+  renderAll();
+}
+
+function toggleQuickActions() {
+  const panel = document.getElementById('quick-actions-panel');
+  const fab   = document.getElementById('qa-fab-topbar');
+  if (!panel) return;
+  const isHidden = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !isHidden);
+  fab?.classList.toggle('active', isHidden);
+  if (isHidden) renderQuickActionsPanel();
+}
+</script>
+
 </body>
 </html>
