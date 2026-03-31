@@ -3,12 +3,16 @@
 let state = {
   employees       : [],
   volunteers      : [],
+  // Base rota: defaultSchedule[dow][empId] = [{ loc, start, end }]
+  // start/end in minutes from midnight
   defaultSchedule : {},
-  schedule        : {},
+  // Per-day shift overrides: shifts[iso] = [{ id, empId, loc, start, end }]
+  shifts          : {},
+  // Early gate assignment: earlyGate[iso] = empId
+  earlyGate       : {},
   volAvailability : {},
   absences        : {},
   leaveRequests   : [],
-  swapRequests    : [],
   holidays        : {},
   empDaysOff      : {},
   empHourCap      : {},
@@ -17,12 +21,6 @@ let state = {
   currentDow      : null,
   mode            : 'live',
   meta            : {},
-  // ── Schedule Wizard ──────────────────────────────────────────
-  draftSchedule   : {},   // iso → { blocks[], score, gaps[], locked }
-  draftBlocks     : {},   // iso → Block[] working copy
-  lunchWaves      : {},   // iso → { wave1: [empId], wave2: [empId] }
-  wizardEarlyGate : {},   // iso → empId  (who does 6-9am Gate)
-  wizardMaintenance: null, // empId or null
 };
 
 // ── PIN Auth ──────────────────────────────────────────────────
@@ -97,37 +95,45 @@ function getEmpHourCap(empId) {
 function autoCleanAbsences() {
   if (!state.absences) return;
   const today = todayStr();
+  // Keep last 7 days for accountability lookups
+  const cutoff = toDateStr(new Date(new Date(today + 'T00:00:00').getTime() - 7 * 86400000));
   Object.keys(state.absences).forEach(iso => {
-    if (iso < today) delete state.absences[iso];
+    if (iso < cutoff) delete state.absences[iso];
   });
+}
+
+// ── Admin session persistence ─────────────────────────────────
+// Admin session is remembered in localStorage so page refreshes
+// don't require re-entering the PIN. Logout clears it explicitly.
+function saveAdminSession() {
+  localStorage.setItem('smPro_adminSession', '1');
+}
+
+function clearAdminSession() {
+  localStorage.removeItem('smPro_adminSession');
+  sessionStorage.removeItem('smPro_adminSession');
+}
+
+function hasAdminSession() {
+  return !!(localStorage.getItem('smPro_adminSession') ||
+            sessionStorage.getItem('smPro_adminSession'));
 }
 
 // ── Init ──────────────────────────────────────────────────────
 function initState() {
   const saved = loadLocal();
   if (saved) {
-    ['employees','volunteers','defaultSchedule','schedule',
-     'volAvailability','absences','leaveRequests','swapRequests',
+    ['employees','volunteers','defaultSchedule','shifts','earlyGate',
+     'volAvailability','absences','leaveRequests',
      'holidays','empDaysOff','empHourCap'].forEach(k => {
       if (saved[k] !== undefined) state[k] = saved[k];
     });
+    // Migrate legacy slot-based schedule → shifts if old data present
+    if (saved.schedule && !saved.shifts) {
+      migrateSlotScheduleToShifts(saved.schedule);
+    }
   }
 
-  // ── Restore unfinished wizard draft from localStorage ────────
-  try {
-    const savedDraft = localStorage.getItem('smPro_draft_nextweek');
-    if (savedDraft) {
-      const parsed = JSON.parse(savedDraft);
-      if (parsed.draftSchedule) state.draftSchedule  = parsed.draftSchedule;
-      if (parsed.draftBlocks)   state.draftBlocks    = parsed.draftBlocks;
-      if (parsed.lunchWaves)    state.lunchWaves     = parsed.lunchWaves;
-      if (parsed.wizardEarlyGate) state.wizardEarlyGate = parsed.wizardEarlyGate;
-      if (parsed.wizardMaintenance !== undefined)
-        state.wizardMaintenance = parsed.wizardMaintenance;
-    }
-  } catch(e) {}
-
-  // ✅ Guard: ensure currentWeekMon is always valid before any render
   if (!state.currentWeekMon) {
     state.currentWeekMon = toDateStr(getWeekMonday(new Date()));
   }
@@ -139,13 +145,12 @@ function initState() {
   }
 
   autoCleanAbsences();
-
-  // FIX: initHolidays is called AFTER Firebase resolves (in onValue callback).
-  // Call it here only as a fallback seed; Firebase sync will re-merge on load.
   initHolidays();
 
+  // Clean up legacy keys
   localStorage.removeItem('smPro_adminPin');
   localStorage.removeItem('smPro_adminPinHash');
+  localStorage.removeItem('smPro_draft_nextweek');
 
   let cfg = HARDCODEDCONFIG;
   try {
@@ -157,4 +162,47 @@ function initState() {
   } catch(e) {}
 
   if (cfg && cfg.apiKey && cfg.databaseURL) initFirebase(cfg);
+}
+
+// ── Migration helper ──────────────────────────────────────────
+// Converts old slot-indexed schedule[iso][si][empId] = loc
+// to new shifts[iso] = [{ id, empId, loc, start, end }]
+// Merges consecutive same-location slots into one shift block.
+function migrateSlotScheduleToShifts(oldSchedule) {
+  if (!oldSchedule) return;
+  Object.entries(oldSchedule).forEach(([iso, slots]) => {
+    if (!slots) return;
+    const empBlocks = {};
+    Object.entries(slots).forEach(([si, empMap]) => {
+      const slotMins = DISPLAY_START_MINS + parseInt(si) * SLOT_DURATION_MINS;
+      Object.entries(empMap || {}).forEach(([empId, loc]) => {
+        if (!empBlocks[empId]) empBlocks[empId] = [];
+        empBlocks[empId].push({ si: parseInt(si), slotMins, loc });
+      });
+    });
+
+    const shifts = [];
+    Object.entries(empBlocks).forEach(([empId, blocks]) => {
+      blocks.sort((a, b) => a.si - b.si);
+      let cur = null;
+      blocks.forEach(b => {
+        if (cur && b.loc === cur.loc &&
+            b.slotMins === cur.end) {
+          cur.end = b.slotMins + SLOT_DURATION_MINS;
+        } else {
+          if (cur) shifts.push(cur);
+          cur = {
+            id    : uid(),
+            empId,
+            loc   : b.loc,
+            start : b.slotMins,
+            end   : b.slotMins + SLOT_DURATION_MINS,
+          };
+        }
+      });
+      if (cur) shifts.push(cur);
+    });
+
+    if (shifts.length) state.shifts[iso] = shifts;
+  });
 }
