@@ -25,7 +25,7 @@ function renderRoster() {
   });
 
   if (!emps.length) {
-    tbody.innerHTML = `<tr><td colspan="9"
+    tbody.innerHTML = `<tr><td colspan="8"
       style="text-align:center;padding:24px;color:var(--muted)">
       No employees match the current filter.</td></tr>`;
     return;
@@ -34,43 +34,36 @@ function renderRoster() {
   tbody.innerHTML = emps.map((emp, idx) => {
     const used      = calcScheduledHrsWeek(emp.id, weekMon);
     const cap       = emp.hourCap || DEFAULTHRSCAP;
-    const pct       = Math.min((used/cap)*100, 100);
+    const pct       = Math.min((used / cap) * 100, 100);
     const over      = used > cap;
-    const warn      = !over && pct >= 80;
-    const barColor  = over ? '#dc2626' : warn ? '#d97706' : '#059669';
+    const barColor  = over ? '#dc2626' : '#059669';
     const onLeave_  = isOnLeave(emp.id, iso);
     const isDayOff_ = isEmpDayOff(emp.id, iso);
     const absent_   = !!state.absences?.[iso]?.[emp.id];
 
     let statusBadge = '';
-    if (absent_)        statusBadge = `<span class="status-chip chip-absent">Absent</span>`;
-    else if (onLeave_)  statusBadge = `<span class="status-chip chip-leave">On Leave</span>`;
-    else if (isDayOff_) statusBadge = `<span class="status-chip chip-dayoff">Day Off</span>`;
-    else statusBadge = `<span class="status-chip chip-${emp.status?.toLowerCase()||'active'}">
-      ${emp.status||'Active'}</span>`;
-
-    const blockedStr = (emp.blocked||[]).map(l =>
-      `<span class="blocked-chip">${LOCLABEL[l]||l}</span>`
-    ).join('') || `<span style="color:var(--subtle);font-size:11px">none</span>`;
+    if (absent_)        statusBadge = `<span class="badge badge-sick">Absent</span>`;
+    else if (onLeave_)  statusBadge = `<span class="badge badge-annual">On Leave</span>`;
+    else if (isDayOff_) statusBadge = `<span class="badge badge-off">Day Off</span>`;
+    else statusBadge = `<span class="badge badge-active">${emp.status || 'Active'}</span>`;
 
     const dows = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
     const dowBadges = dows.map(d => {
-      const isOff = (emp.daysOff||[]).includes(d);
-      return `<span class="dow-badge ${isOff?'dow-badge-off':''}"
-        ${state.mode==='admin'
-          ? `onclick="toggleEmpDow('${emp.id}','${d}')"
-             style="cursor:pointer" title="Toggle ${d} off"`
+      const isOff = (emp.daysOff || []).includes(d);
+      return `<span class="dow-badge ${isOff ? 'dow-badge-off' : ''}"
+        ${state.mode === 'admin'
+          ? `onclick="toggleEmpDow('${emp.id}','${d}')" style="cursor:pointer"`
           : ''}>${d}</span>`;
     }).join('');
 
-    const annualUsed = calcLeaveUsed(emp.id,'annual');
-    const sickUsed   = calcLeaveUsed(emp.id,'sick');
+    const annualUsed = calcLeaveUsed(emp.id, 'annual');
+    const sickUsed   = calcLeaveUsed(emp.id, 'sick');
     const annualCap  = emp.annualLeave || 20;
     const sickCap    = emp.sickLeave   || 10;
-    const leaveStr   = `<div style="font-size:10px;line-height:1.6">
-      <span style="color:${annualUsed>=annualCap?'#dc2626':'var(--muted)'}">
+    const leaveStr   = `<div style="font-size:10px;line-height:1.8">
+      <span style="color:${annualUsed >= annualCap ? '#dc2626' : 'var(--muted)'}">
         AL: ${annualUsed}/${annualCap}d</span><br>
-      <span style="color:${sickUsed>=sickCap?'#dc2626':'var(--muted)'}">
+      <span style="color:${sickUsed >= sickCap ? '#dc2626' : 'var(--muted)'}">
         SL: ${sickUsed}/${sickCap}d</span>
     </div>`;
 
@@ -80,23 +73,16 @@ function renderRoster() {
           style="width:${pct}%;background:${barColor}"></div>
       </div>
       <span class="roster-hr-label" style="color:${barColor}">
-        ${used.toFixed(1)}/${cap}h
+        ${used.toFixed(1)}/${cap}h${over ? ' ⚠' : ''}
       </span>
     </div>`;
 
-    return `<tr class="${absent_?'row-absent':''} ${onLeave_?'row-leave':''}">
-      <td style="color:var(--muted);font-size:11px">${idx+1}</td>
+    return `<tr class="${absent_ ? 'row-absent' : ''} ${onLeave_ ? 'row-leave' : ''}">
+      <td style="color:var(--muted);font-size:11px">${idx + 1}</td>
       <td>
         <div style="font-weight:700;font-size:13px">${escH(emp.name)}</div>
         <div style="font-size:10px;color:var(--subtle)">${emp.id}</div>
       </td>
-      <td>
-        <span class="loc-select ${LOCCLS[emp.fallback]||''}"
-          style="font-size:10px;padding:2px 6px">
-          ${escH(emp.fallback||'—')}
-        </span>
-      </td>
-      <td>${blockedStr}</td>
       <td>${statusBadge}</td>
       <td>${hourBar}</td>
       <td><div style="display:flex;gap:2px;flex-wrap:wrap">${dowBadges}</div></td>
@@ -105,10 +91,12 @@ function renderRoster() {
         <div style="display:flex;gap:4px;flex-wrap:wrap">
           <button class="btn btn-sm btn-ghost"
             onclick="openEditEmployee('${emp.id}')">Edit</button>
-          <button class="btn btn-sm btn-ghost"
-            onclick="openPlanSchedule('${emp.id}')">Plan</button>
-          <button class="btn btn-sm btn-danger"
-            onclick="deleteEmployee('${emp.id}')">✕</button>
+          ${state.mode === 'admin'
+            ? `<button class="btn btn-sm btn-leave"
+                onclick="openAddLeave('${emp.id}')">+ Leave</button>
+               <button class="btn btn-sm btn-danger"
+                onclick="deleteEmployee('${emp.id}')">✕</button>`
+            : ''}
         </div>
       </td>
     </tr>`;
@@ -126,10 +114,15 @@ function filterRoster(val) {
   renderRoster();
 }
 
+// ── Volunteers ────────────────────────────────────────────────
+// Simplified: single today-available toggle per volunteer
+// (replaces 7-day day-of-week matrix)
+
 function renderVolunteers() {
   const el = document.getElementById('volunteer-list');
   if (!el) return;
   const vols = state.volunteers || [];
+  const iso  = todayStr();
 
   if (!vols.length) {
     el.innerHTML = `<div class="card"
@@ -138,48 +131,52 @@ function renderVolunteers() {
     return;
   }
 
-  const iso = todayStr();
-  const dow = DAYSSHORT[(new Date().getDay()+6)%7];
-
   el.innerHTML = `<div class="card"><div style="overflow-x:auto">
     <table class="data-table">
       <thead><tr>
-        <th>#</th><th>Name</th><th>Availability</th>
-        <th>Available Today</th><th>Note</th><th>Actions</th>
+        <th>#</th><th>Name</th><th>Available Today</th><th>Note</th>
+        ${state.mode === 'admin' ? '<th>Actions</th>' : ''}
       </tr></thead>
       <tbody>
         ${vols.map((vol, i) => {
-          const avail      = state.volAvailability?.[vol.id] || {};
-          const todayAvail = avail[dow] !== false;
-          const availDows  = DAYSSHORT.map(d =>
-            `<span class="dow-badge ${avail[d]===false?'':'dow-badge-avail'}"
-              ${state.mode==='admin'
-                ? `onclick="toggleVolAvail('${vol.id}','${d}')" style="cursor:pointer"`
-                : ''}>
-              ${d}</span>`
-          ).join('');
-
+          const todayAvail = state.volAvailability?.[vol.id]?.[iso] !== false;
           return `<tr>
-            <td style="color:var(--muted);font-size:11px">${i+1}</td>
+            <td style="color:var(--muted);font-size:11px">${i + 1}</td>
             <td style="font-weight:700;font-size:13px">${escH(vol.name)}</td>
-            <td><div style="display:flex;gap:2px;flex-wrap:wrap">${availDows}</div></td>
             <td>
-              <span class="status-chip ${todayAvail?'chip-active':'chip-dayoff'}">
-                ${todayAvail?'Available':'Not available'}
-              </span>
+              ${state.mode === 'admin'
+                ? `<button class="btn btn-sm ${todayAvail ? 'btn-success' : 'btn-ghost'}"
+                    onclick="toggleVolToday('${vol.id}')">
+                    ${todayAvail ? '✔ Available' : '— Not today'}
+                  </button>`
+                : `<span class="badge ${todayAvail ? 'badge-active' : 'badge-off'}">
+                    ${todayAvail ? 'Available' : 'Not today'}</span>`}
             </td>
-            <td style="font-size:12px;color:var(--muted)">${escH(vol.note||'—')}</td>
-            <td>
-              <div style="display:flex;gap:4px">
-                <button class="btn btn-sm btn-ghost"
-                  onclick="openEditVolunteer('${vol.id}')">Edit</button>
-                <button class="btn btn-sm btn-danger"
-                  onclick="deleteVolunteer('${vol.id}')">✕</button>
-              </div>
-            </td>
+            <td style="font-size:12px;color:var(--muted)">${escH(vol.note || '—')}</td>
+            ${state.mode === 'admin'
+              ? `<td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn btn-sm btn-ghost"
+                      onclick="openEditVolunteer('${vol.id}')">Edit</button>
+                    <button class="btn btn-sm btn-danger"
+                      onclick="deleteVolunteer('${vol.id}')">✕</button>
+                  </div>
+                </td>`
+              : ''}
           </tr>`;
         }).join('')}
       </tbody>
     </table>
   </div></div>`;
+}
+
+// Toggle volunteer availability for today only
+function toggleVolToday(volId) {
+  const iso = todayStr();
+  if (!state.volAvailability)         state.volAvailability         = {};
+  if (!state.volAvailability[volId])  state.volAvailability[volId]  = {};
+  const cur = state.volAvailability[volId][iso];
+  state.volAvailability[volId][iso] = (cur === false) ? true : false;
+  persistAll('volAvailability');
+  renderVolunteers();
 }
