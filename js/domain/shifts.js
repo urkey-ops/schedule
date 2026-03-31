@@ -1,8 +1,5 @@
 // ── domain/shifts.js ─────────────────────────────────────────
-// All shift storage is: state.shifts[iso] = [{ id, empId, loc, start, end }]
-// start / end are minutes from midnight (e.g. 9*60 = 540 = 09:00)
 
-// ── Helpers ───────────────────────────────────────────────────
 function minsToHHMM(mins) {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
@@ -14,16 +11,12 @@ function HHMMtoMins(str) {
   return h * 60 + (m || 0);
 }
 
-function shiftsForDay(iso) {
-  return state.shifts?.[iso] || [];
-}
+function shiftsForDay(iso) { return state.shifts?.[iso] || []; }
 
 function baseRotaShifts(iso) {
-  // Returns shifts derived from the base rota (defaultSchedule) for this date.
-  // defaultSchedule[dow][empId] = [{ loc, start, end }]
-  const dow = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const dow     = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
   const empRota = state.defaultSchedule?.[dow] || {};
-  const shifts = [];
+  const shifts  = [];
   Object.entries(empRota).forEach(([empId, blocks]) => {
     (blocks || []).forEach(b => {
       shifts.push({ id: `base-${empId}-${b.start}`, empId, loc: b.loc,
@@ -33,65 +26,48 @@ function baseRotaShifts(iso) {
   return shifts;
 }
 
-// Resolved shifts for a day: base rota merged with overrides.
-// An override replaces ALL base shifts for that employee on that day
-// if any override exists for them; otherwise base rota is used.
 function getResolvedShifts(iso) {
   const overrides   = shiftsForDay(iso);
   const base        = baseRotaShifts(iso);
   const overrideEmp = new Set(overrides.map(s => s.empId));
-
   const baseFiltered = base.filter(s => !overrideEmp.has(s.empId));
 
-  // Also fold in early gate
   const earlyEmpId = state.earlyGate?.[iso];
   const earlyShift = earlyEmpId
     ? [{ id: `early-${iso}`, empId: earlyEmpId, loc: 'gate',
          start: EARLY_GATE_START, end: EARLY_GATE_END, isEarlyGate: true }]
     : [];
 
-  // Filter out base/override gate shifts during early window for early gate person
   const all = [...earlyShift, ...overrides, ...baseFiltered];
   return all.filter(s => {
     if (!earlyEmpId) return true;
     if (s.isEarlyGate) return true;
-    // For the early gate person, remove any shift that overlaps the early window
     if (s.empId === earlyEmpId &&
-        s.start < EARLY_GATE_END && s.end > EARLY_GATE_START) {
-      return false;
-    }
+        s.start < EARLY_GATE_END && s.end > EARLY_GATE_START) return false;
     return true;
   });
 }
 
-// Who is at a given location at a given time (mins)?
-// Returns array of employees currently there.
 function getLocAtTime(iso, loc, timeMins) {
   if (loc === 'off' || loc === 'vac') return [];
-  const shifts = getResolvedShifts(iso);
-  return shifts
+  return getResolvedShifts(iso)
     .filter(s => s.loc === loc && s.start <= timeMins && s.end > timeMins)
     .map(s => state.employees.find(e => e.id === s.empId))
     .filter(Boolean);
 }
 
-// What location is an employee at right now?
 function getEmpLocAtTime(iso, empId, timeMins) {
-  if (isOnLeave(empId, iso))    return 'vac';
-  if (isEmpDayOff(empId, iso))  return 'off';
-  if (state.absences?.[iso]?.[empId]) return 'off';
+  if (isOnLeave(empId, iso))           return 'vac';
+  if (isEmpDayOff(empId, iso))         return 'off';
+  if (state.absences?.[iso]?.[empId])  return 'off';
 
-  const shifts = getResolvedShifts(iso);
-  const match  = shifts.find(s =>
+  const match = getResolvedShifts(iso).find(s =>
     s.empId === empId && s.start <= timeMins && s.end > timeMins
   );
   if (match) return match.loc;
-
-  const emp = state.employees.find(e => e.id === empId);
-  return emp?.fallback || 'off';
+  return state.employees.find(e => e.id === empId)?.fallback || 'off';
 }
 
-// Current slot index for display grid alignment
 function currentSlotIdx() {
   const mins = nowMins();
   if (mins < DISPLAY_START_MINS || mins >= DISPLAY_END_MINS) return -1;
@@ -99,11 +75,11 @@ function currentSlotIdx() {
 }
 
 // ── CRUD ──────────────────────────────────────────────────────
-function addShift(iso, empId, loc, startMins, endMins) {
-  if (!state.shifts)       state.shifts       = {};
-  if (!state.shifts[iso])  state.shifts[iso]  = [];
 
-  // Validate against location operating hours
+function addShift(iso, empId, loc, startMins, endMins) {
+  if (!state.shifts)      state.shifts      = {};
+  if (!state.shifts[iso]) state.shifts[iso] = [];
+
   const locH = LOC_HOURS[loc];
   if (locH) {
     if (startMins < locH.open)  startMins = locH.open;
@@ -111,12 +87,24 @@ function addShift(iso, empId, loc, startMins, endMins) {
     if (startMins >= endMins) return null;
   }
 
-  // Remove any existing shift for this employee that overlaps this time range
+  // Check soft/hard overtime cap
+  const weekMon = getWeekMonStr(iso);
+  const currentHrs = calcScheduledHrsWeek(empId, weekMon);
+  const newHrs     = (endMins - startMins) / 60;
+  const emp        = state.employees.find(e => e.id === empId);
+  const cap        = getEmpHourCap(empId);
+
+  if (currentHrs + newHrs > OVERTIME_HARD_CAP) {
+    if (!confirm(`⚠ ${emp?.name || empId} would exceed the hard cap of ${OVERTIME_HARD_CAP}h (currently ${currentHrs.toFixed(1)}h + ${newHrs.toFixed(1)}h). Add anyway?`)) return null;
+  } else if (currentHrs + newHrs > OVERTIME_SOFT_CAP && currentHrs <= OVERTIME_SOFT_CAP) {
+    showToast(`⏱ ${emp?.name || empId} will exceed ${OVERTIME_SOFT_CAP}h this week`);
+  }
+
   state.shifts[iso] = state.shifts[iso].filter(s =>
     s.empId !== empId || s.end <= startMins || s.start >= endMins
   );
 
-  const shift = { id: uid(), empId, loc, start: startMins, end: endMins };
+  const shift = { id: uid(), empId, loc, start: startMins, end: endMins, updatedAt: Date.now() };
   state.shifts[iso].push(shift);
   state.shifts[iso].sort((a, b) => a.start - b.start || a.empId.localeCompare(b.empId));
   persistAll('shifts');
@@ -133,36 +121,44 @@ function removeShift(iso, shiftId) {
 function updateShift(iso, shiftId, changes) {
   const shift = state.shifts?.[iso]?.find(s => s.id === shiftId);
   if (!shift) return;
-  Object.assign(shift, changes);
+  Object.assign(shift, changes, { updatedAt: Date.now() });
   persistAll('shifts');
 }
 
-// Set early gate person for a day
 function setEarlyGate(iso, empId) {
   if (!state.earlyGate) state.earlyGate = {};
-  if (empId) {
-    state.earlyGate[iso] = empId;
-  } else {
-    delete state.earlyGate[iso];
-  }
+  if (empId) state.earlyGate[iso] = empId;
+  else delete state.earlyGate[iso];
   persistAll('earlyGate');
 }
 
+// ── Revert single employee to base rota ───────────────────────
+function revertEmpToBase(iso, empId) {
+  if (!confirm(`Revert ${state.employees.find(e=>e.id===empId)?.name || empId}'s shifts for ${fmtDate(iso)} to base rota?`)) return;
+  pushUndo('Revert to base', state);
+  if (state.shifts?.[iso]) {
+    state.shifts[iso] = state.shifts[iso].filter(s => s.empId !== empId);
+    if (!state.shifts[iso].length) delete state.shifts[iso];
+  }
+  persistAll('shifts');
+  renderRota();
+  showToast('Reverted to base rota');
+}
+
 // ── Base rota CRUD ────────────────────────────────────────────
-// defaultSchedule[dow][empId] = [{ loc, start, end }]
 
 function setBaseShift(dow, empId, loc, startMins, endMins) {
-  if (!state.defaultSchedule)          state.defaultSchedule          = {};
-  if (!state.defaultSchedule[dow])     state.defaultSchedule[dow]     = {};
-  if (!state.defaultSchedule[dow][empId]) state.defaultSchedule[dow][empId] = [];
+  if (!state.defaultSchedule)               state.defaultSchedule               = {};
+  if (!state.defaultSchedule[dow])          state.defaultSchedule[dow]          = {};
+  if (!state.defaultSchedule[dow][empId])   state.defaultSchedule[dow][empId]   = [];
 
-  // Remove overlapping base shifts for this employee/day
   state.defaultSchedule[dow][empId] = state.defaultSchedule[dow][empId]
     .filter(b => b.end <= startMins || b.start >= endMins);
 
   state.defaultSchedule[dow][empId].push({ loc, start: startMins, end: endMins });
   state.defaultSchedule[dow][empId].sort((a, b) => a.start - b.start);
   persistAll('defaultSchedule');
+  logAction('edit_base_rota', `Base rota updated: ${dow} ${empId} ${LOCLABEL[loc]} ${minsToHHMM(startMins)}–${minsToHHMM(endMins)}`);
 }
 
 function removeBaseShift(dow, empId, startMins) {
@@ -172,12 +168,12 @@ function removeBaseShift(dow, empId, startMins) {
   persistAll('defaultSchedule');
 }
 
-// ── Hours calculation ─────────────────────────────────────────
+// ── Hours ─────────────────────────────────────────────────────
+
 function calcEmpHrsDay(iso, empId) {
-  const shifts = getResolvedShifts(iso).filter(s =>
-    s.empId === empId && s.loc !== 'off' && s.loc !== 'vac' && s.loc !== 'lunch'
-  );
-  return shifts.reduce((acc, s) => acc + (s.end - s.start) / 60, 0);
+  return getResolvedShifts(iso)
+    .filter(s => s.empId === empId && s.loc !== 'off' && s.loc !== 'vac' && s.loc !== 'lunch')
+    .reduce((acc, s) => acc + (s.end - s.start) / 60, 0);
 }
 
 function calcScheduledHrsWeek(empId, weekMon) {
@@ -193,48 +189,75 @@ function calcScheduledHrsWeek(empId, weekMon) {
   return total;
 }
 
+function getWeekHoursSummary(weekMon) {
+  const result = {};
+  state.employees.filter(e => e.status === 'Active').forEach(e => {
+    result[e.id] = calcScheduledHrsWeek(e.id, weekMon);
+  });
+  return result;
+}
+
+function getUnscheduledEmployees(weekMon) {
+  return state.employees
+    .filter(e => e.status === 'Active' && !e.inTraining)
+    .filter(e => calcScheduledHrsWeek(e.id, weekMon) === 0);
+}
+
 // ── Coverage gap detection ────────────────────────────────────
-// Returns array of { loc, gapStart, gapEnd } for uncovered windows
+// Uses MIN_STAFF_PER_LOC — gap = covered by fewer staff than minimum
+
 function getCoverageGaps(iso) {
   const gaps   = [];
   const shifts = getResolvedShifts(iso);
 
   REQUIREDLOCS.forEach(loc => {
-    const locH = LOC_HOURS[loc];
+    const locH   = LOC_HOURS[loc];
+    const minStaff = MIN_STAFF_PER_LOC[loc] || 1;
     if (!locH) return;
 
-    // Collect all covered intervals for this location
-    const covered = shifts
+    // Build coverage timeline: array of { time, delta }
+    const events = [];
+    shifts
       .filter(s => s.loc === loc &&
         !isEmpDayOff(s.empId, iso) &&
         !isOnLeave(s.empId, iso) &&
         !state.absences?.[iso]?.[s.empId])
-      .map(s => ({ start: s.start, end: s.end }))
-      .sort((a, b) => a.start - b.start);
+      .forEach(s => {
+        events.push({ t: s.start, d: +1 });
+        events.push({ t: s.end,   d: -1 });
+      });
+    events.sort((a, b) => a.t - b.t || b.d - a.d);
 
-    // Find uncovered ranges within operating window
+    let count  = 0;
     let cursor = locH.open;
-    covered.forEach(interval => {
-      if (interval.start > cursor) {
-        gaps.push({ loc, gapStart: cursor, gapEnd: interval.start });
+    let gapStart = null;
+
+    const checkGap = (t) => {
+      if (count < minStaff && gapStart === null) gapStart = cursor;
+      else if (count >= minStaff && gapStart !== null) {
+        if (t > gapStart) gaps.push({ loc, gapStart, gapEnd: t, understaffed: count > 0 });
+        gapStart = null;
       }
-      if (interval.end > cursor) cursor = interval.end;
-    });
-    if (cursor < locH.close) {
-      gaps.push({ loc, gapStart: cursor, gapEnd: locH.close });
+    };
+
+    for (const ev of events) {
+      if (ev.t < locH.open || ev.t > locH.close) continue;
+      checkGap(ev.t);
+      cursor = ev.t;
+      count += ev.d;
+    }
+    checkGap(locH.close);
+    if (gapStart !== null && locH.close > gapStart) {
+      gaps.push({ loc, gapStart, gapEnd: locH.close, understaffed: count > 0 });
     }
   });
 
   return gaps;
 }
 
-// ── Point-in-time gap check (used by Now view) ────────────────
 function isLocCoveredAtTime(iso, loc, timeMins) {
-  return getLocAtTime(iso, loc, timeMins).length > 0;
+  const minStaff = MIN_STAFF_PER_LOC[loc] || 1;
+  return getLocAtTime(iso, loc, timeMins).length >= minStaff;
 }
 
-// ── Who was where (accountability lookup) ─────────────────────
-function whoWasAt(iso, loc, timeMins) {
-  // Checks resolved shifts (includes early gate, base rota, overrides)
-  return getLocAtTime(iso, loc, timeMins);
-}
+function whoWasAt(iso, loc, timeMins) { return getLocAtTime(iso, loc, timeMins); }
