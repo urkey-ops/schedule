@@ -1,0 +1,359 @@
+/* ── Gantt Rota Editor ─────────────────────────────────────── */
+
+.gantt-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+.gantt-axis-row,
+.gantt-row,
+.gantt-window-row,
+.gantt-coverage-wrap {
+  display: flex;
+  align-items: center;
+  min-width: 700px;
+}
+
+.gantt-name-col {
+  width: 110px;
+  flex-shrink: 0;
+  padding: 0 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gantt-emp-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gantt-emp-hrs {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.gantt-bars-col {
+  flex: 1;
+  position: relative;
+  height: 36px;
+  background: var(--surface3);
+  border-radius: 6px;
+  margin: 2px 0;
+  overflow: visible;
+  cursor: crosshair;
+}
+
+.gantt-row-dayoff .gantt-bars-col,
+.gantt-row-leave  .gantt-bars-col {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--surface3),
+    var(--surface3) 3px,
+    var(--surface2) 3px,
+    var(--surface2) 8px
+  );
+  cursor: default;
+}
+
+.gantt-row-dayoff .gantt-name-col { opacity: 0.5; }
+.gantt-row-leave  .gantt-name-col { opacity: 0.7; }
+
+.gantt-selecting .gantt-bars-col {
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Bars ── */
+.gantt-bar {
+  position: absolute;
+  top: 3px;
+  height: calc(100% - 6px);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: filter 0.1s;
+  min-width: 4px;
+}
+
+.gantt-bar:hover { filter: brightness(1.1); }
+
+.gantt-bar-early {
+  top: 0;
+  height: 100%;
+  border-radius: 5px;
+  opacity: 0.85;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+
+.gantt-bar-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 5px;
+  pointer-events: none;
+}
+
+.gantt-bar-del {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+  font-size: 9px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.gantt-bar:hover .gantt-bar-del { display: flex; }
+
+/* ── Time axis ── */
+.gantt-time-label {
+  position: absolute;
+  top: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── Current time line ── */
+.gantt-now-line {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--red);
+  border-radius: 1px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ── Operating window overlay ── */
+.gantt-loc-window {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* ── Coverage band ── */
+.gantt-coverage-wrap {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
+.gantt-cov-loc {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.gantt-cov-label {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.gantt-gap-mark {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: var(--red);
+  opacity: 0.5;
+  border-radius: 2px;
+}
+
+/* ── Day off / leave labels on bar ── */
+.gantt-dayoff-label,
+.gantt-leave-label {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* ── Early gate strip ── */
+.early-gate-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--amber-bg);
+  border: 1.5px solid rgba(201,108,0,.2);
+  border-radius: var(--r);
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  flex-wrap: wrap;
+}
+
+.early-gate-label { flex-shrink: 0; }
+.early-gate-name  { font-weight: 800; color: var(--text); }
+
+.early-gate-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  font-size: 13px;
+  font-family: Outfit, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  flex: 1;
+  min-width: 160px;
+}
+
+/* ── Override summary strip ── */
+.override-summary {
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+/* ── Rota mode toggle ── */
+.rota-mode-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.rota-mode-btn {
+  padding: 0 16px;
+  height: 36px;
+  border-radius: 22px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: Outfit, sans-serif;
+  color: var(--muted);
+  transition: all .15s;
+}
+
+.rota-mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Loc picker modal ── */
+.loc-picker-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ── Alert flat list ── */
+.alert-flat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.alert-flat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+
+.alert-flat-gap    { border-color: rgba(215,43,43,.25);   background: var(--red-bg);    }
+.alert-flat-absent { border-color: rgba(215,43,43,.15);   background: var(--red-bg);    }
+.alert-flat-leave  { border-color: rgba(109,40,217,.15);  background: var(--purple-bg); }
+.alert-flat-overhr { border-color: rgba(201,108,0,.2);    background: var(--amber-bg);  }
+
+.alert-flat-icon { font-size: 14px; flex-shrink: 0; }
+.alert-flat-msg  { flex: 1; line-height: 1.4; }
+
+.alert-fill-btn    { margin-left: auto; flex-shrink: 0; }
+
+.alert-dismiss-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 14px;
+  flex-shrink: 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.alert-dismiss-btn:hover { background: var(--surface3); }
+
+.alert-flat-more {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 4px 12px;
+}
+
+/* ── Who was where lookup (in settings/leave page) ── */
+.www-lookup {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+/* ── Grand View alert strip ── */
+#grand-alert-strip {
+  margin-bottom: 10px;
+}
+
+/* ── Grand View early gate banner ── */
+#grand-early-gate {
+  margin-bottom: 8px;
+}
