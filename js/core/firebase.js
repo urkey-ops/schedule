@@ -18,16 +18,14 @@ let _hasLocalEdits = false;
 const dirtyKeys   = new Set();
 let debounceTimer = null;
 
-// ✅ FIXED — added 'swapRequests'
 const FBKEYS = [
   'employees','volunteers','defaultSchedule','shifts','earlyGate',
   'volAvailability','absences','leaveRequests','swapRequests',
-  'holidays','empDaysOff','empHourCap',
+  'publishedWeeks','auditLog','broadcastMsg','empNotes','locNotes',
+  'shiftConfirmations','holidays','empDaysOff','empHourCap',
 ];
 
-async function importFBSDK(file) {
-  return import(FBSDK + file);
-}
+async function importFBSDK(file) { return import(FBSDK + file); }
 
 async function initFirebase(cfg) {
   if (fbInit) return;
@@ -51,9 +49,7 @@ async function initFirebase(cfg) {
 
       FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
 
-      if (data.schedule && !data.shifts) {
-        migrateSlotScheduleToShifts(data.schedule);
-      }
+      if (data.schedule && !data.shifts) migrateSlotScheduleToShifts(data.schedule);
 
       initHolidays();
       saveLocal();
@@ -63,7 +59,6 @@ async function initFirebase(cfg) {
       } else {
         renderAll();
       }
-
       setSyncStatus('synced');
     });
 
@@ -87,14 +82,11 @@ function pushToFirebase() {
 }
 
 async function flushDirty() {
-  if (!fbRef) return;
-  if (dirtyKeys.size === 0) return;
-
+  if (!fbRef || dirtyKeys.size === 0) return;
   setSyncStatus('syncing');
   const keys = [...dirtyKeys];
   dirtyKeys.clear();
   _hasLocalEdits = false;
-
   try {
     const { ref, update } = await importFBSDK('firebase-database.js');
     const patch = {};
