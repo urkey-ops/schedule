@@ -21,7 +21,6 @@ function saveEmployee() {
     .filter(d => document.getElementById(`dow-off-${d}`)?.checked);
 
   if (_editEmpId) {
-    // Duplicate name check (exclude self)
     const dup = state.employees.find(e =>
       e.id !== _editEmpId &&
       e.name.toLowerCase() === name.toLowerCase()
@@ -124,13 +123,4 @@ function deleteVolunteer(volId) {
   showToast('Volunteer deleted');
 }
 
-// ── Volunteer availability toggle ─────────────────────────────
-function toggleVolAvail(volId, dow) {
-  if (!state.volAvailability)        state.volAvailability        = {};
-  if (!state.volAvailability[volId]) state.volAvailability[volId] = {};
-  const cur = state.volAvailability[volId][dow];
-  // undefined / true = available; false = not available
-  state.volAvailability[volId][dow] = (cur === false) ? true : false;
-  persistAll('volAvailability');
-  renderVolunteers();
-}
+// ── toggleVolAvail removed — replaced by toggleVolToday in staff-page.js ──
