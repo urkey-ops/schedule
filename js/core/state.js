@@ -3,16 +3,13 @@
 let state = {
   employees       : [],
   volunteers      : [],
-  // Base rota: defaultSchedule[dow][empId] = [{ loc, start, end }]
-  // start/end in minutes from midnight
   defaultSchedule : {},
-  // Per-day shift overrides: shifts[iso] = [{ id, empId, loc, start, end }]
   shifts          : {},
-  // Early gate assignment: earlyGate[iso] = empId
   earlyGate       : {},
   volAvailability : {},
   absences        : {},
   leaveRequests   : [],
+  swapRequests    : [],   // ✅ FIXED — was missing
   holidays        : {},
   empDaysOff      : {},
   empHourCap      : {},
@@ -94,8 +91,7 @@ function getEmpHourCap(empId) {
 // ── Absence helpers ───────────────────────────────────────────
 function autoCleanAbsences() {
   if (!state.absences) return;
-  const today = todayStr();
-  // Keep last 7 days for accountability lookups
+  const today  = todayStr();
   const cutoff = toDateStr(new Date(new Date(today + 'T00:00:00').getTime() - 7 * 86400000));
   Object.keys(state.absences).forEach(iso => {
     if (iso < cutoff) delete state.absences[iso];
@@ -103,8 +99,6 @@ function autoCleanAbsences() {
 }
 
 // ── Admin session persistence ─────────────────────────────────
-// Admin session is remembered in localStorage so page refreshes
-// don't require re-entering the PIN. Logout clears it explicitly.
 function saveAdminSession() {
   localStorage.setItem('smPro_adminSession', '1');
 }
@@ -123,12 +117,14 @@ function hasAdminSession() {
 function initState() {
   const saved = loadLocal();
   if (saved) {
-    ['employees','volunteers','defaultSchedule','shifts','earlyGate',
-     'volAvailability','absences','leaveRequests',
-     'holidays','empDaysOff','empHourCap'].forEach(k => {
+    // ✅ FIXED — added 'swapRequests' to restore list
+    [
+      'employees','volunteers','defaultSchedule','shifts','earlyGate',
+      'volAvailability','absences','leaveRequests','swapRequests',
+      'holidays','empDaysOff','empHourCap',
+    ].forEach(k => {
       if (saved[k] !== undefined) state[k] = saved[k];
     });
-    // Migrate legacy slot-based schedule → shifts if old data present
     if (saved.schedule && !saved.shifts) {
       migrateSlotScheduleToShifts(saved.schedule);
     }
@@ -147,7 +143,6 @@ function initState() {
   autoCleanAbsences();
   initHolidays();
 
-  // Clean up legacy keys
   localStorage.removeItem('smPro_adminPin');
   localStorage.removeItem('smPro_adminPinHash');
   localStorage.removeItem('smPro_draft_nextweek');
@@ -165,9 +160,6 @@ function initState() {
 }
 
 // ── Migration helper ──────────────────────────────────────────
-// Converts old slot-indexed schedule[iso][si][empId] = loc
-// to new shifts[iso] = [{ id, empId, loc, start, end }]
-// Merges consecutive same-location slots into one shift block.
 function migrateSlotScheduleToShifts(oldSchedule) {
   if (!oldSchedule) return;
   Object.entries(oldSchedule).forEach(([iso, slots]) => {
@@ -186,8 +178,7 @@ function migrateSlotScheduleToShifts(oldSchedule) {
       blocks.sort((a, b) => a.si - b.si);
       let cur = null;
       blocks.forEach(b => {
-        if (cur && b.loc === cur.loc &&
-            b.slotMins === cur.end) {
+        if (cur && b.loc === cur.loc && b.slotMins === cur.end) {
           cur.end = b.slotMins + SLOT_DURATION_MINS;
         } else {
           if (cur) shifts.push(cur);
