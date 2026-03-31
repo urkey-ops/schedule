@@ -1,38 +1,40 @@
 // ── core/state.js ─────────────────────────────────────────────
 
 let state = {
-  employees       : [],
-  volunteers      : [],
-  defaultSchedule : {},
-  shifts          : {},
-  earlyGate       : {},
-  volAvailability : {},
-  absences        : {},
-  leaveRequests   : [],
-  swapRequests    : [],   // ✅ FIXED — was missing
-  holidays        : {},
-  empDaysOff      : {},
-  empHourCap      : {},
-  currentWeekMon  : null,
-  currentDateISO  : null,
-  currentDow      : null,
-  mode            : 'live',
-  meta            : {},
+  employees        : [],
+  volunteers       : [],
+  defaultSchedule  : {},
+  shifts           : {},
+  earlyGate        : {},
+  volAvailability  : {},
+  absences         : {},
+  leaveRequests    : [],
+  swapRequests     : [],
+  publishedWeeks   : {},
+  auditLog         : [],
+  broadcastMsg     : null,
+  empNotes         : {},
+  locNotes         : {},
+  shiftConfirmations: {},
+  holidays         : {},
+  empDaysOff       : {},
+  empHourCap       : {},
+  currentWeekMon   : null,
+  currentDateISO   : null,
+  currentDow       : null,
+  mode             : 'live',
+  meta             : {},
 };
 
 // ── PIN Auth ──────────────────────────────────────────────────
 async function hashPin(pin) {
-  const buf = await crypto.subtle.digest(
-    'SHA-256', new TextEncoder().encode(pin)
-  );
-  return Array.from(new Uint8Array(buf))
-    .map(b => b.toString(16).padStart(2, '0')).join('');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
 async function verifyPin(pin) {
   if (!HARDCODEDPINHASH || HARDCODEDPINHASH === 'PASTE_YOUR_HASH_HERE') return false;
-  const h = await hashPin(pin);
-  return h === HARDCODEDPINHASH;
+  return (await hashPin(pin)) === HARDCODEDPINHASH;
 }
 
 function hasPinSet() {
@@ -75,9 +77,10 @@ function persistAll(key) {
   saveLocal();
   if (key) markDirty(key);
   pushToFirebase();
+  resetIdleTimer();
 }
 
-// ── Day Off helpers ───────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────
 function getEmpDaysOff(empId) {
   const emp = state.employees.find(e => e.id === empId);
   return emp?.daysOff || state.empDaysOff?.[empId] || [];
@@ -88,20 +91,35 @@ function getEmpHourCap(empId) {
   return emp?.hourCap || state.empHourCap?.[empId] || DEFAULTHRSCAP;
 }
 
+function getNextWeekMon() {
+  const d = new Date(state.currentWeekMon + 'T00:00:00');
+  d.setDate(d.getDate() + 7);
+  return toDateStr(d);
+}
+
 // ── Absence helpers ───────────────────────────────────────────
 function autoCleanAbsences() {
   if (!state.absences) return;
-  const today  = todayStr();
-  const cutoff = toDateStr(new Date(new Date(today + 'T00:00:00').getTime() - 7 * 86400000));
+  const cutoff = toDateStr(
+    new Date(new Date(todayStr() + 'T00:00:00').getTime() - 7 * 86400000)
+  );
   Object.keys(state.absences).forEach(iso => {
     if (iso < cutoff) delete state.absences[iso];
   });
 }
 
-// ── Admin session persistence ─────────────────────────────────
-function saveAdminSession() {
-  localStorage.setItem('smPro_adminSession', '1');
+function autoCleanLocNotes() {
+  if (!state.locNotes) return;
+  const cutoff = toDateStr(
+    new Date(new Date(todayStr() + 'T00:00:00').getTime() - 14 * 86400000)
+  );
+  Object.keys(state.locNotes).forEach(iso => {
+    if (iso < cutoff) delete state.locNotes[iso];
+  });
 }
+
+// ── Admin session ─────────────────────────────────────────────
+function saveAdminSession() { localStorage.setItem('smPro_adminSession', '1'); }
 
 function clearAdminSession() {
   localStorage.removeItem('smPro_adminSession');
@@ -117,30 +135,28 @@ function hasAdminSession() {
 function initState() {
   const saved = loadLocal();
   if (saved) {
-    // ✅ FIXED — added 'swapRequests' to restore list
     [
       'employees','volunteers','defaultSchedule','shifts','earlyGate',
       'volAvailability','absences','leaveRequests','swapRequests',
-      'holidays','empDaysOff','empHourCap',
-    ].forEach(k => {
-      if (saved[k] !== undefined) state[k] = saved[k];
-    });
-    if (saved.schedule && !saved.shifts) {
-      migrateSlotScheduleToShifts(saved.schedule);
-    }
+      'publishedWeeks','auditLog','broadcastMsg','empNotes','locNotes',
+      'shiftConfirmations','holidays','empDaysOff','empHourCap',
+    ].forEach(k => { if (saved[k] !== undefined) state[k] = saved[k]; });
+
+    if (saved.schedule && !saved.shifts) migrateSlotScheduleToShifts(saved.schedule);
   }
 
-  if (!state.currentWeekMon) {
-    state.currentWeekMon = toDateStr(getWeekMonday(new Date()));
-  }
-  if (!state.currentDateISO) {
-    state.currentDateISO = todayStr();
-  }
-  if (!state.currentDow) {
-    state.currentDow = DAYSSHORT[(new Date().getDay() + 6) % 7];
-  }
+  if (!state.currentWeekMon)  state.currentWeekMon = toDateStr(getWeekMonday(new Date()));
+  if (!state.currentDateISO)  state.currentDateISO = todayStr();
+  if (!state.currentDow)      state.currentDow     = DAYSSHORT[(new Date().getDay()+6)%7];
+  if (!state.publishedWeeks)  state.publishedWeeks  = {};
+  if (!state.auditLog)        state.auditLog        = [];
+  if (!state.empNotes)        state.empNotes        = {};
+  if (!state.locNotes)        state.locNotes        = {};
+  if (!state.shiftConfirmations) state.shiftConfirmations = {};
+  if (!state.swapRequests)    state.swapRequests    = [];
 
   autoCleanAbsences();
+  autoCleanLocNotes();
   initHolidays();
 
   localStorage.removeItem('smPro_adminPin');
@@ -172,7 +188,6 @@ function migrateSlotScheduleToShifts(oldSchedule) {
         empBlocks[empId].push({ si: parseInt(si), slotMins, loc });
       });
     });
-
     const shifts = [];
     Object.entries(empBlocks).forEach(([empId, blocks]) => {
       blocks.sort((a, b) => a.si - b.si);
@@ -182,18 +197,11 @@ function migrateSlotScheduleToShifts(oldSchedule) {
           cur.end = b.slotMins + SLOT_DURATION_MINS;
         } else {
           if (cur) shifts.push(cur);
-          cur = {
-            id    : uid(),
-            empId,
-            loc   : b.loc,
-            start : b.slotMins,
-            end   : b.slotMins + SLOT_DURATION_MINS,
-          };
+          cur = { id: uid(), empId, loc: b.loc, start: b.slotMins, end: b.slotMins + SLOT_DURATION_MINS };
         }
       });
       if (cur) shifts.push(cur);
     });
-
     if (shifts.length) state.shifts[iso] = shifts;
   });
 }
