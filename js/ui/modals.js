@@ -18,12 +18,15 @@ function checkAdminPin(e) {
 }
 
 async function submitAdminPin() {
-  const pin   = document.getElementById('admin-pin-input').value.trim();
-  const errEl = document.getElementById('admin-pin-error');
+  const pin    = document.getElementById('admin-pin-input').value.trim();
+  const errEl  = document.getElementById('admin-pin-error');
+  const remember = document.getElementById('admin-remember')?.checked;
   if (!pin) { errEl.textContent = 'Please enter your PIN.'; return; }
   if (!hasPinSet()) { errEl.textContent = 'No PIN configured.'; return; }
   const ok = await verifyPin(pin);
   if (ok) {
+    if (remember) saveAdminSession();
+    else sessionStorage.setItem('smPro_adminSession', '1');
     closeModal('admin-login-modal');
     enterAdmin();
   } else {
@@ -78,7 +81,7 @@ function openAddEmployee() {
   _blockedLocs = [];
   document.getElementById('modal-title').textContent    = 'Add Employee';
   document.getElementById('emp-name').value             = '';
-  document.getElementById('emp-fallback').value         = 'Field Work';
+  document.getElementById('emp-fallback').value         = 'field';
   document.getElementById('emp-hour-cap').value         = '';
   document.getElementById('emp-status').value           = 'Active';
   document.getElementById('emp-annual').value           = '';
@@ -99,11 +102,11 @@ function openEditEmployee(empId) {
   const emp = state.employees.find(e => e.id === empId);
   if (!emp) return;
   _editEmpId   = empId;
-  _blockedLocs = [...(emp.blocked||[])];
+  _blockedLocs = [...(emp.blocked || [])];
 
   document.getElementById('modal-title').textContent  = 'Edit Employee';
   document.getElementById('emp-name').value           = emp.name     || '';
-  document.getElementById('emp-fallback').value       = emp.fallback || 'Field Work';
+  document.getElementById('emp-fallback').value       = emp.fallback || 'field';
   document.getElementById('emp-hour-cap').value       = emp.hourCap  || '';
   document.getElementById('emp-status').value         = emp.status   || 'Active';
   document.getElementById('emp-annual').value         = emp.annualLeave || '';
@@ -111,7 +114,7 @@ function openEditEmployee(empId) {
 
   ['MON','TUE','WED','THU','FRI','SAT','SUN'].forEach(d => {
     const cb = document.getElementById(`dow-off-${d}`);
-    if (cb) cb.checked = (emp.daysOff||[]).includes(d);
+    if (cb) cb.checked = (emp.daysOff || []).includes(d);
   });
   ['gate','podium','mandir','field','giftshop'].forEach(loc => {
     document.getElementById(`tog-${loc}`)
@@ -121,15 +124,14 @@ function openEditEmployee(empId) {
   const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
   const used    = calcScheduledHrsWeek(empId, weekMon);
   const cap     = emp.hourCap || DEFAULTHRSCAP;
-  const pct     = Math.min((used/cap)*100, 100);
-  const color   = used>cap?'#dc2626':pct>=80?'#d97706':'#059669';
+  const pct     = Math.min((used / cap) * 100, 100);
+  const color   = used > cap ? '#dc2626' : pct >= 80 ? '#d97706' : '#059669';
   document.getElementById('emp-hrs-summary').innerHTML =
     `<div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:12px;color:var(--muted);font-weight:600">This week:</span>
       <div class="roster-hr-bar" style="flex:1">
         <div class="roster-hr-track">
-          <div class="roster-hr-fill"
-            style="width:${pct}%;background:${color}"></div>
+          <div class="roster-hr-fill" style="width:${pct}%;background:${color}"></div>
         </div>
         <span class="roster-hr-label" style="color:${color}">
           ${used.toFixed(1)}/${cap}h
@@ -145,7 +147,7 @@ function openEditEmployee(empId) {
 
 let _editLeaveId = null;
 
-function openAddLeave() {
+function openAddLeave(preEmpId = null) {
   _editLeaveId = null;
   document.getElementById('leave-modal-title').textContent = 'Add Leave Record';
   document.getElementById('leave-from').value              = todayStr();
@@ -157,13 +159,16 @@ function openAddLeave() {
   const sel = document.getElementById('leave-emp-id');
   sel.innerHTML = state.employees
     .filter(e => e.status === 'Active')
-    .map(e => `<option value="${e.id}">${escH(e.name)}</option>`)
+    .map(e => `<option value="${e.id}" ${preEmpId === e.id ? 'selected' : ''}>
+      ${escH(e.name)}</option>`)
     .join('');
+
+  updateLeaveBalance();
   openModal('leave-modal');
 }
 
 function openEditLeave(leaveId) {
-  const rec = (state.leaveRequests||[]).find(l => l.id === leaveId);
+  const rec = (state.leaveRequests || []).find(l => l.id === leaveId);
   if (!rec) return;
   _editLeaveId = leaveId;
   document.getElementById('leave-modal-title').textContent = 'Edit Leave Record';
@@ -171,8 +176,8 @@ function openEditLeave(leaveId) {
   const sel = document.getElementById('leave-emp-id');
   sel.innerHTML = state.employees
     .filter(e => e.status === 'Active')
-    .map(e => `<option value="${e.id}"
-      ${e.id===rec.empId?'selected':''}>${escH(e.name)}</option>`)
+    .map(e => `<option value="${e.id}" ${e.id === rec.empId ? 'selected' : ''}>
+      ${escH(e.name)}</option>`)
     .join('');
 
   document.getElementById('leave-from').value   = rec.from   || '';
@@ -180,7 +185,24 @@ function openEditLeave(leaveId) {
   document.getElementById('leave-type').value   = rec.type   || 'annual';
   document.getElementById('leave-note').value   = rec.note   || '';
   document.getElementById('leave-status').value = rec.status || 'active';
+  updateLeaveBalance();
   openModal('leave-modal');
+}
+
+// Shows remaining leave days inline in the modal
+function updateLeaveBalance() {
+  const el    = document.getElementById('leave-balance-info');
+  if (!el) return;
+  const empId = document.getElementById('leave-emp-id')?.value;
+  const type  = document.getElementById('leave-type')?.value;
+  const emp   = state.employees.find(e => e.id === empId);
+  if (!emp || !['annual','sick'].includes(type)) { el.innerHTML = ''; return; }
+  const cap    = type === 'annual' ? (emp.annualLeave || 20) : (emp.sickLeave || 10);
+  const used   = calcLeaveUsed(empId, type);
+  const remain = cap - used;
+  const color  = remain <= 3 ? 'var(--red)' : 'var(--green)';
+  el.innerHTML = `<span style="font-size:12px;font-weight:600;color:${color}">
+    ${remain}d remaining of ${cap}d ${type} leave</span>`;
 }
 
 function saveLeave() {
@@ -197,7 +219,7 @@ function saveLeave() {
   const conflicts = checkLeaveConflicts(empId, from, to);
   if (conflicts.length) {
     const emp = state.employees.find(e => e.id === empId);
-    if (!confirm(`${emp?.name||'This employee'} has ${conflicts.length} scheduled shift(s) during this period.\n\nContinue anyway?`)) return;
+    if (!confirm(`${emp?.name || 'This employee'} has ${conflicts.length} scheduled shift(s) during this period.\n\nContinue anyway?`)) return;
   }
 
   if (!state.leaveRequests) state.leaveRequests = [];
@@ -213,105 +235,9 @@ function saveLeave() {
 
   persistAll('leaveRequests');
   closeModal('leave-modal');
-  renderLeave(); renderAll();
-  showToast(_editLeaveId ? 'Leave updated' : 'Leave added');
-}
-
-// ── Swap modal ────────────────────────────────────────────────
-
-let _editSwapId = null;
-
-function openAddSwap() {
-  _editSwapId = null;
-  document.getElementById('swap-modal-title').textContent = 'Add Day-Off Swap';
-  const sel = document.getElementById('swap-emp-id');
-  sel.innerHTML = state.employees
-    .filter(e => e.status === 'Active')
-    .map(e => `<option value="${e.id}">${escH(e.name)}</option>`)
-    .join('');
-  document.getElementById('swap-from').value = todayStr();
-  document.getElementById('swap-to').value   = todayStr();
-  document.getElementById('swap-note').value = '';
-  openModal('swap-modal');
-}
-
-function openEditSwap(swapId) {
-  const rec = (state.swapRequests||[]).find(s => s.id === swapId);
-  if (!rec) return;
-  _editSwapId = swapId;
-  document.getElementById('swap-modal-title').textContent = 'Edit Swap';
-  const sel = document.getElementById('swap-emp-id');
-  sel.innerHTML = state.employees
-    .filter(e => e.status === 'Active')
-    .map(e => `<option value="${e.id}"
-      ${e.id===rec.empId?'selected':''}>${escH(e.name)}</option>`)
-    .join('');
-  document.getElementById('swap-from').value = rec.fromDate || '';
-  document.getElementById('swap-to').value   = rec.toDate   || '';
-  document.getElementById('swap-note').value = rec.note     || '';
-  openModal('swap-modal');
-}
-
-function saveSwap() {
-  const empId    = document.getElementById('swap-emp-id')?.value;
-  const fromDate = v('swap-from');
-  const toDate   = v('swap-to');
-  const note     = v('swap-note');
-
-  if (!empId || !fromDate || !toDate) {
-    alert('Please fill all required fields.'); return;
-  }
-
-  // FIX: validateSwapDayOff was defined in leave.js but never called here —
-  // invalid swaps (non-day-off dates, duplicate active swaps) were silently accepted.
-  if (!_editSwapId) {
-    if (!validateSwapDayOff(empId, fromDate)) return;
-  }
-
-  if (!state.swapRequests) state.swapRequests = [];
-
-  if (_editSwapId) {
-    const rec = state.swapRequests.find(s => s.id === _editSwapId);
-    if (rec) Object.assign(rec, { empId, fromDate, toDate, note });
-  } else {
-    state.swapRequests.push({
-      id: `swap-${Date.now()}`, empId, fromDate, toDate, note, status: 'active',
-    });
-  }
-
-  persistAll('swapRequests');
-  closeModal('swap-modal');
-  renderSwaps(); renderAll();
-  showToast(_editSwapId ? 'Swap updated' : 'Swap added');
-}
-
-// ── Plan schedule modal ───────────────────────────────────────
-
-let _planWeekMon = '';
-
-function openPlanSchedule(empId) {
-  const emp = state.employees.find(e => e.id === empId);
-  if (!emp) return;
-  _editEmpId   = empId;
-  _planWeekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
-  document.getElementById('plan-modal-title').textContent =
-    `Plan Schedule — ${emp.name}`;
-  renderPlanModal();
-  openModal('plan-modal');
-}
-
-function planShiftWeek(delta) {
-  const d = new Date(_planWeekMon+'T00:00:00');
-  d.setDate(d.getDate() + delta * 7);
-  _planWeekMon = toDateStr(d);
-  renderPlanModal();
-}
-
-function savePlanSchedule() {
-  persistAll('schedule');
-  closeModal('plan-modal');
+  renderLeave();
   renderAll();
-  showToast('Schedule saved');
+  showToast(_editLeaveId ? 'Leave updated' : 'Leave added');
 }
 
 // ── Volunteer modal ───────────────────────────────────────────
@@ -328,7 +254,7 @@ function openAddVolunteer() {
 }
 
 function openEditVolunteer(volId) {
-  const vol = (state.volunteers||[]).find(v => v.id === volId);
+  const vol = (state.volunteers || []).find(v => v.id === volId);
   if (!vol) return;
   _editVolId = volId;
   document.getElementById('vol-modal-title').textContent = 'Edit Volunteer';
@@ -351,9 +277,9 @@ async function confirmReset() {
   const ok  = await verifyPin(pin);
   if (!ok) { document.getElementById('reset-error').textContent = 'Incorrect PIN.'; return; }
   Object.assign(state, {
-    employees:[], volunteers:[], defaultSchedule:{}, schedule:{},
-    volAvailability:{}, absences:{}, leaveRequests:[], swapRequests:[],
-    holidays:{}, empDaysOff:{}, empHourCap:{},
+    employees:[], volunteers:[], defaultSchedule:{}, shifts:{},
+    earlyGate:{}, volAvailability:{}, absences:{},
+    leaveRequests:[], holidays:{}, empDaysOff:{}, empHourCap:{},
   });
   persistAll();
   closeModal('reset-modal');
@@ -364,7 +290,7 @@ async function confirmReset() {
 // ── Export / Import ───────────────────────────────────────────
 
 function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
   a.download = `schedule-backup-${todayStr()}.json`;
@@ -390,4 +316,30 @@ function handleImportFile(e) {
     } catch(err) { alert('Invalid JSON file.'); }
   };
   reader.readAsText(file);
+}
+
+// ── Who was where lookup ──────────────────────────────────────
+
+function renderWhoWasWhere() {
+  const iso    = document.getElementById('www-date')?.value;
+  const loc    = document.getElementById('www-loc')?.value;
+  const timeStr= document.getElementById('www-time')?.value;
+  const el     = document.getElementById('www-result');
+  if (!iso || !loc || !timeStr || !el) return;
+
+  const timeMins = HHMMtoMins(timeStr);
+  const emps     = whoWasAt(iso, loc, timeMins);
+
+  el.innerHTML = emps.length
+    ? `<div style="margin-top:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">
+          At ${LOCLABEL[loc]||loc} on ${fmtDate(iso)} at ${timeStr}:
+        </div>
+        ${emps.map(e =>
+          `<div style="font-size:14px;font-weight:600;padding:6px 0;
+                       border-bottom:1px solid var(--border)">${escH(e.name)}</div>`
+        ).join('')}
+      </div>`
+    : `<div style="margin-top:10px;font-size:13px;color:var(--muted)">
+        Nobody recorded at ${LOCLABEL[loc]||loc} at that time.</div>`;
 }
