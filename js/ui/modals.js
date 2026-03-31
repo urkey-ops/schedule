@@ -18,8 +18,8 @@ function checkAdminPin(e) {
 }
 
 async function submitAdminPin() {
-  const pin    = document.getElementById('admin-pin-input').value.trim();
-  const errEl  = document.getElementById('admin-pin-error');
+  const pin      = document.getElementById('admin-pin-input').value.trim();
+  const errEl    = document.getElementById('admin-pin-error');
   const remember = document.getElementById('admin-remember')?.checked;
   if (!pin) { errEl.textContent = 'Please enter your PIN.'; return; }
   if (!hasPinSet()) { errEl.textContent = 'No PIN configured.'; return; }
@@ -189,7 +189,6 @@ function openEditLeave(leaveId) {
   openModal('leave-modal');
 }
 
-// Shows remaining leave days inline in the modal
 function updateLeaveBalance() {
   const el    = document.getElementById('leave-balance-info');
   if (!el) return;
@@ -279,8 +278,10 @@ async function confirmReset() {
   Object.assign(state, {
     employees:[], volunteers:[], defaultSchedule:{}, shifts:{},
     earlyGate:{}, volAvailability:{}, absences:{},
-    leaveRequests:[], holidays:{}, empDaysOff:{}, empHourCap:{},
+    leaveRequests:[], swapRequests:[], holidays:{}, empDaysOff:{}, empHourCap:{},
   });
+  // ✅ FIXED — mark all keys dirty so Firebase receives the reset
+  FBKEYS.forEach(k => markDirty(k));
   persistAll();
   closeModal('reset-modal');
   renderAll();
@@ -310,6 +311,8 @@ function handleImportFile(e) {
       if (!confirm('This will replace ALL current data. Are you sure?')) return;
       pushUndo('Import data', state);
       Object.keys(data).forEach(k => { state[k] = data[k]; });
+      // ✅ FIXED — mark all keys dirty so Firebase receives the import
+      FBKEYS.forEach(k => markDirty(k));
       persistAll();
       renderAll();
       showToast('Data imported successfully');
