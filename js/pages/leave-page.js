@@ -100,27 +100,15 @@ function renderSwaps() {
             ? escH(emp.name)
             : `<span style="color:var(--red)">Unknown</span>`;
 
-          const coverIssues = [];
-          if (s.status === 'active') {
-            TIMESLOTS.forEach((slot, si) => {
-              const { loc } = getResolvedLoc(s.fromDate, si, s.empId);
-              if (!REQUIREDLOCS.includes(loc)) return;
-              const others = state.employees.filter(e =>
-                e.status==='Active' && e.id !== s.empId &&
-                !isEmpDayOff(e.id, s.fromDate) &&
-                !isOnLeave(e.id, s.fromDate)
-              );
-              const covered = others.some(e =>
-                getResolvedLoc(s.fromDate, si, e.id).loc === loc
-              );
-              if (!covered) coverIssues.push(slot);
-            });
-          }
+          // ✅ FIXED — use getCoverageGaps instead of slot-by-slot TIMESLOTS loop
+          const coverIssues = s.status === 'active'
+            ? getCoverageGaps(s.fromDate)
+            : [];
 
           const coverBadge = coverIssues.length
             ? `<span class="leave-conflict-badge">
-                ⚠️ ${coverIssues.length} gap${coverIssues.length>1?'s':''}</span>`
-            : s.status==='active'
+                ⚠️ ${coverIssues.length} gap${coverIssues.length > 1 ? 's' : ''}</span>`
+            : s.status === 'active'
             ? `<span style="font-size:11px;color:#059669;font-weight:600">✔ covered</span>`
             : `<span style="font-size:11px;color:var(--muted)">—</span>`;
 
