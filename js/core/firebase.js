@@ -18,9 +18,10 @@ let _hasLocalEdits = false;
 const dirtyKeys   = new Set();
 let debounceTimer = null;
 
+// ✅ FIXED — added 'swapRequests'
 const FBKEYS = [
   'employees','volunteers','defaultSchedule','shifts','earlyGate',
-  'volAvailability','absences','leaveRequests',
+  'volAvailability','absences','leaveRequests','swapRequests',
   'holidays','empDaysOff','empHourCap',
 ];
 
@@ -50,7 +51,6 @@ async function initFirebase(cfg) {
 
       FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
 
-      // Migrate legacy slot-schedule if present in Firebase
       if (data.schedule && !data.shifts) {
         migrateSlotScheduleToShifts(data.schedule);
       }
