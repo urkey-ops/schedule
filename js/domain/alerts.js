@@ -1,38 +1,27 @@
 // ── domain/alerts.js ─────────────────────────────────────────
 
 function getDayGapCount(iso) {
-  return scanAlerts(iso).filter(a => a.type === ALERT_TYPES.GAP).length;
+  return getCoverageGaps(iso).length;
 }
 
 function scanAlerts(iso) {
-  const alerts     = [];
-  const activeEmps = state.employees.filter(e => e.status === 'Active');
+  const alerts = [];
 
-  TIMESLOTS.forEach((slot, si) => {
-    REQUIREDLOCS.forEach(loc => {
-      const covered = activeEmps.some(e => {
-        if (isEmpDayOff(e.id, iso))         return false;
-        if (isOnLeave(e.id, iso))           return false;
-        if (state.absences?.[iso]?.[e.id]) return false;
-        const { loc: l } = getResolvedLoc(iso, si, e.id);
-        return l === loc;
-      });
-      if (!covered) {
-        alerts.push({
-          type : ALERT_TYPES.GAP,
-          iso,
-          si,
-          slot,
-          loc,
-          msg  : `${slot} — ${LOCLABEL[loc] || loc} uncovered`,
-        });
-      }
+  // Coverage gaps (continuous, not per-slot)
+  getCoverageGaps(iso).forEach(g => {
+    alerts.push({
+      type     : ALERT_TYPES.GAP,
+      iso,
+      loc      : g.loc,
+      gapStart : g.gapStart,
+      gapEnd   : g.gapEnd,
+      msg      : `${LOCLABEL[g.loc] || g.loc} uncovered ` +
+                 `${minsToHHMM(g.gapStart)}–${minsToHHMM(g.gapEnd)}`,
     });
   });
 
   // Absent employees
-  const absentIds = Object.keys(state.absences?.[iso] || {});
-  absentIds.forEach(empId => {
+  Object.keys(state.absences?.[iso] || {}).forEach(empId => {
     const emp = state.employees.find(e => e.id === empId);
     if (emp) alerts.push({
       type  : ALERT_TYPES.ABSENT,
@@ -54,6 +43,19 @@ function scanAlerts(iso) {
         msg   : `${emp.name} on ${l.type} leave`,
       });
     });
+
+  // Over hour cap
+  const weekMon = state.currentWeekMon || toDateStr(getWeekMonday(new Date()));
+  state.employees.filter(e => e.status === 'Active').forEach(e => {
+    const used = calcScheduledHrsWeek(e.id, weekMon);
+    const cap  = getEmpHourCap(e.id);
+    if (used > cap) alerts.push({
+      type  : ALERT_TYPES.OVERHR,
+      iso,
+      empId : e.id,
+      msg   : `${e.name} is ${(used - cap).toFixed(1)}h over cap this week`,
+    });
+  });
 
   return alerts;
 }
