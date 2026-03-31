@@ -1,4 +1,4 @@
-// ── firebase.js ───────────────────────────────────────────────
+// ── core/firebase.js ──────────────────────────────────────────
 
 const HARDCODEDCONFIG = {
   apiKey:      "AIzaSyAT0EMRwzFSQMSbMjvmL2t7iOwwWqsDqzQ",
@@ -10,18 +10,18 @@ const HARDCODEDCONFIG = {
 
 const FBSDK = 'https://www.gstatic.com/firebasejs/10.12.0/';
 
-let db          = null;
-let fbRef       = null;
-let fbInit      = false;
+let db             = null;
+let fbRef          = null;
+let fbInit         = false;
 let _hasLocalEdits = false;
 
-const dirtyKeys = new Set();
+const dirtyKeys   = new Set();
 let debounceTimer = null;
 
 const FBKEYS = [
-  'employees','volunteers','defaultSchedule','schedule',
-  'volAvailability','absences','leaveRequests','swapRequests',
-  'holidays','empDaysOff','empHourCap'
+  'employees','volunteers','defaultSchedule','shifts','earlyGate',
+  'volAvailability','absences','leaveRequests',
+  'holidays','empDaysOff','empHourCap',
 ];
 
 async function importFBSDK(file) {
@@ -44,17 +44,18 @@ async function initFirebase(cfg) {
       if (!data) { setSyncStatus('synced'); return; }
 
       if (_hasLocalEdits && state.mode === 'admin') {
-        // FIX: showOutOfSyncBanner signature now matches sync-ui.js (accepts optional msg)
         showOutOfSyncBanner('New changes available from another device.');
         return;
       }
 
       FBKEYS.forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
 
-      // FIX: re-run initHolidays after Firebase loads so defaults are merged
-      // even when Firebase has no holidays key yet.
-      initHolidays();
+      // Migrate legacy slot-schedule if present in Firebase
+      if (data.schedule && !data.shifts) {
+        migrateSlotScheduleToShifts(data.schedule);
+      }
 
+      initHolidays();
       saveLocal();
 
       if (document.readyState === 'loading') {
@@ -106,10 +107,6 @@ async function flushDirty() {
     setSyncStatus('error');
   }
 }
-
-// FIX: setSyncStatus and showOutOfSyncBanner are defined ONLY in sync-ui.js.
-// The duplicate definitions that were here have been removed.
-// hideOutOfSyncBanner is also defined in sync-ui.js.
 
 function reloadFromFirebase() {
   _hasLocalEdits = false;
