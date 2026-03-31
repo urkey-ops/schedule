@@ -1,6 +1,5 @@
 // ── core/constants.js ─────────────────────────────────────────
 
-// ── Locations ─────────────────────────────────────────────────
 const LOC_CYCLE    = ['gate','podium','mandir','field','giftshop','lunch','off'];
 const ALLLOCS      = ['gate','podium','mandir','field','giftshop','lunch','off','vac'];
 const REQUIREDLOCS = ['gate','podium','mandir'];
@@ -38,79 +37,119 @@ const LOCCLS = {
   vac      : 'loc-vac',
 };
 
-// ── Location operating windows (mins from midnight) ────────────
-// Shifts outside these windows should be flagged as invalid.
 const LOC_HOURS = {
-  gate     : { open:  6 * 60, close: 20 * 60 + 30 }, // 06:00–20:30
-  podium   : { open:  9 * 60, close: 20 * 60 + 30 }, // 09:00–20:30
-  mandir   : { open:  9 * 60, close: 20 * 60 + 30 }, // 09:00–20:30
-  field    : { open:  9 * 60, close: 17 * 60       }, // 09:00–17:00
-  giftshop : { open: 10 * 60, close: 18 * 60       }, // 10:00–18:00
-  lunch    : { open: 12 * 60, close: 14 * 60       }, // 12:00–14:00
+  gate     : { open:  6 * 60, close: 20 * 60 + 30 },
+  podium   : { open:  9 * 60, close: 20 * 60 + 30 },
+  mandir   : { open:  9 * 60, close: 20 * 60 + 30 },
+  field    : { open:  9 * 60, close: 17 * 60       },
+  giftshop : { open: 10 * 60, close: 18 * 60       },
+  lunch    : { open: 12 * 60, close: 14 * 60       },
   off      : null,
   vac      : null,
 };
 
-// Early gate: single person covers Gate 06:00–09:00 before main shift
-const EARLY_GATE_START = 6 * 60;   // 06:00 in mins
-const EARLY_GATE_END   = 9 * 60;   // 09:00 in mins
+// ── Minimum staff per required location ───────────────────────
+const MIN_STAFF_PER_LOC = {
+  gate    : 2,
+  podium  : 1,
+  mandir  : 1,
+};
+
+// ── Overtime thresholds ───────────────────────────────────────
+const OVERTIME_SOFT_CAP = 40;
+const OVERTIME_HARD_CAP = 48;
+
+// ── Early gate ────────────────────────────────────────────────
+const EARLY_GATE_START = 6 * 60;
+const EARLY_GATE_END   = 9 * 60;
 
 // ── Days ──────────────────────────────────────────────────────
 const DAYSSHORT = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-const DAYSFULL  = ['Monday','Tuesday','Wednesday','Thursday',
-                   'Friday','Saturday','Sunday'];
+const DAYSFULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
 // ── Display grid ──────────────────────────────────────────────
-// TIMESLOTS is used only for rendering the Gantt x-axis grid lines
-// and for the Now-view current-slot lookup. It is NOT the storage format.
-// Storage is shift blocks: { id, empId, loc, start, end } in minutes.
-const DISPLAY_START_MINS = 6 * 60;   // 06:00
-const DISPLAY_END_MINS   = 21 * 60;  // 21:00
+const DISPLAY_START_MINS = 6 * 60;
+const DISPLAY_END_MINS   = 21 * 60;
 const SLOT_DURATION_MINS = 30;
 
-// Generate display slot labels from 06:00 to 20:30
 const TIMESLOTS = (() => {
   const slots = [];
   for (let m = DISPLAY_START_MINS; m < DISPLAY_END_MINS; m += SLOT_DURATION_MINS) {
-    const h1 = String(Math.floor(m / 60)).padStart(2,'0');
-    const m1 = String(m % 60).padStart(2,'0');
-    const m2 = m + SLOT_DURATION_MINS;
-    const h2 = String(Math.floor(m2 / 60)).padStart(2,'0');
+    const h1  = String(Math.floor(m / 60)).padStart(2,'0');
+    const m1  = String(m % 60).padStart(2,'0');
+    const m2  = m + SLOT_DURATION_MINS;
+    const h2  = String(Math.floor(m2 / 60)).padStart(2,'0');
     const m2s = String(m2 % 60).padStart(2,'0');
     slots.push(`${h1}:${m1}–${h2}:${m2s}`);
   }
   return slots;
 })();
 
-// Keep SLOT_START_MINS as alias so any remaining legacy code doesn't break
 const SLOT_START_MINS = DISPLAY_START_MINS;
-
-// ── Defaults ──────────────────────────────────────────────────
-const DEFAULTHRSCAP = 40;
+const DEFAULTHRSCAP   = 40;
 
 // ── Alert types ───────────────────────────────────────────────
 const ALERT_TYPES = {
-  GAP     : 'gap',
-  OVERHR  : 'overhr',
-  ABSENT  : 'absent',
-  LEAVE   : 'leave',
-  CONFLICT: 'conflict',
+  GAP          : 'gap',
+  UNDERSTAFFED : 'understaffed',
+  OVERHR       : 'overhr',
+  ABSENT       : 'absent',
+  LEAVE        : 'leave',
+  CONFLICT     : 'conflict',
+  SWAP_PENDING : 'swap_pending',
+  UNSCHEDULED  : 'unscheduled',
+  UNPUBLISHED  : 'unpublished',
 };
 
 const ALERT_TYPE_LABELS = {
-  gap     : 'Coverage Gaps',
-  overhr  : 'Hour Cap Exceeded',
-  absent  : 'Absent Staff',
-  leave   : 'On Leave',
-  conflict: 'Schedule Conflicts',
+  gap          : 'Coverage Gaps',
+  understaffed : 'Understaffed',
+  overhr       : 'Over Hour Cap',
+  absent       : 'Absent Staff',
+  leave        : 'On Leave',
+  conflict     : 'Schedule Conflicts',
+  swap_pending : 'Pending Swaps',
+  unscheduled  : 'Unscheduled Staff',
+  unpublished  : 'Week Not Published',
 };
 
 const ALERT_TYPE_ICONS = {
-  gap     : '⚠️',
-  overhr  : '⏱',
-  absent  : '✖',
-  leave   : '🔒',
-  conflict: '⚡',
+  gap          : '⚠️',
+  understaffed : '👥',
+  overhr       : '⏱',
+  absent       : '✖',
+  leave        : '🔒',
+  conflict     : '⚡',
+  swap_pending : '🔄',
+  unscheduled  : '📋',
+  unpublished  : '📌',
+};
+
+// Lower number = higher priority in alert list
+const ALERT_PRIORITY = {
+  gap          : 1,
+  understaffed : 2,
+  absent       : 3,
+  swap_pending : 4,
+  overhr       : 5,
+  unscheduled  : 6,
+  unpublished  : 7,
+  leave        : 8,
+  conflict     : 9,
+};
+
+// ── Swap status ───────────────────────────────────────────────
+const SWAP_STATUS = {
+  PENDING   : 'pending',
+  APPROVED  : 'approved',
+  REJECTED  : 'rejected',
+  CANCELLED : 'cancelled',
+};
+
+// ── Week publish status ───────────────────────────────────────
+const WEEK_STATUS = {
+  DRAFT     : 'draft',
+  PUBLISHED : 'published',
 };
 
 // ── US Federal Holidays 2025–2026 ─────────────────────────────
@@ -139,7 +178,6 @@ const US_FEDERAL_HOLIDAYS = {
   '2026-12-25': { name: 'Christmas Day',          emoji: '🎄', color: '#4F8EF7' },
 };
 
-// ── Hindu / Indian Festivals 2025–2026 ────────────────────────
 const HINDU_FESTIVALS_DEFAULT = {
   '2025-01-14': { name: 'Makar Sankranti',  emoji: '🪁', color: '#EA580C' },
   '2025-01-29': { name: 'Vasant Panchami',  emoji: '🌸', color: '#EA580C' },
