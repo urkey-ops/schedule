@@ -57,6 +57,6 @@ function currentSlotIdx() {
 
 function parseSlotTime(slotStr) {
   // Returns [h, m] of slot start — e.g. '09:30–10:00' → [9, 30]
-  const match = slotStr.match(/^(\d{1,2}):(\d{2})/);
+const match = slotStr.match(/^(\d{1,2}):(\d{2})/);
   return match ? [parseInt(match[1]), parseInt(match[2])] : [0, 0];
 }
