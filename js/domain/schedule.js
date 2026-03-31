@@ -1,63 +1,41 @@
-// ── domain/schedule.js ────────────────────────────────────────
+// ── domain/schedule.js ───────────────────────────────────────
+// Compatibility + helper layer that sits on top of shifts.js.
+// getResolvedLoc is kept so existing rendering code (live.js,
+// grandview.js) doesn't need to change signatures immediately.
 
 function isEmpDayOff(empId, iso) {
   const emp = state.employees.find(e => e.id === empId);
   if (!emp) return false;
-  // Check swap — if employee has active swap fromDate=iso, they are working
-  const swapped = (state.swapRequests||[]).some(s =>
-    s.empId === empId && s.fromDate === iso && s.status === 'active'
-  );
-  if (swapped) return false;
-  const dow = DAYSSHORT[(new Date(iso+'T00:00:00').getDay()+6)%7];
-  return (emp.daysOff||[]).includes(dow);
+  const dow = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  return (emp.daysOff || []).includes(dow);
 }
 
 function isOnLeave(empId, iso) {
-  return (state.leaveRequests||[]).some(l =>
+  return (state.leaveRequests || []).some(l =>
     l.empId === empId && l.status === 'active' &&
     iso >= l.from && iso <= l.to
   );
 }
 
+// Returns { loc, source } at a given display slot index.
+// source: 'shift' | 'earlygate' | 'leave' | 'dayoff' | 'absent' | 'fallback'
 function getResolvedLoc(iso, si, empId) {
-  // 1. Override
-  const ovr = state.schedule?.[iso]?.[si]?.[empId];
-  if (ovr) return { loc: ovr, source: 'override' };
+  if (isEmpDayOff(empId, iso)) return { loc: 'off',  source: 'dayoff'  };
+  if (isOnLeave(empId, iso))   return { loc: 'vac',  source: 'leave'   };
+  if (state.absences?.[iso]?.[empId]) return { loc: 'off', source: 'absent' };
+
+  const slotMins = DISPLAY_START_MINS + si * SLOT_DURATION_MINS;
+  const loc      = getEmpLocAtTime(iso, empId, slotMins);
+
+  const isEarlyGate = state.earlyGate?.[iso] === empId &&
+                      slotMins >= EARLY_GATE_START &&
+                      slotMins < EARLY_GATE_END;
+
+  if (isEarlyGate) return { loc: 'gate', source: 'earlygate' };
+  if (loc !== 'off') return { loc, source: 'shift' };
 
   const emp = state.employees.find(e => e.id === empId);
-  if (!emp) return { loc: 'off', source: 'default' };
-
-  // 2. Day off
-  if (isEmpDayOff(empId, iso)) return { loc: 'off', source: 'dayoff' };
-
-  // 3. Leave
-  if (isOnLeave(empId, iso)) return { loc: 'vac', source: 'leave' };
-
-  // 4. Default schedule
-  const dow = DAYSSHORT[(new Date(iso+'T00:00:00').getDay()+6)%7];
-  const def = state.defaultSchedule?.[dow]?.[si]?.[empId];
-  if (def) return { loc: def, source: 'default' };
-
-  // 5. Fallback
-  return { loc: emp.fallback || 'off', source: 'fallback' };
-}
-
-function calcScheduledHrsWeek(empId, weekMon) {
-  const mon = new Date(weekMon + 'T00:00:00');
-  let total = 0;
-  for (let di = 0; di < 7; di++) {
-    const d   = new Date(mon); d.setDate(d.getDate() + di);
-    const iso = toDateStr(d);
-    if (isEmpDayOff(empId, iso) || isOnLeave(empId, iso)) continue;
-    // FIX: also skip absent days — absent staff were being counted before
-    if (state.absences?.[iso]?.[empId]) continue;
-    TIMESLOTS.forEach((slot, si) => {
-      const { loc } = getResolvedLoc(iso, si, empId);
-      // FIX: SLOT_HRS is now a per-slot array (constants.js fix); index by si
-      if (loc !== 'off' && loc !== 'vac') total += SLOT_HRS[si] || 0;
-    });
-  }
-  return total;
+  return { loc: emp?.fallback || 'off', source: 'fallback' };
 }
 
 function getSlotAssignments(iso, si) {
@@ -66,33 +44,40 @@ function getSlotAssignments(iso, si) {
     .map(e => ({ emp: e, ...getResolvedLoc(iso, si, e.id) }));
 }
 
+// countDayOverrides — counts how many employees have shift overrides on a day
 function countDayOverrides(iso) {
-  const ovrs = state.schedule?.[iso] || {};
-  return Object.values(ovrs).reduce((acc, slot) =>
-    acc + Object.keys(slot).length, 0);
+  return new Set((state.shifts?.[iso] || []).map(s => s.empId)).size;
 }
 
-// ── Wizard: convert block sequence → slot map ─────────────────
-function blocksToSlotMap(iso) {
-  const blocks = state.draftBlocks[iso] || [];
-  const slotMap = {};
+// applyDefaultToDay — copies base rota shifts into override layer for a date
+function applyDefaultToDay(iso) {
+  const dow     = DAYSSHORT[(new Date(iso + 'T00:00:00').getDay() + 6) % 7];
+  const empRota = state.defaultSchedule?.[dow] || {};
+  if (!state.shifts)      state.shifts      = {};
+  if (!state.shifts[iso]) state.shifts[iso] = [];
 
-  blocks.forEach(block => {
-    if (block.type === 'lunch') return;
-    for (let si = block.siStart; si <= block.siEnd; si++) {
-      if (!slotMap[si]) slotMap[si] = {};
-      slotMap[si][block.empId] = block.loc;
-    }
-  });
+  pushUndo('Apply default', state);
 
-  return slotMap;
+  state.employees
+    .filter(e => e.status === 'Active' && !isEmpDayOff(e.id, iso))
+    .forEach(e => {
+      const blocks = empRota[e.id] || [];
+      // Remove existing overrides for this employee on this day
+      state.shifts[iso] = (state.shifts[iso] || []).filter(s => s.empId !== e.id);
+      blocks.forEach(b => {
+        state.shifts[iso].push({ id: uid(), empId: e.id, loc: b.loc,
+                                 start: b.start, end: b.end });
+      });
+    });
+
+  persistAll('shifts');
+  showToast('Default rota applied to ' + fmtDate(iso));
 }
 
-function applyDraftToSchedule(isoList) {
-  isoList.forEach(iso => {
-    const slotMap = blocksToSlotMap(iso);
-    if (Object.keys(slotMap).length) {
-      state.schedule[iso] = slotMap;
-    }
-  });
+function clearOverridesForDay(iso) {
+  if (!confirm(`Clear all shift overrides for ${fmtDate(iso)}?`)) return;
+  pushUndo('Clear overrides', state);
+  delete state.shifts?.[iso];
+  persistAll('shifts');
+  showToast('Overrides cleared');
 }
