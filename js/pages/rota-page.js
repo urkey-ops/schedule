@@ -1,9 +1,7 @@
 // ── pages/rota-page.js ────────────────────────────────────────
-// Unified rota editor: Gantt bar view for base rota and weekly overrides.
-// Replaces schedule-page.js + the old default schedule tab.
 
-let _rotaMode      = 'week';   // 'week' | 'base'
-let _blockStart    = null;     // { empId, startMins } — first click state
+let _rotaMode      = 'week';
+let _blockStart    = null;
 let _rotaReadOnly  = false;
 
 // ── Entry point ───────────────────────────────────────────────
@@ -30,7 +28,6 @@ function renderOverrideSummary() {
   if (!el) return;
   if (_rotaMode === 'base') { el.innerHTML = ''; return; }
 
-  const iso     = state.currentDateISO;
   const weekMon = state.currentWeekMon;
   const mon     = new Date(weekMon + 'T00:00:00');
   const changes = [];
@@ -48,7 +45,6 @@ function renderOverrideSummary() {
     }
   }
 
-  // Leave this week
   const leaveNames = (state.leaveRequests || [])
     .filter(l => l.status === 'active')
     .filter(l => {
@@ -114,14 +110,12 @@ function renderGantt() {
 
   const totalMins  = DISPLAY_END_MINS - DISPLAY_START_MINS;
 
-  // Time axis labels (every hour)
   const timeLabels = [];
   for (let m = DISPLAY_START_MINS; m <= DISPLAY_END_MINS; m += 60) {
     const pct = ((m - DISPLAY_START_MINS) / totalMins) * 100;
     timeLabels.push({ pct, label: minsToHHMM(m) });
   }
 
-  // Current time indicator
   const nowPct = (() => {
     const m = nowMins();
     if (_rotaMode === 'base' || iso !== todayStr()) return -1;
@@ -133,7 +127,6 @@ function renderGantt() {
     let bars = [];
 
     if (_rotaMode === 'week') {
-      // Show resolved shifts for this day
       if (isOnLeave(e.id, iso)) {
         bars = [{ loc: 'vac', start: DISPLAY_START_MINS, end: DISPLAY_END_MINS,
                   id: null, isLeave: true }];
@@ -145,7 +138,6 @@ function renderGantt() {
           .map(s => ({ ...s }));
       }
     } else {
-      // Base rota for this dow
       bars = (state.defaultSchedule?.[dow]?.[e.id] || [])
         .map(b => ({ ...b, id: `base-${e.id}-${b.start}` }));
     }
@@ -200,7 +192,7 @@ function renderGantt() {
                        style="left:${left}%;width:${width}%;background:${color}"
                        title="${label} ${minsToHHMM(bar.start)}–${minsToHHMM(bar.end)}"
                        ${!_rotaReadOnly && bar.id && !bar.isLeave
-                         ? `onclick="event.stopPropagation();openShiftEditor('${iso || dow}','${emp.id}','${bar.id}','${_rotaMode}')`
+                         ? `onclick="event.stopPropagation();openShiftEditor('${iso || dow}','${emp.id}','${bar.id}','${_rotaMode}')"`
                          : ''}>
                     <span class="gantt-bar-label">${label}</span>
                     ${!_rotaReadOnly && bar.id && !bar.isLeave
@@ -222,7 +214,6 @@ function renderGantt() {
 }
 
 function renderLocWindows(totalMins) {
-  // Grey background bands showing each location's operating window
   const windows = Object.entries(LOC_HOURS)
     .filter(([, h]) => h)
     .map(([loc, h]) => {
@@ -277,7 +268,6 @@ function renderCoverageBand(totalMins, iso, dow) {
 }
 
 // ── Block-assign interaction ──────────────────────────────────
-// Click once = set start; click again = open location picker to finish
 
 function ganttColClick(event, empId) {
   if (_rotaReadOnly) return;
@@ -288,14 +278,12 @@ function ganttColClick(event, empId) {
   const clickMins = DISPLAY_START_MINS + Math.round((pct * totalMins) / 30) * 30;
 
   if (!_blockStart || _blockStart.empId !== empId) {
-    // First click — set anchor
     _blockStart = { empId, startMins: clickMins };
     showToast(`Start: ${minsToHHMM(clickMins)} — click end time`);
     col.classList.add('gantt-selecting');
     return;
   }
 
-  // Second click — open location picker
   const startMins = Math.min(_blockStart.startMins, clickMins);
   const endMins   = Math.max(_blockStart.startMins, clickMins);
   _blockStart     = null;
@@ -322,12 +310,14 @@ function openLocPickerModal(empId, startMins, endMins) {
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${LOC_CYCLE.filter(l => l !== 'off').map(loc => {
-        const locH = LOC_HOURS[loc];
+        const locH  = LOC_HOURS[loc];
         const valid = !locH || (startMins >= locH.open && endMins <= locH.close);
-        return `<button class="btn ${valid ? 'btn-ghost' : 'btn-ghost'}"
+        return `<button class="btn btn-ghost"
           style="border-color:${LOCCOLOR[loc]};color:${LOCCOLOR[loc]};
                  ${!valid ? 'opacity:.4;cursor:not-allowed' : ''}"
-          ${valid ? `onclick="confirmLocPick('${iso || dow}','${empId}',${startMins},${endMins},'${loc}','${_rotaMode}')"` : 'disabled'}
+          ${valid
+            ? `onclick="confirmLocPick('${iso || dow}','${empId}',${startMins},${endMins},'${loc}','${_rotaMode}')"`
+            : 'disabled'}
           title="${valid ? '' : `Outside ${LOCLABEL[loc]} operating hours`}">
           ${LOCLABEL[loc]}
         </button>`;
@@ -348,12 +338,12 @@ function confirmLocPick(isoOrDow, empId, startMins, endMins, loc, mode) {
   showToast(`${LOCLABEL[loc]} ${minsToHHMM(startMins)}–${minsToHHMM(endMins)}`);
 }
 
+// ✅ FIXED — correct empId and start parsing for base shiftIds like "base-emp-1234567890-540"
 function deleteBarClick(isoOrDow, shiftId, mode) {
   if (mode === 'base') {
-    // For base, shiftId = `base-${empId}-${start}`
-    const parts   = shiftId.replace('base-','').split('-');
-    const empId   = parts[0];
-    const start   = parseInt(parts[1]);
+    const parts = shiftId.replace('base-', '').split('-');
+    const start = parseInt(parts[parts.length - 1]);       // ✅ last segment = start mins
+    const empId = parts.slice(0, -1).join('-');            // ✅ everything before = empId
     removeBaseShift(isoOrDow, empId, start);
   } else {
     removeShift(isoOrDow, shiftId);
@@ -361,19 +351,17 @@ function deleteBarClick(isoOrDow, shiftId, mode) {
   renderRota();
 }
 
+// ✅ FIXED — correct start parsing; empId already passed as parameter
 function openShiftEditor(isoOrDow, empId, shiftId, mode) {
-  // Re-use the loc picker to change location of existing bar
-  // Resolve existing shift details first
   let shift;
   if (mode === 'base') {
-    const parts = shiftId.replace('base-','').split('-');
-    const start = parseInt(parts[1]);
+    const parts = shiftId.replace('base-', '').split('-');
+    const start = parseInt(parts[parts.length - 1]);       // ✅ last segment = start mins
     const dow   = isoOrDow;
     shift = (state.defaultSchedule?.[dow]?.[empId] || [])
       .find(b => b.start === start);
     if (!shift) return;
     openLocPickerModal(empId, shift.start, shift.end);
-    // After pick, confirmLocPick will overwrite the old base shift
   } else {
     shift = (state.shifts?.[isoOrDow] || []).find(s => s.id === shiftId);
     if (!shift) return;
@@ -389,7 +377,7 @@ function calcBaseHrsDay(dow, empId) {
     .reduce((acc, b) => acc + (b.end - b.start) / 60, 0);
 }
 
-// ── Alerts strip (above gantt) ────────────────────────────────
+// ── Alerts strip ──────────────────────────────────────────────
 
 function renderRotaAlerts() {
   const el = document.getElementById('rota-alerts-bar');
@@ -398,13 +386,10 @@ function renderRotaAlerts() {
   renderAlertsBar('rota-alerts-bar', state.currentDateISO);
 }
 
-// ── Week nav for rota page ────────────────────────────────────
-
 function renderRotaWeekNav() {
   renderWeekNav();
 }
 
-// Called by nav.js when rota page activates
 function onRotaPageShow() {
   _blockStart = null;
   renderRota();
