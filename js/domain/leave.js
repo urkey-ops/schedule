@@ -1,97 +1,83 @@
-// ── domain/leave.js ───────────────────────────────────────────
+// ── pages/leave-page.js ───────────────────────────────────────
 
-// ── Validators ────────────────────────────────────────────────
+function renderLeave() {
+  const tbody = document.getElementById('leave-body');
+  if (!tbody) return;
+  const records = state.leaveRequests || [];
 
-function validateDuplicateEmployee(name, excludeId = null) {
-  const dupe = state.employees.some(e =>
-    e.name.trim().toLowerCase() === name.trim().toLowerCase() &&
-    e.id !== excludeId
-  );
-  if (dupe) { alert(`An employee named "${name}" already exists.`); return false; }
-  return true;
-}
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="8"
+      style="text-align:center;padding:24px;color:var(--muted)">
+      No leave records yet.</td></tr>`;
+    return;
+  }
 
-function validateLeaveOverlap(empId, from, to, excludeId = null) {
-  const conflict = (state.leaveRequests || []).some(l => {
-    if (l.status !== 'active') return false;
-    if (l.empId !== empId)     return false;
-    if (l.id    === excludeId) return false;
-    return from <= l.to && to >= l.from;
+  // Sort: active first, then by from date descending
+  const sorted = [...records].sort((a, b) => {
+    if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+    return b.from.localeCompare(a.from);
   });
-  if (conflict) {
-    alert('This employee already has active leave that overlaps these dates.');
-    return false;
-  }
-  return true;
-}
 
-// ── Leave usage calc ──────────────────────────────────────────
+  tbody.innerHTML = sorted.map(l => {
+    const emp     = state.employees.find(e => e.id === l.empId);
+    const empName = emp
+      ? escH(emp.name)
+      : `<span style="color:var(--red)">Unknown</span>`;
 
-function calcLeaveUsed(empId, type) {
-  return (state.leaveRequests || [])
-    .filter(l => l.empId === empId && l.type === type && l.status === 'active')
-    .reduce((acc, l) => {
-      const from = new Date(l.from + 'T00:00:00');
-      const to   = new Date(l.to   + 'T00:00:00');
-      return acc + Math.round((to - from) / 86400000) + 1;
-    }, 0);
-}
+    const from  = new Date(l.from + 'T00:00:00');
+    const to    = new Date(l.to   + 'T00:00:00');
+    const days  = Math.round((to - from) / 86400000) + 1;
 
-// ── Leave conflict check (shift-based) ───────────────────────
-// Returns shifts that conflict with the leave period so admin
-// can decide whether to proceed.
+    // Remaining leave balance
+    let remainHtml = '—';
+    if (emp) {
+      const type = ['annual','sick'].includes(l.type) ? l.type : null;
+      if (type) {
+        const cap    = type === 'annual' ? (emp.annualLeave || 20) : (emp.sickLeave || 10);
+        const used   = calcLeaveUsed(emp.id, type);
+        const remain = cap - used;
+        remainHtml   = `<span class="leave-remaining ${remain <= 3 ? 'low' : ''}">
+          ${remain}d left</span>`;
+      }
+    }
 
-function checkLeaveConflicts(empId, from, to) {
-  const conflicts = [];
-  const start     = new Date(from + 'T00:00:00');
-  const end       = new Date(to   + 'T00:00:00');
+    // Conflict check
+    const conflicts    = emp ? checkLeaveConflicts(emp.id, l.from, l.to) : [];
+    const conflictHtml = conflicts.length
+      ? `<span class="leave-conflict-badge">
+          ⚠️ ${conflicts.length} shift${conflicts.length > 1 ? 's' : ''} affected</span>`
+      : `<span style="font-size:11px;color:#059669;font-weight:600">✔ clear</span>`;
 
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const iso     = toDateStr(d);
-    const shifts  = (state.shifts?.[iso] || []).filter(s =>
-      s.empId === empId && s.loc !== 'off' && s.loc !== 'vac'
-    );
-    shifts.forEach(s => {
-      conflicts.push({
-        iso,
-        loc  : s.loc,
-        start: s.start,
-        end  : s.end,
-        label: `${fmtDate(iso)} ${minsToHHMM(s.start)}–${minsToHHMM(s.end)} ${LOCLABEL[s.loc] || s.loc}`,
-      });
-    });
-  }
-  return conflicts;
-}
+    const typeBadge = `<span class="badge badge-${l.type === 'annual' ? 'annual' : l.type === 'sick' ? 'sick' : l.type === 'comp' ? 'comp' : 'other'}">
+      ${(l.type || 'annual').toUpperCase()}</span>`;
 
-// ── Leave CRUD ────────────────────────────────────────────────
+    const statusBadge = l.status === 'active'
+      ? `<span class="leave-status-active">Active</span>`
+      : `<span class="leave-status-cancelled">Cancelled</span>`;
 
-function cancelLeave(leaveId) {
-  const rec = (state.leaveRequests || []).find(l => l.id === leaveId);
-  if (!rec) return;
-  rec.status = 'cancelled';
-  persistAll('leaveRequests');
-  renderLeave();
-  renderAll();
-  showToast('Leave cancelled');
-}
-
-function reinstateLeave(leaveId) {
-  const rec = (state.leaveRequests || []).find(l => l.id === leaveId);
-  if (!rec) return;
-  rec.status = 'active';
-  persistAll('leaveRequests');
-  renderLeave();
-  renderAll();
-  showToast('Leave reinstated');
-}
-
-function deleteLeave(leaveId) {
-  if (!confirm('Delete this leave record?')) return;
-  pushUndo('Delete leave', state);
-  state.leaveRequests = (state.leaveRequests || []).filter(l => l.id !== leaveId);
-  persistAll('leaveRequests');
-  renderLeave();
-  renderAll();
-  showToast('Leave deleted');
+    return `<tr class="${l.status === 'cancelled' ? 'row-cancelled' : ''}">
+      <td><div style="font-weight:700;font-size:13px">${empName}</div></td>
+      <td>${typeBadge}</td>
+      <td><div style="font-size:12px;font-weight:600">${fmtDate(l.from)}</div></td>
+      <td><div style="font-size:12px;font-weight:600">${fmtDate(l.to)}</div></td>
+      <td><span style="font-size:13px;font-weight:700;
+        font-family:'DM Mono',monospace">${days}d</span></td>
+      <td>${remainHtml}</td>
+      <td>${statusBadge}</td>
+      <td>${conflictHtml}</td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${l.status === 'active'
+            ? `<button class="btn btn-sm btn-warn"
+                onclick="cancelLeave('${l.id}')">Cancel</button>`
+            : `<button class="btn btn-sm btn-success"
+                onclick="reinstateLeave('${l.id}')">Reinstate</button>`}
+          <button class="btn btn-sm btn-ghost"
+            onclick="openEditLeave('${l.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger"
+            onclick="deleteLeave('${l.id}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
 }
