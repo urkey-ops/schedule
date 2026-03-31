@@ -15,7 +15,6 @@ function todayStr() {
 }
 
 function toDateStr(d) {
-  // Safe manual build — never uses toISOString() to avoid timezone shift
   return d.getFullYear() + '-' +
     String(d.getMonth() + 1).padStart(2, '0') + '-' +
     String(d.getDate()).padStart(2, '0');
@@ -30,7 +29,7 @@ function fmtDate(iso) {
 
 function getWeekMonday(d) {
   const day = new Date(d);
-  const dow = (day.getDay() + 6) % 7; // Mon=0
+  const dow = (day.getDay() + 6) % 7;
   day.setDate(day.getDate() - dow);
   day.setHours(0, 0, 0, 0);
   return day;
@@ -45,18 +44,10 @@ function nowMins() {
   return n.getHours() * 60 + n.getMinutes();
 }
 
-function currentSlotIdx() {
-  // ✅ FIXED — uses SLOT_START_MINS + per-slot offset, no SLOT_START array needed
-  const mins = nowMins();
-  for (let i = TIMESLOTS.length - 1; i >= 0; i--) {
-    const slotStart = SLOT_START_MINS + i * SLOT_DURATION_MINS;
-    if (mins >= slotStart) return i;
-  }
-  return -1;
-}
+// currentSlotIdx() is defined in domain/shifts.js — intentionally not duplicated here
 
 function parseSlotTime(slotStr) {
-  // Returns [h, m] of slot start — e.g. '09:30–10:00' → [9, 30]
-const match = slotStr.match(/^(\d{1,2}):(\d{2})/);
+  // ✅ FIXED — was /^(\\d{1,2}):(\\d{2})/ which never matched
+  const match = slotStr.match(/^(\d{1,2}):(\d{2})/);
   return match ? [parseInt(match[1]), parseInt(match[2])] : [0, 0];
 }
