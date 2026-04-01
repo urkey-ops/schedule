@@ -1082,7 +1082,13 @@ function renderHourSummary(){
       <td class="bold">${esc(p.name)}</td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Emp':'Vol'}</span></td>
       ${dh[p.id].map(h=>`<td style="text-align:center;font-size:11px;">${h>0?h.toFixed(1):''}</td>`).join('')}
-      <td style="font-size:12px;${total>cap?'color:var(--accent3);':'total>cap*0.88?color:var(--accent);':'color:var(--green);'}">${total.toFixed(1)}h</td>
+     <td style="font-size:12px;${
+  total > cap
+    ? 'color:var(--accent3);'
+    : total > cap * 0.88
+      ? 'color:var(--accent);'
+      : 'color:var(--green);'
+}">
       <td class="text2">${cap}h</td>
       <td style="min-width:130px;padding:7px 10px;">
         <div style="display:flex;align-items:center;gap:8px;">
