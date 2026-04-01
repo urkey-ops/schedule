@@ -1533,4 +1533,58 @@ function importTemplate(evt){
       state.demand=data.demand||{};
       state.settings=data.settings||{};
       state.nextId=data.nextId||state.people.length+1;
-      state
+                 state.schedule = migrateSched(state.schedule || {});
+      if(!state.settings) state.settings = {};
+      initDemand();
+      rebuildPeopleMap();
+      const lp = document.getElementById('lunch-paid');
+      if(lp) lp.checked = !!state.settings?.lunchPaid;
+      toast('Template imported!');
+    } catch(err) {
+      toast('Import failed: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+// ══════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════
+function esc(s){ 
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, dur=2200){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), dur);
+}
+
+function clearSchedule(){
+  if(!confirm('Clear entire schedule? Locked slots will also be cleared.')) return;
+  state.schedule = {};
+  save();
+  renderScheduleGrid();
+  renderHourSummary();
+  document.getElementById('sched-errors').innerHTML = '';
+  toast('Schedule cleared');
+}
+
+// ══════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════
+(function init(){
+  load();
+  seedDefaults();
+  renderRoster();
+  renderDemandGrid();
+  if(Object.keys(state.schedule).length){
+    renderScheduleGrid();
+  }
+})();
+</script>
+</body>
+</html>
