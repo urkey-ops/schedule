@@ -8,21 +8,28 @@
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&display=swap');
 
   :root {
-    --bg: #0f0f11;
-    --surface: #18181c;
-    --surface2: #222228;
-    --border: #2e2e38;
-    --accent: #e8c547;
-    --accent2: #47b8e8;
-    --accent3: #e8476e;
-    --text: #e8e8f0;
-    --text2: #8888a0;
-    --text3: #555568;
-    --green: #47e8a0;
-    --purple: #b880ff;
-    --radius: 8px;
-    --mono: 'DM Mono', monospace;
-    --serif: 'Fraunces', serif;
+    --bg:        #f5f4f0;
+    --surface:   #ffffff;
+    --surface2:  #f0efe9;
+    --border:    #dddbd4;
+    --accent:    #b07d00;
+    --accent2:   #0072a3;
+    --accent3:   #c0304a;
+    --text:      #1e1c17;
+    --text2:     #6b6860;
+    --text3:     #a8a69e;
+    --green:     #2a7a4b;
+    --purple:    #6b3faa;
+    --warn-bg:   #fff8e0;
+    --warn-border:#c8a000;
+    --err-bg:    #fff0f2;
+    --err-border:#c0304a;
+    --ok-bg:     #edfaf3;
+    --ok-border: #2a7a4b;
+    --radius:    8px;
+    --mono:      'DM Mono', monospace;
+    --serif:     'Fraunces', serif;
+    --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,10 +37,11 @@
 
   header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 28px; border-bottom: 1px solid var(--border);
+    padding: 14px 28px; border-bottom: 1px solid var(--border);
     background: var(--surface); position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow);
   }
-  header h1 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--accent); }
+  header h1 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--text); }
   header .header-right { display: flex; align-items: center; gap: 12px; }
   header span { color: var(--text2); font-size: 11px; }
 
@@ -44,11 +52,11 @@
   .tab {
     padding: 10px 18px; cursor: pointer;
     border-bottom: 2px solid transparent;
-    color: var(--text2); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;
-    transition: all 0.15s;
+    color: var(--text2); font-size: 11px; letter-spacing: 0.5px;
+    text-transform: uppercase; transition: all 0.15s;
   }
   .tab:hover { color: var(--text); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
 
   main { padding: 20px 28px; max-width: 1800px; margin: 0 auto; }
   .panel { display: none; }
@@ -59,45 +67,48 @@
     margin-bottom: 12px; padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 10px;
+    color: var(--text);
   }
   .badge {
-    background: var(--accent); color: var(--bg);
+    background: var(--accent2); color: #fff;
     font-family: var(--mono); font-size: 10px;
     padding: 2px 7px; border-radius: 20px; font-weight: 500;
   }
-  .badge-blue { background: #0a2a3a; color: var(--accent2); border: 1px solid var(--accent2); }
-  .badge-purple { background: #1a0a2a; color: var(--purple); border: 1px solid var(--purple); }
+  .badge-blue  { background: #e8f4fb; color: var(--accent2); border: 1px solid var(--accent2); }
+  .badge-purple{ background: #f3eeff; color: var(--purple);  border: 1px solid var(--purple); }
+  .badge-warn  { background: var(--warn-bg); color: var(--accent); border: 1px solid var(--warn-border); }
 
   .btn {
     padding: 6px 14px; border-radius: var(--radius);
     border: none; cursor: pointer; font-family: var(--mono);
     font-size: 11px; font-weight: 500; transition: all 0.15s; white-space: nowrap;
   }
-  .btn-primary { background: var(--accent); color: var(--bg); }
-  .btn-primary:hover { background: #f0d060; }
-  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-secondary:hover { border-color: var(--text2); }
-  .btn-danger { background: transparent; color: var(--accent3); border: 1px solid var(--accent3); }
+  .btn-primary   { background: var(--accent2); color: #fff; }
+  .btn-primary:hover { background: #005c87; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--surface2); border-color: var(--text2); }
+  .btn-danger    { background: transparent; color: var(--accent3); border: 1px solid var(--accent3); }
   .btn-danger:hover { background: var(--accent3); color: #fff; }
-  .btn-blue { background: var(--accent2); color: var(--bg); }
-  .btn-blue:hover { background: #60c8f0; }
-  .btn-swap { background: #1a1a3a; color: var(--purple); border: 1px solid var(--purple); }
-  .btn-swap:hover { background: #2a1a4a; }
+  .btn-blue      { background: var(--accent2); color: #fff; }
+  .btn-blue:hover{ background: #005c87; }
+  .btn-swap      { background: #f3eeff; color: var(--purple); border: 1px solid var(--purple); }
+  .btn-swap:hover{ background: #e8ddff; }
   .btn-swap.active { background: var(--purple); color: #fff; }
   .btn-sm { padding: 2px 7px; font-size: 10px; }
 
-  /* ROSTER */
+  /* ── ROSTER ── */
   .roster-controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
   .roster-note { color: var(--text2); font-size: 11px; margin-left: auto; }
 
-  .roster-table { width: 100%; border-collapse: collapse; }
+  .roster-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
   .roster-table th {
     text-align: left; padding: 7px 8px;
     background: var(--surface2); color: var(--text2);
     font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
   }
   .roster-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .roster-table tr:last-child td { border-bottom: none; }
   .roster-table tr:hover td { background: var(--surface2); }
 
   .name-input {
@@ -105,39 +116,41 @@
     font-family: var(--mono); font-size: 12px; width: 100px;
     padding: 2px 4px; border-radius: 4px;
   }
-  .name-input:focus { outline: 1px solid var(--accent2); background: var(--surface); }
+  .name-input:focus { outline: 1px solid var(--accent2); background: var(--bg); }
 
   .type-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .type-badge.emp { background: #1a3a2a; color: var(--green); }
-  .type-badge.vol { background: #2a1a3a; color: var(--purple); }
+  .type-badge.emp { background: #eaf5f0; color: var(--green); border: 1px solid #b8deca; }
+  .type-badge.vol { background: #f3eeff; color: var(--purple); border: 1px solid #cdb8f0; }
 
-  .day-check { accent-color: var(--accent); width: 13px; height: 13px; cursor: pointer; }
+  .day-check  { accent-color: var(--accent);  width: 13px; height: 13px; cursor: pointer; }
   .role-check { accent-color: var(--accent2); width: 13px; height: 13px; cursor: pointer; }
-  .over-check { accent-color: var(--purple); width: 13px; height: 13px; cursor: pointer; }
+  .over-check { accent-color: var(--purple);  width: 13px; height: 13px; cursor: pointer; }
 
   .pref-select {
-    background: var(--surface2); border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     color: var(--text); font-family: var(--mono); font-size: 11px;
     padding: 2px 4px; border-radius: 4px; width: 40px;
   }
-
   .num-input {
     background: var(--surface); border: 1px solid var(--border);
     color: var(--text); font-family: var(--mono); font-size: 11px;
     padding: 2px 6px; border-radius: 4px; width: 50px; text-align: center;
   }
-  .num-input:focus { outline: 1px solid var(--accent); }
+  .num-input:focus { outline: 1px solid var(--accent2); }
 
-  .override-flag {
-    font-size: 10px; color: var(--purple); margin-left: 3px;
-    title: 'Overrides active';
+  .override-flag { font-size: 10px; color: var(--purple); margin-left: 3px; }
+
+  .roster-warn {
+    padding: 8px 12px; background: var(--warn-bg); border: 1px solid var(--warn-border);
+    border-radius: var(--radius); font-size: 11px; color: var(--accent);
+    margin-bottom: 10px;
   }
 
-  /* DEMAND */
+  /* ── DEMAND ── */
   .demand-grid {
     display: grid; grid-template-columns: 160px repeat(7, 1fr);
     gap: 0; border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; margin-bottom: 20px;
+    overflow: hidden; margin-bottom: 20px; background: var(--surface); box-shadow: var(--shadow);
   }
   .dg-header {
     background: var(--surface2); padding: 7px 10px;
@@ -147,159 +160,141 @@
   }
   .dg-cell {
     padding: 5px 6px; border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center;
+    background: var(--surface);
   }
   .dg-cell:nth-child(8n) { border-right: none; }
   .dg-label {
-    background: var(--surface); padding: 7px 10px;
+    background: var(--surface2); padding: 7px 10px;
     font-size: 11px; color: var(--text2);
     border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center;
   }
+  .dg-lunch-marker { font-size: 9px; color: var(--purple); margin-left: 4px; }
 
-  /* SCHEDULE */
+  /* ── SCHEDULE ── */
   .schedule-wrap { overflow-x: auto; }
-  .sched-table { border-collapse: collapse; min-width: 1000px; width: 100%; }
+  .sched-table { border-collapse: collapse; min-width: 1100px; width: 100%; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
   .sched-table th {
     padding: 8px 10px; background: var(--surface2); text-align: center;
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
     color: var(--text2); border: 1px solid var(--border);
   }
-  .sched-table td {
-    padding: 4px 5px; border: 1px solid var(--border);
-    vertical-align: top; min-width: 120px;
-  }
-  .sched-table .row-label {
-    padding: 6px 10px; min-width: 150px; max-width: 160px;
-    background: var(--surface2);
-  }
+  .sched-table td { padding: 4px 5px; border: 1px solid var(--border); vertical-align: top; min-width: 130px; }
+  .sched-table .row-label { padding: 6px 10px; min-width: 150px; max-width: 160px; background: var(--surface2); }
   .row-label-name { font-size: 11px; font-weight: 500; color: var(--text); }
   .row-label-time { font-size: 10px; color: var(--text3); margin-top: 1px; }
 
   .slot-wrap { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; }
   .slot-dd {
-    flex: 1; background: var(--surface);
-    border: 1px solid var(--border); color: var(--text);
-    font-family: var(--mono); font-size: 11px;
-    padding: 3px 4px; border-radius: 4px; cursor: pointer;
-    transition: border-color 0.15s;
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 11px;
+    padding: 3px 4px; border-radius: 4px; cursor: pointer; transition: border-color 0.15s;
   }
   .slot-dd:focus { outline: none; border-color: var(--accent2); }
-  .slot-dd.error { border-color: var(--accent3) !important; background: #2a1015; }
-  .slot-dd.warn  { border-color: var(--accent) !important; }
-  .slot-dd.warn-daily-soft { border-color: var(--accent) !important; background: #1a1500; }
-  .slot-dd.warn-daily-hard { border-color: var(--accent3) !important; background: #2a0a0a; }
-  .slot-dd.locked { opacity: 0.65; cursor: not-allowed; background: #1a1a28; border-color: var(--purple) !important; }
+  .slot-dd.error          { border-color: var(--accent3) !important; background: var(--err-bg); }
+  .slot-dd.warn           { border-color: var(--accent) !important; background: var(--warn-bg); }
+  .slot-dd.warn-daily-soft{ border-color: var(--accent) !important; background: var(--warn-bg); }
+  .slot-dd.warn-daily-hard{ border-color: var(--accent3) !important; background: var(--err-bg); }
+  .slot-dd.locked         { opacity: 0.7; cursor: not-allowed; background: #f3eeff; border-color: var(--purple) !important; }
 
   .lock-btn {
-    background: none; border: none; cursor: pointer;
-    font-size: 12px; padding: 1px 3px; border-radius: 3px;
-    color: var(--text3); transition: color 0.15s; flex-shrink: 0;
+    background: none; border: none; cursor: pointer; font-size: 12px;
+    padding: 1px 3px; border-radius: 3px; color: var(--text3);
+    transition: color 0.15s; flex-shrink: 0;
   }
   .lock-btn:hover { color: var(--purple); }
   .lock-btn.locked { color: var(--purple); }
 
   .swap-highlight { outline: 2px solid var(--purple) !important; }
-  .swap-source { outline: 2px solid var(--accent) !important; background: #1a1a00 !important; }
+  .swap-source    { outline: 2px solid var(--accent2) !important; background: #e8f4fb !important; }
 
-  .station-gate    { background: rgba(30,60,30,0.4); }
-  .station-podium  { background: rgba(20,30,60,0.4); }
-  .station-mandir  { background: rgba(50,20,50,0.4); }
-  .station-field1  { background: rgba(20,50,50,0.4); }
-  .station-field2  { background: rgba(50,50,20,0.4); }
-  .station-lunch   { background: rgba(60,30,20,0.4); }
+  /* Station colours — light, distinguishable */
+  .station-gate    { background: #edf7ed; }
+  .station-podium  { background: #edf2fd; }
+  .station-mandir  { background: #f5eeff; }
+  .station-field1  { background: #fffbe8; }
+  .station-field2  { background: #fff4e8; }
+  .station-field3  { background: #edfaf5; }
+  .station-field4  { background: #fef3f0; }
+  .station-lunch   { background: #fdf0e8; }
 
   .block-group-header td {
-    background: var(--surface) !important;
-    padding: 5px 10px;
-    font-size: 10px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase;
-    font-weight: 500;
+    background: var(--surface2) !important; padding: 5px 10px;
+    font-size: 10px; color: var(--accent2); letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 500; border-top: 2px solid var(--border);
+  }
+  .block-lunch-header td {
+    background: #fdf5e8 !important; padding: 5px 10px;
+    font-size: 10px; color: #8a5c00; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 500; border-top: 2px solid #e8c870;
   }
 
-  /* CONTEXT MENU */
+  /* ── CONTEXT MENU ── */
   .ctx-menu {
-    position: fixed; background: var(--surface2); border: 1px solid var(--border);
+    position: fixed; background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 4px 0; z-index: 9999;
-    min-width: 140px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    display: none;
+    min-width: 150px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); display: none;
   }
   .ctx-menu.show { display: block; }
-  .ctx-item {
-    padding: 6px 14px; font-size: 11px; cursor: pointer; color: var(--text);
-    transition: background 0.1s;
-  }
-  .ctx-item:hover { background: var(--surface); }
+  .ctx-item { padding: 7px 14px; font-size: 11px; cursor: pointer; color: var(--text); transition: background 0.1s; }
+  .ctx-item:hover { background: var(--surface2); }
   .ctx-item.danger { color: var(--accent3); }
 
-  /* SCHED LOG */
-  .sched-log {
-    margin-top: 12px; border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden;
-  }
-  .sched-log summary {
-    padding: 8px 14px; background: var(--surface); cursor: pointer;
-    font-size: 11px; color: var(--text2); user-select: none;
-  }
+  /* ── SCHED LOG ── */
+  .sched-log { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .sched-log summary { padding: 8px 14px; background: var(--surface2); cursor: pointer; font-size: 11px; color: var(--text2); user-select: none; }
   .sched-log summary:hover { color: var(--text); }
-  .sched-log-body {
-    max-height: 200px; overflow-y: auto; padding: 8px 14px;
-    background: var(--bg); font-size: 10px; color: var(--text3);
-    line-height: 1.7;
-  }
+  .sched-log-body { max-height: 220px; overflow-y: auto; padding: 8px 14px; background: var(--bg); font-size: 10px; color: var(--text2); line-height: 1.8; }
 
-  /* HOURS */
-  .hour-table { width: 100%; border-collapse: collapse; }
-  .hour-table th {
-    padding: 7px 10px; background: var(--surface2);
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
-    color: var(--text2); border: 1px solid var(--border); text-align: left;
-  }
+  /* ── HOURS ── */
+  .hour-table { width: 100%; border-collapse: collapse; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
+  .hour-table th { padding: 7px 10px; background: var(--surface2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); border: 1px solid var(--border); text-align: left; }
   .hour-table td { padding: 6px 10px; border: 1px solid var(--border); font-size: 12px; }
-  .bar-bg { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .bar-bg   { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
   .bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
   .bar-fill.over { background: var(--accent3); }
   .bar-fill.near { background: var(--accent); }
-  .day-cell-warn { color: var(--accent) !important; font-weight: 700; }
+  .day-cell-warn { color: var(--accent)  !important; font-weight: 700; }
   .day-cell-hard { color: var(--accent3) !important; font-weight: 700; }
 
-  /* TOOLBAR */
+  /* ── TOOLBAR / SETTINGS ── */
   .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .toolbar .sep { width: 1px; height: 22px; background: var(--border); }
 
-  /* SETTINGS ROW */
   .settings-row {
     display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
     padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); margin-bottom: 16px; font-size: 12px;
+    border-radius: var(--radius); margin-bottom: 16px; font-size: 12px; box-shadow: var(--shadow);
   }
   .settings-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
-  /* TOAST */
+  /* ── TOAST ── */
   #toast {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--surface2); border: 1px solid var(--border);
+    background: var(--text); color: var(--surface);
     padding: 9px 18px; border-radius: var(--radius);
-    font-size: 12px; color: var(--text); z-index: 9999;
-    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    font-size: 12px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
   }
   #toast.show { opacity: 1; }
 
-  /* SWAP MODAL */
   #swap-info {
-    display: none; padding: 8px 14px;
-    background: #1a0a2a; border: 1px solid var(--purple);
-    border-radius: var(--radius); margin-bottom: 12px;
-    font-size: 12px; color: var(--purple);
+    display: none; padding: 8px 14px; background: #f3eeff;
+    border: 1px solid var(--purple); border-radius: var(--radius);
+    margin-bottom: 12px; font-size: 12px; color: var(--purple);
   }
   #swap-info.show { display: block; }
 
   .empty-state { padding: 40px; text-align: center; color: var(--text3); font-size: 13px; }
+  .alert-box { padding: 10px 14px; border-radius: var(--radius); margin-bottom: 10px; font-size: 12px; }
+  .alert-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: #7a5500; }
+  .alert-err  { background: var(--err-bg);  border: 1px solid var(--err-border);  color: var(--accent3); }
+  .alert-ok   { background: var(--ok-bg);   border: 1px solid var(--ok-border);   color: var(--green); }
+
   .flex { display: flex; } .gap-8 { gap: 8px; } .mt-16 { margin-top: 16px; }
   .text2 { color: var(--text2); } .text-xs { font-size: 11px; }
-  .bold { font-weight: 700; } .red { color: var(--accent3); }
-  .green { color: var(--green); } .yellow { color: var(--accent); }
+  .bold { font-weight: 700; }
   .spin { animation: spin 1s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -311,8 +306,7 @@
     #tab-schedule { display: block !important; }
     .sched-table th, .sched-table td { border: 1px solid #ccc !important; background: #fff !important; }
     .slot-dd { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px; }
-    .lock-btn { display: none !important; }
-    * { color: #000 !important; }
+    .lock-btn, .ctx-menu { display: none !important; }
   }
 </style>
 
@@ -322,8 +316,8 @@
 <header>
   <h1>⚙ WorkForce Scheduler</h1>
   <div class="header-right">
-    <button class="btn btn-secondary" onclick="exportTemplate()" style="font-size:11px;">⬇ Export Template</button>
-    <label class="btn btn-secondary" style="font-size:11px; cursor:pointer;">
+    <button class="btn btn-secondary" onclick="exportTemplate()">⬇ Export Template</button>
+    <label class="btn btn-secondary" style="cursor:pointer;">
       ⬆ Import Template
       <input type="file" accept=".json" style="display:none;" onchange="importTemplate(event)">
     </label>
@@ -348,6 +342,7 @@
     <button class="btn btn-danger" onclick="clearRoster()" style="margin-left:4px;">Clear All</button>
     <span class="roster-note" id="roster-count">0 employees · 0 volunteers</span>
   </div>
+  <div id="roster-warnings"></div>
   <div id="roster-empty" class="empty-state">No people added. Click "+ Employee" or "+ Volunteer" to begin, or import a template.</div>
   <div style="overflow-x:auto;">
     <table class="roster-table" id="roster-table" style="display:none;">
@@ -356,20 +351,19 @@
           <th>#</th>
           <th>Name</th>
           <th>Type</th>
-          <th title="Day Off - check = off that day">Mon Off</th>
-          <th>Tue Off</th><th>Wed Off</th><th>Thu Off</th><th>Fri Off</th><th>Sat Off</th><th>Sun Off</th>
-          <th title="Permitted at Gate">Gate</th>
-          <th title="Permitted at Podium">Podium</th>
-          <th title="Permitted at Mandir">Mandir</th>
-          <th title="Permitted in Field Work">Field</th>
-          <th title="Scheduling preference 1=low 5=high">Pref★</th>
-          <th title="Default daily hour cap (6–10)">Day Cap</th>
-          <th title="Allow up to 10 hrs/day">+10hr</th>
+          <th title="Day Off">Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+          <th title="Gate role">Gate</th>
+          <th title="Podium role">Podium</th>
+          <th title="Mandir role">Mandir</th>
+          <th title="Field work role">Field</th>
+          <th title="Preference 1–5">Pref</th>
+          <th title="Default daily hour cap">Day Cap</th>
+          <th title="Allow up to 10 hrs/day">+10h</th>
           <th title="Weekly hour cap">Max/Wk</th>
-          <th title="Allow scheduling over 40 hrs/week">Ov40</th>
-          <th title="Allow over 9 hrs/day">Ov9hr</th>
-          <th title="Ignore turnaround / clopen rules">No-Turn</th>
-          <th title="Weekend exempt from fairness rotation">WkndEx</th>
+          <th title="Override weekly cap">Ov40</th>
+          <th title="Override daily 9h cap">Ov9h</th>
+          <th title="Ignore turnaround rules">NoTurn</th>
+          <th title="Weekend exempt">WkndEx</th>
           <th></th>
         </tr>
       </thead>
@@ -380,12 +374,15 @@
 
 <!-- ══════════ DEMAND TAB ══════════ -->
 <div class="panel" id="tab-demand">
-  <div class="sec-title">Station Demand <span class="badge">slots per block per day</span></div>
-  <p class="text2 text-xs" style="margin-bottom:14px;">Set how many staff are required at each station for each day/block combination. 0 = station closed for that period.</p>
+  <div class="sec-title">Station Demand <span class="badge">slots required per block per day</span></div>
+  <p class="text2 text-xs" style="margin-bottom:14px;">
+    Set how many staff are required at each station per day. 0 = closed.
+    <strong>Lunch blocks (b3–b5) show ALL stations</strong> — Gate/Podium/Mandir still need coverage during lunch.
+  </p>
   <div id="demand-grid-wrap"></div>
 
   <div class="sec-title mt-16">Time Block Reference <span class="badge">9 blocks</span></div>
-  <table class="roster-table" style="max-width:560px;">
+  <table class="roster-table" style="max-width:600px;">
     <thead><tr><th>#</th><th>Label</th><th>Start</th><th>End</th><th>Duration</th><th>Notes</th></tr></thead>
     <tbody id="blocks-info"></tbody>
   </table>
@@ -395,28 +392,25 @@
 <div class="panel" id="tab-schedule">
   <div class="settings-row">
     <label>
-      <input type="checkbox" id="lunch-paid" onchange="saveSetting('lunchPaid',this.checked)" style="accent-color:var(--accent);">
-      Lunch blocks count toward paid hours
+      <input type="checkbox" id="lunch-paid" onchange="saveSetting('lunchPaid',this.checked)" style="accent-color:var(--accent2);">
+      Lunch <em>break</em> blocks count toward paid hours
     </label>
-    <span class="text2 text-xs">| Swap mode: click a slot to select source, then click target to swap.</span>
+    <span class="text2 text-xs">Station coverage during lunch is always counted.</span>
     <span class="text2 text-xs">| Right-click any slot for options.</span>
   </div>
   <div class="toolbar">
     <button class="btn btn-primary" onclick="runScheduler()">▶ Auto-Generate</button>
-    <select id="regen-from" class="pref-select" style="width:auto;padding:4px 6px;font-size:11px;" title="Regenerate from this day onward">
+    <select id="regen-from" class="pref-select" style="width:auto;padding:4px 8px;font-size:11px;" title="Regenerate from this day onward">
       <option value="-1">Full week</option>
-      <option value="0">From Mon</option>
-      <option value="1">From Tue</option>
-      <option value="2">From Wed</option>
-      <option value="3">From Thu</option>
-      <option value="4">From Fri</option>
-      <option value="5">From Sat</option>
+      <option value="0">From Mon</option><option value="1">From Tue</option>
+      <option value="2">From Wed</option><option value="3">From Thu</option>
+      <option value="4">From Fri</option><option value="5">From Sat</option>
       <option value="6">From Sun</option>
     </select>
     <div class="sep"></div>
     <button class="btn btn-swap" id="swap-btn" onclick="toggleSwapMode()">⇄ Swap Mode</button>
     <button class="btn btn-secondary" onclick="clearSchedule()">✕ Clear</button>
-    <button class="btn btn-blue" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print</button>
     <span class="text2 text-xs" style="margin-left:auto;" id="sched-status"></span>
   </div>
   <div id="swap-info"></div>
@@ -433,9 +427,9 @@
 <!-- ══════════ HOURS TAB ══════════ -->
 <div class="panel" id="tab-hours">
   <div class="sec-title">Weekly Hour Summary</div>
-  <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">
+  <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
     <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;">
-      <input type="checkbox" id="filter-under40" onchange="renderHourSummary()" style="accent-color:var(--accent);">
+      <input type="checkbox" id="filter-under40" onchange="renderHourSummary()" style="accent-color:var(--accent2);">
       Show only employees under their weekly cap
     </label>
   </div>
@@ -443,6 +437,7 @@
 </div>
 
 </main>
+
 <div id="toast"></div>
 <div class="ctx-menu" id="ctx-menu">
   <div class="ctx-item" id="ctx-lock">🔒 Lock slot</div>
@@ -455,34 +450,36 @@
 //  CONSTANTS
 // ══════════════════════════════════════════════
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const MAX_SHIFT_GAP_HOURS = 3; // max hrs gap within same day before treated as split shift
+const MAX_SHIFT_GAP_HOURS = 3;
 
 const BLOCKS = [
   { id:'b1', label:'Early Morning Gate',  start:'06:00', end:'09:00', isLunch:false, notes:'Opening / Gate Lock' },
   { id:'b2', label:'Mid Morning',         start:'09:00', end:'12:00', isLunch:false, notes:'' },
-  { id:'b3', label:'Lunch Rotation 1',    start:'12:00', end:'12:30', isLunch:true,  notes:'Staggered lunch 1' },
-  { id:'b4', label:'Lunch Rotation 2',    start:'12:30', end:'13:00', isLunch:true,  notes:'Staggered lunch 2' },
-  { id:'b5', label:'Lunch Rotation 3',    start:'13:00', end:'13:30', isLunch:true,  notes:'Staggered lunch 3' },
+  { id:'b3', label:'Lunch Window 1',      start:'12:00', end:'12:30', isLunch:true,  notes:'Coverage + break stagger 1' },
+  { id:'b4', label:'Lunch Window 2',      start:'12:30', end:'13:00', isLunch:true,  notes:'Coverage + break stagger 2' },
+  { id:'b5', label:'Lunch Window 3',      start:'13:00', end:'13:30', isLunch:true,  notes:'Coverage + break stagger 3' },
   { id:'b6', label:'Afternoon',           start:'13:30', end:'14:30', isLunch:false, notes:'' },
   { id:'b7', label:'Late Afternoon',      start:'14:30', end:'16:30', isLunch:false, notes:'' },
   { id:'b8', label:'Evening 1',           start:'16:30', end:'18:30', isLunch:false, notes:'' },
   { id:'b9', label:'Evening 2 (Closing)', start:'18:30', end:'20:30', isLunch:false, notes:'Closing Shift' },
 ];
 
-const NON_LUNCH_BLOCKS = BLOCKS.filter(b => !b.isLunch);
-const LUNCH_BLOCKS     = BLOCKS.filter(b =>  b.isLunch);
-
 const STATIONS = [
-  { id:'gate',   label:'Gate',         cls:'station-gate',   isField:false },
-  { id:'podium', label:'Podium',       cls:'station-podium', isField:false },
-  { id:'mandir', label:'Mandir',       cls:'station-mandir', isField:false },
-  { id:'field1', label:'Field Work 1', cls:'station-field1', isField:true  },
-  { id:'field2', label:'Field Work 2', cls:'station-field2', isField:true  },
-  { id:'lunch',  label:'Lunch',        cls:'station-lunch',  isLunch:true  },
+  { id:'gate',   label:'Gate',         cls:'station-gate',   isField:false, isLunch:false },
+  { id:'podium', label:'Podium',       cls:'station-podium', isField:false, isLunch:false },
+  { id:'mandir', label:'Mandir',       cls:'station-mandir', isField:false, isLunch:false },
+  { id:'field1', label:'Field Work 1', cls:'station-field1', isField:true,  isLunch:false },
+  { id:'field2', label:'Field Work 2', cls:'station-field2', isField:true,  isLunch:false },
+  { id:'field3', label:'Field Work 3', cls:'station-field3', isField:true,  isLunch:false },
+  { id:'field4', label:'Field Work 4', cls:'station-field4', isField:true,  isLunch:false },
+  { id:'lunch',  label:'Lunch Break',  cls:'station-lunch',  isField:false, isLunch:true  },
 ];
 
-const BASE_STATIONS  = STATIONS.filter(s => !s.isField && !s.isLunch);
-const FIELD_STATIONS = STATIONS.filter(s =>  s.isField);
+// Grouped for convenience
+const BASE_STATIONS    = STATIONS.filter(s => !s.isField && !s.isLunch); // gate, podium, mandir
+const FIELD_STATIONS   = STATIONS.filter(s =>  s.isField);               // field1–4
+const WORK_STATIONS    = STATIONS.filter(s => !s.isLunch);               // all non-lunch
+const COVERAGE_STATIONS= BASE_STATIONS; // stations that must stay staffed during lunch
 
 function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
 function blockDur(b){ return (toMin(b.end)-toMin(b.start))/60; }
@@ -493,40 +490,36 @@ function blockDur(b){ return (toMin(b.end)-toMin(b.start))/60; }
 let state = {
   people: [],
   demand: {},
-  schedule: {},   // schedule[di][bid][sid] = [{pid, locked}, ...]
+  schedule: {},
   settings: { lunchPaid: false },
   nextId: 1,
 };
-
-// Fast lookup map — rebuilt on every roster change
 let peopleById = {};
 function rebuildPeopleMap(){ peopleById={}; state.people.forEach(p=>{ peopleById[p.id]=p; }); }
 
 // ══════════════════════════════════════════════
-//  PERSISTENCE
+//  PERSISTENCE & MIGRATION
 // ══════════════════════════════════════════════
 function save(){
-  try { localStorage.setItem('wfs_v4', JSON.stringify(state)); } catch(e){}
-  const el = document.getElementById('save-status');
-  if(el) el.textContent = 'Saved ' + new Date().toLocaleTimeString();
+  try { localStorage.setItem('wfs_v5', JSON.stringify(state)); } catch(e){}
+  const el=document.getElementById('save-status');
+  if(el) el.textContent='Saved '+new Date().toLocaleTimeString();
 }
 
 function migrateSched(raw){
-  // Migrate old format: sched[di][bid][sid] = [pid|null, ...]
-  // to new format: sched[di][bid][sid] = [{pid, locked:false}, ...]
   if(!raw) return {};
-  const out = {};
+  const out={};
   Object.keys(raw).forEach(di=>{
     out[di]={};
     Object.keys(raw[di]).forEach(bid=>{
       out[di][bid]={};
       Object.keys(raw[di][bid]).forEach(sid=>{
-        const arr = raw[di][bid][sid];
+        const arr=raw[di][bid][sid];
         if(!Array.isArray(arr)){ out[di][bid][sid]=[]; return; }
-        out[di][bid][sid] = arr.map(item=>{
+        out[di][bid][sid]=arr.map(item=>{
           if(item===null||item===undefined) return {pid:null,locked:false};
           if(typeof item==='string') return {pid:item,locked:false};
-          return item; // already new format
+          return item;
         });
       });
     });
@@ -536,26 +529,25 @@ function migrateSched(raw){
 
 function load(){
   try {
-    // Try v4 first, fall back to v3
-    let raw = localStorage.getItem('wfs_v4') || localStorage.getItem('wfs_v3');
+    const raw=localStorage.getItem('wfs_v5')||localStorage.getItem('wfs_v4')||localStorage.getItem('wfs_v3');
     if(raw){
-      const d = JSON.parse(raw);
-      state = d;
-      state.schedule = migrateSched(state.schedule);
-      if(!state.settings) state.settings = {};
+      const d=JSON.parse(raw);
+      state=d;
+      state.schedule=migrateSched(state.schedule||{});
+      if(!state.settings) state.settings={};
     }
-  } catch(e){ console.warn('Load failed', e); }
+  } catch(e){ console.warn('Load error',e); }
   initDemand();
   rebuildPeopleMap();
-  const lp = document.getElementById('lunch-paid');
-  if(lp) lp.checked = !!state.settings?.lunchPaid;
+  const lp=document.getElementById('lunch-paid');
+  if(lp) lp.checked=!!state.settings?.lunchPaid;
 }
 
 function saveSetting(key,val){
   if(!state.settings) state.settings={};
   state.settings[key]=val;
   save();
-  if(Object.keys(state.schedule).length){ computeWeeklyHours(); renderHourSummary(); }
+  if(Object.keys(state.schedule).length){ renderHourSummary(); }
 }
 
 function initDemand(){
@@ -563,7 +555,17 @@ function initDemand(){
   BLOCKS.forEach(b=>{
     if(!state.demand[b.id]) state.demand[b.id]={};
     STATIONS.forEach(s=>{
-      if(!state.demand[b.id][s.id]) state.demand[b.id][s.id] = DAYS.map(()=>1);
+      if(state.demand[b.id][s.id]===undefined){
+        // Smart defaults:
+        // Lunch-break station: 1 per lunch block
+        // Field3/4: default 0 (admin enables as needed)
+        // Lunch window blocks (b3/b4/b5) — coverage stations keep their demand
+        let def=1;
+        if(s.isLunch && !b.isLunch) def=0;
+        if(!s.isLunch && b.isLunch && (s.id==='field3'||s.id==='field4')) def=0;
+        if(s.id==='field3'||s.id==='field4') def=0; // always start at 0
+        state.demand[b.id][s.id]=DAYS.map(()=>def);
+      }
     });
   });
 }
@@ -576,93 +578,112 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('tab-'+t.dataset.tab).classList.add('active');
-    if(t.dataset.tab==='hours')   renderHourSummary();
-    if(t.dataset.tab==='demand')  renderDemandGrid();
+    if(t.dataset.tab==='hours')  renderHourSummary();
+    if(t.dataset.tab==='demand') renderDemandGrid();
+    if(t.dataset.tab==='roster') renderRosterWarnings();
   });
 });
 
 // ══════════════════════════════════════════════
 //  ROSTER
 // ══════════════════════════════════════════════
-const DEFAULT_EMPLOYEES = [
-  {name:'Dh', off:[false,false,false,false,true,false,false]},
-  {name:'S',  off:[false,false,false,false,true,false,false]},
-  {name:'P',  off:[false,false,false,true, false,false,false]},
-  {name:'B',  off:[false,false,false,true, false,false,false]},
-  {name:'K',  off:[true, false,false,false,false,false,false]},
-  {name:'D',  off:[false,true, false,false,false,false,false]},
-  {name:'U',  off:[true, false,false,false,false,false,false]},
-  {name:'A',  off:[false,false,true, false,false,false,false]},
+const DEFAULT_EMPLOYEES=[
+  {name:'Dh',off:[false,false,false,false,true,false,false]},
+  {name:'S', off:[false,false,false,false,true,false,false]},
+  {name:'P', off:[false,false,false,true,false,false,false]},
+  {name:'B', off:[false,false,false,true,false,false,false]},
+  {name:'K', off:[true,false,false,false,false,false,false]},
+  {name:'D', off:[false,true,false,false,false,false,false]},
+  {name:'U', off:[true,false,false,false,false,false,false]},
+  {name:'A', off:[false,false,true,false,false,false,false]},
 ];
-const DEFAULT_VOLUNTEERS = [{name:'V1'},{name:'V2'}];
+const DEFAULT_VOLUNTEERS=[{name:'V1'},{name:'V2'}];
 
-function makePerson(type, name, off){
+function makePerson(type,name,off){
   return {
-    id: 'p'+(state.nextId++),
-    name, type,
-    off: off || DAYS.map(()=>false),
-    roles: { gate:true, podium:true, mandir:true, field:true },
-    pref: 3,
-    dailyCap: 8,
-    allowExtendedDay: false,
-    maxHrs: type==='emp' ? 40 : 20,
-    overrideOver40: false,
-    overrideOver9hr: false,
-    overrideIgnoreTurnaround: false,
-    weekendExempt: false,
-    preferredBlocks: [],
-    avoidBlocks: [],
-    availableBlocks: [], // volunteers only; empty = all blocks ok
+    id:'p'+(state.nextId++), name, type,
+    off: off||DAYS.map(()=>false),
+    roles:{gate:true,podium:true,mandir:true,field:true},
+    pref:3,
+    dailyCap:8,
+    allowExtendedDay:false,
+    maxHrs: type==='emp'?40:20,
+    overrideOver40:false,
+    overrideOver9hr:false,
+    overrideIgnoreTurnaround:false,
+    weekendExempt:false,
+    preferredBlocks:[],
+    avoidBlocks:[],
+    availableBlocks:[],
   };
 }
 
 function seedDefaults(){
-  if(state.people.length > 0) return;
-  DEFAULT_EMPLOYEES.forEach(e=>state.people.push(makePerson('emp', e.name, e.off)));
-  DEFAULT_VOLUNTEERS.forEach(v=>state.people.push(makePerson('vol', v.name, null)));
+  if(state.people.length>0) return;
+  DEFAULT_EMPLOYEES.forEach(e=>state.people.push(makePerson('emp',e.name,e.off)));
+  DEFAULT_VOLUNTEERS.forEach(v=>state.people.push(makePerson('vol',v.name,null)));
   save(); rebuildPeopleMap();
 }
 
 function addPerson(type){
-  const cnt = state.people.filter(p=>p.type===type).length;
-  if(cnt>=20){ toast('Max 20 '+type+'s reached'); return; }
-  const idx = cnt+1;
-  state.people.push(makePerson(type, type==='emp'?'E'+idx:'V'+idx, null));
+  const cnt=state.people.filter(p=>p.type===type).length;
+  if(cnt>=20){ toast('Max 20 '+type+'s'); return; }
+  const idx=cnt+1;
+  state.people.push(makePerson(type,type==='emp'?'E'+idx:'V'+idx,null));
   save(); rebuildPeopleMap(); renderRoster();
 }
 
 function removePerson(id){
-  state.people = state.people.filter(p=>p.id!==id);
+  state.people=state.people.filter(p=>p.id!==id);
   save(); rebuildPeopleMap(); renderRoster();
 }
 
 function clearRoster(){
-  if(!confirm('Remove all people from roster?')) return;
+  if(!confirm('Remove all people?')) return;
   state.people=[]; state.schedule={};
   save(); rebuildPeopleMap(); renderRoster();
 }
 
+function ensurePersonFields(p){
+  if(p.dailyCap===undefined) p.dailyCap=8;
+  if(p.allowExtendedDay===undefined) p.allowExtendedDay=false;
+  if(p.overrideOver40===undefined) p.overrideOver40=false;
+  if(p.overrideOver9hr===undefined) p.overrideOver9hr=false;
+  if(p.overrideIgnoreTurnaround===undefined) p.overrideIgnoreTurnaround=false;
+  if(p.weekendExempt===undefined) p.weekendExempt=false;
+  if(!p.preferredBlocks) p.preferredBlocks=[];
+  if(!p.avoidBlocks) p.avoidBlocks=[];
+  if(!p.availableBlocks) p.availableBlocks=[];
+}
+
+function renderRosterWarnings(){
+  const wrap=document.getElementById('roster-warnings');
+  if(!wrap) return;
+  const warnings=[];
+  state.people.forEach(p=>{
+    const hasRole=p.roles.gate||p.roles.podium||p.roles.mandir||p.roles.field;
+    if(!hasRole) warnings.push(`⚠ ${p.name} has no roles enabled — cannot be scheduled anywhere.`);
+    const daysOff=p.off.filter(Boolean).length;
+    if(daysOff===7) warnings.push(`⚠ ${p.name} is marked off every day of the week.`);
+  });
+  wrap.innerHTML=warnings.map(w=>`<div class="alert-box alert-warn">${w}</div>`).join('');
+}
+
 function renderRoster(){
-  const body  = document.getElementById('roster-body');
-  const table = document.getElementById('roster-table');
-  const empty = document.getElementById('roster-empty');
+  const body=document.getElementById('roster-body');
+  const table=document.getElementById('roster-table');
+  const empty=document.getElementById('roster-empty');
   body.innerHTML='';
   if(!state.people.length){
-    table.style.display='none'; empty.style.display='block'; return;
+    table.style.display='none'; empty.style.display='block';
+    renderRosterWarnings(); return;
   }
   table.style.display='table'; empty.style.display='none';
 
   state.people.forEach((p,i)=>{
-    // Ensure new fields exist on old records
-    if(p.dailyCap===undefined) p.dailyCap=8;
-    if(p.allowExtendedDay===undefined) p.allowExtendedDay=false;
-    if(p.overrideOver40===undefined) p.overrideOver40=false;
-    if(p.overrideOver9hr===undefined) p.overrideOver9hr=false;
-    if(p.overrideIgnoreTurnaround===undefined) p.overrideIgnoreTurnaround=false;
-    if(p.weekendExempt===undefined) p.weekendExempt=false;
-
-    const hasOverride = p.overrideOver40||p.overrideOver9hr||p.overrideIgnoreTurnaround||p.allowExtendedDay;
-    const tr = document.createElement('tr');
+    ensurePersonFields(p);
+    const hasOverride=p.overrideOver40||p.overrideOver9hr||p.overrideIgnoreTurnaround||p.allowExtendedDay;
+    const tr=document.createElement('tr');
     tr.innerHTML=`
       <td class="text2" style="font-size:11px;">${i+1}</td>
       <td>
@@ -671,20 +692,20 @@ function renderRoster(){
       </td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Employee':'Volunteer'}</span></td>
       ${DAYS.map((_,di)=>`<td style="text-align:center;"><input type="checkbox" class="day-check" ${p.off[di]?'checked':''} onchange="pOff('${p.id}',${di},this.checked)" title="${DAYS[di]} off"></td>`).join('')}
-      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.gate?'checked':''} onchange="pRole('${p.id}','gate',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.gate  ?'checked':''} onchange="pRole('${p.id}','gate',  this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.podium?'checked':''} onchange="pRole('${p.id}','podium',this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.mandir?'checked':''} onchange="pRole('${p.id}','mandir',this.checked)"></td>
-      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.field?'checked':''} onchange="pRole('${p.id}','field',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.field ?'checked':''} onchange="pRole('${p.id}','field', this.checked)"></td>
       <td><select class="pref-select" onchange="pf('${p.id}','pref',+this.value)">
         ${[1,2,3,4,5].map(v=>`<option ${p.pref===v?'selected':''}>${v}</option>`).join('')}
       </select></td>
       <td><input type="number" class="num-input" value="${p.dailyCap}" min="6" max="10" style="width:44px;" onchange="pf('${p.id}','dailyCap',+this.value)"></td>
-      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.allowExtendedDay?'checked':''} onchange="pf('${p.id}','allowExtendedDay',this.checked)" title="Allow up to 10 hrs/day"></td>
+      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.allowExtendedDay?'checked':''} onchange="pf('${p.id}','allowExtendedDay',this.checked)"></td>
       <td><input type="number" class="num-input" value="${p.maxHrs}" min="0" max="80" onchange="pf('${p.id}','maxHrs',+this.value)"></td>
-      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideOver40?'checked':''} onchange="pf('${p.id}','overrideOver40',this.checked)" title="Allow over 40 hrs"></td>
-      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideOver9hr?'checked':''} onchange="pf('${p.id}','overrideOver9hr',this.checked)" title="Allow over 9 hrs/day"></td>
-      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideIgnoreTurnaround?'checked':''} onchange="pf('${p.id}','overrideIgnoreTurnaround',this.checked)" title="Ignore turnaround rules"></td>
-      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.weekendExempt?'checked':''} onchange="pf('${p.id}','weekendExempt',this.checked)" title="Weekend exempt"></td>
+      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideOver40?'checked':''} onchange="pf('${p.id}','overrideOver40',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideOver9hr?'checked':''} onchange="pf('${p.id}','overrideOver9hr',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideIgnoreTurnaround?'checked':''} onchange="pf('${p.id}','overrideIgnoreTurnaround',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.weekendExempt?'checked':''} onchange="pf('${p.id}','weekendExempt',this.checked)"></td>
       <td><button class="btn btn-danger btn-sm" onclick="removePerson('${p.id}')">✕</button></td>
     `;
     body.appendChild(tr);
@@ -693,28 +714,28 @@ function renderRoster(){
   const ec=state.people.filter(p=>p.type==='emp').length;
   const vc=state.people.filter(p=>p.type==='vol').length;
   document.getElementById('roster-count').textContent=`${ec} employee${ec!==1?'s':''} · ${vc} volunteer${vc!==1?'s':''}`;
+  renderRosterWarnings();
 }
 
-function pf(id,field,val){
-  const p=peopleById[id];
-  if(p){ p[field]=val; save(); renderRoster(); }
-}
-function pOff(id,di,val){ const p=peopleById[id]; if(p){p.off[di]=val; save();} }
-function pRole(id,role,val){ const p=peopleById[id]; if(p){p.roles[role]=val; save();} }
+function pf(id,field,val){ const p=peopleById[id]; if(p){ p[field]=val; save(); renderRoster(); } }
+function pOff(id,di,val){ const p=peopleById[id]; if(p){ p.off[di]=val; save(); } }
+function pRole(id,role,val){ const p=peopleById[id]; if(p){ p.roles[role]=val; save(); } }
 
 // ══════════════════════════════════════════════
 //  DEMAND GRID
 // ══════════════════════════════════════════════
 function renderDemandGrid(){
-  const wrap = document.getElementById('demand-grid-wrap');
+  const wrap=document.getElementById('demand-grid-wrap');
   wrap.innerHTML='';
   BLOCKS.forEach(b=>{
     const sec=document.createElement('div');
-    sec.style.cssText='margin-top:18px;';
+    sec.style.cssText='margin-top:20px;';
+    const lunchNote = b.isLunch
+      ? '<span class="badge-purple" style="font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;">Lunch Window — set coverage AND break slots</span>'
+      : '';
     sec.innerHTML=`<div class="sec-title" style="font-size:13px;">
-      Block: ${b.label}
-      <span class="text2 text-xs">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
-      ${b.isLunch?'<span class="badge-purple" style="font-size:10px;padding:2px 7px;border-radius:20px;">Lunch</span>':''}
+      ${b.label} ${lunchNote}
+      <span class="text2 text-xs" style="margin-left:4px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
     </div>`;
     wrap.appendChild(sec);
 
@@ -723,12 +744,18 @@ function renderDemandGrid(){
     grid.innerHTML='<div class="dg-header">Station</div>'+
       DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
 
-    STATIONS.forEach(s=>{
-      if(b.isLunch  && !s.isLunch) return;
-      if(!b.isLunch &&  s.isLunch) return;
-      grid.innerHTML+=`<div class="dg-label">${s.label}</div>`;
+    // KEY FIX: show ALL stations for every block — no more mutual exclusion
+    // For lunch blocks: show coverage stations (gate/podium/mandir) AND lunch station
+    // For non-lunch blocks: show work stations (no lunch station)
+    const stationsToShow = b.isLunch
+      ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
+      : WORK_STATIONS;
+
+    stationsToShow.forEach(s=>{
+      const lunchMark = s.isLunch ? '<span class="dg-lunch-marker">(break)</span>' : '';
+      grid.innerHTML+=`<div class="dg-label">${s.label}${lunchMark}</div>`;
       DAYS.forEach((_,di)=>{
-        const val=(state.demand[b.id]?.[s.id]?.[di])??1;
+        const val=(state.demand[b.id]?.[s.id]?.[di])??0;
         grid.innerHTML+=`<div class="dg-cell"><input type="number" class="num-input" min="0" max="10" value="${val}" style="width:46px;" onchange="updDemand('${b.id}','${s.id}',${di},+this.value)"></div>`;
       });
     });
@@ -737,8 +764,7 @@ function renderDemandGrid(){
 
   const tbody=document.getElementById('blocks-info');
   tbody.innerHTML=BLOCKS.map((b,i)=>`<tr>
-    <td class="text2">${i+1}</td>
-    <td>${b.label}</td>
+    <td class="text2">${i+1}</td><td>${b.label}</td>
     <td>${b.start}</td><td>${b.end}</td>
     <td>${blockDur(b).toFixed(2)} h</td>
     <td class="text2 text-xs">${b.notes}</td>
@@ -747,7 +773,7 @@ function renderDemandGrid(){
 
 function updDemand(bid,sid,di,val){
   if(!state.demand[bid]) state.demand[bid]={};
-  if(!state.demand[bid][sid]) state.demand[bid][sid]=DAYS.map(()=>1);
+  if(!state.demand[bid][sid]) state.demand[bid][sid]=DAYS.map(()=>0);
   state.demand[bid][sid][di]=val;
   save();
 }
@@ -755,79 +781,72 @@ function updDemand(bid,sid,di,val){
 // ══════════════════════════════════════════════
 //  SCHEDULER
 // ══════════════════════════════════════════════
-function runScheduler(){
-  if(!state.people.length){ toast('Add people first'); return; }
-  const startDay = parseInt(document.getElementById('regen-from').value);
-  document.getElementById('sched-status').innerHTML='<span class="spin">⚙</span> Generating…';
-  setTimeout(()=>{
-    try {
-      const t0 = performance.now();
-      state.schedule = generateSchedule(startDay);
-      const elapsed = (performance.now()-t0).toFixed(0);
-      save();
-      renderScheduleGrid();
-      renderHourSummary();
-      document.getElementById('sched-status').textContent=`✓ Generated in ${elapsed}ms`;
-      toast('Schedule generated!');
-    } catch(e){
-      document.getElementById('sched-status').textContent='Error generating';
-      toast('Error: '+e.message);
-      console.error(e);
-    }
-  }, 60);
-}
-
 function effectiveDailyCap(p){
   if(p.overrideOver9hr) return 10;
   if(p.allowExtendedDay) return 10;
-  return Math.min(p.dailyCap ?? 8, 10);
+  return Math.min(p.dailyCap??8, 10);
+}
+
+function runScheduler(){
+  if(!state.people.length){ toast('Add people first'); return; }
+  const startDay=parseInt(document.getElementById('regen-from').value);
+  document.getElementById('sched-status').innerHTML='<span class="spin">⚙</span> Generating…';
+  setTimeout(()=>{
+    try {
+      const t0=performance.now();
+      state.schedule=generateSchedule(startDay);
+      const ms=(performance.now()-t0).toFixed(0);
+      save(); renderScheduleGrid(); renderHourSummary();
+      document.getElementById('sched-status').textContent=`✓ Done in ${ms}ms`;
+      toast('Schedule generated!');
+    } catch(e){
+      document.getElementById('sched-status').textContent='Error';
+      toast('Error: '+e.message); console.error(e);
+    }
+  },60);
 }
 
 function generateSchedule(startDay=-1){
-  const schedLog = [];
-  const log = (msg) => schedLog.push(msg);
+  const schedLog=[];
+  const log=msg=>schedLog.push(msg);
 
-  // ── Precompute availability map ──
-  const availMap = {}; // availMap[pid][di] = true/false
-  state.people.forEach(p=>{
-    availMap[p.id] = DAYS.map((_,di)=>!p.off[di]);
-  });
+  // ── Precompute availability ──
+  const availMap={};
+  state.people.forEach(p=>{ availMap[p.id]=DAYS.map((_,di)=>!p.off[di]); });
 
   // ── Init counters ──
-  const wkHrs  = {}; // pid -> total weekly hours
-  const dayHrs = {}; // pid -> [7 days of hours]
-  const satWorked = {}, sunWorked = {};
-  const lastAssigned = {}; // pid -> { di, endMin }
+  const wkHrs={}, dayHrs={};
+  const satWorkedDay={}, sunWorkedDay={};
+  const satWorked={}, sunWorked={};
+  const lastAssigned={}; // pid -> {di, endMin}
 
   state.people.forEach(p=>{
-    wkHrs[p.id]    = 0;
-    dayHrs[p.id]   = DAYS.map(()=>0);
-    satWorked[p.id]= 0;
-    sunWorked[p.id]= 0;
-    lastAssigned[p.id] = null;
+    wkHrs[p.id]=0;
+    dayHrs[p.id]=DAYS.map(()=>0);
+    satWorked[p.id]=0; sunWorked[p.id]=0;
+    satWorkedDay[p.id]=false; sunWorkedDay[p.id]=false;
+    lastAssigned[p.id]=null;
   });
 
-  // ── Preserve locked slots when regenerating from a day ──
-  const sched = {};
+  // ── Build sched skeleton, preserve locked days ──
+  const sched={};
   DAYS.forEach((_,di)=>{
     sched[di]={};
-    if(startDay >= 0 && di < startDay && state.schedule[di]){
-      // Preserve this day entirely and account for its hours
-      sched[di] = JSON.parse(JSON.stringify(state.schedule[di]));
+    if(startDay>=0 && di<startDay && state.schedule[di]){
+      sched[di]=JSON.parse(JSON.stringify(state.schedule[di]));
+      // Recount hours from preserved days
       BLOCKS.forEach(b=>{
-        if(b.isLunch && !state.settings?.lunchPaid) return;
-        const dur = blockDur(b);
-        const keys = b.isLunch ? ['lunch'] : STATIONS.filter(s=>!s.isLunch).map(s=>s.id);
-        keys.forEach(key=>{
+        const dur=blockDur(b);
+        STATIONS.forEach(s=>{
+          const key=s.isLunch?'lunch':s.id;
+          if(b.isLunch && s.isLunch && !state.settings?.lunchPaid) return; // skip unpaid break
+          if(b.isLunch && !s.isLunch) { /* coverage during lunch — always count */ }
           (sched[di][b.id]?.[key]||[]).forEach(slot=>{
-            const pid = slot?.pid||null;
-            if(pid && wkHrs[pid]!==undefined){
-              wkHrs[pid]  += dur;
-              dayHrs[pid][di] += dur;
-              lastAssigned[pid] = { di, endMin: toMin(b.end) };
-              if(di===5) satWorked[pid]++;
-              if(di===6) sunWorked[pid]++;
-            }
+            const pid=slot?.pid; if(!pid||wkHrs[pid]===undefined) return;
+            wkHrs[pid]+=dur; dayHrs[pid][di]+=dur;
+            lastAssigned[pid]={di,endMin:toMin(b.end)};
+            if(di===5){ if(!satWorkedDay[pid]){ satWorked[pid]++; satWorkedDay[pid]=true; } }
+            if(di===6){ if(!sunWorkedDay[pid]){ sunWorked[pid]++; sunWorkedDay[pid]=true; } }
           });
         });
       });
@@ -836,273 +855,269 @@ function generateSchedule(startDay=-1){
     }
   });
 
-  const employees  = state.people.filter(p=>p.type==='emp');
-  const volunteers = state.people.filter(p=>p.type==='vol');
+  const employees=state.people.filter(p=>p.type==='emp');
 
-  // ── Helper: is candidate eligible for this block/day/station? ──
-  function isEligible(p, di, b, s, assignedThisBlock){
+  // ── Eligibility check ──
+  function isEligible(p,di,b,s,assignedSet){
     if(!availMap[p.id][di]) return false;
-    if(assignedThisBlock.has(p.id)) return false;
-
-    const roleKey = s.isField ? 'field' : s.id;
-    if(!p.roles[roleKey]) return false;
-    if(p.type==='vol' && s.isField) return false; // volunteers never in field
-
-    // Volunteer block availability
+    if(assignedSet.has(p.id)) return false;
+    const roleKey=s.isField?'field':s.isLunch?null:s.id;
+    if(roleKey && !p.roles[roleKey]) return false;
+    if(s.isLunch && p.type==='vol') return false; // vols don't get formal lunch slot
+    if(p.type==='vol' && s.isField) return false;
     if(p.type==='vol' && p.availableBlocks?.length>0 && !p.availableBlocks.includes(b.id)) return false;
 
-    const dur = blockDur(b);
-    const bStartMin = toMin(b.start);
-    const last = lastAssigned[p.id];
+    const dur=blockDur(b);
+    const bStartMin=toMin(b.start);
+    const last=lastAssigned[p.id];
 
-    // No clopen: worked past 18:00 previous day → can't do 06:00 opening today
-    if(!p.overrideIgnoreTurnaround && last && last.di===di-1 && last.endMin>=1080){
-      if(bStartMin===360){
-        log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: clopen`);
-        return false;
+    if(!p.overrideIgnoreTurnaround){
+      // No clopen: worked ≥18:00 previous day → can't do 06:00 today
+      if(last&&last.di===di-1&&last.endMin>=1080&&bStartMin===360){
+        log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: clopen`); return false;
+      }
+      // 10h turnaround across days
+      if(last&&last.di===di-1){
+        if(24*60+bStartMin < last.endMin+600){
+          log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: turnaround`); return false;
+        }
+      }
+      // Same-day split shift gap
+      if(last&&last.di===di){
+        const gap=bStartMin-last.endMin;
+        if(gap>MAX_SHIFT_GAP_HOURS*60&&!p.allowExtendedDay){
+          log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: split gap ${(gap/60).toFixed(1)}h`); return false;
+        }
       }
     }
-    // 10-hour turnaround across days
-    if(!p.overrideIgnoreTurnaround && last && last.di===di-1){
-      const nextDayStart = 24*60 + bStartMin;
-      if(nextDayStart < last.endMin + 600){
-        log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: <10hr turnaround`);
-        return false;
-      }
+
+    // Daily cap
+    if(dayHrs[p.id][di]+dur>effectiveDailyCap(p)+0.01){
+      log(`SKIP ${p.name} d${di}: daily cap`); return false;
     }
-    // Same-day split shift gap check
-    if(last && last.di===di && !p.allowExtendedDay && !p.overrideIgnoreTurnaround){
-      const gapMins = bStartMin - last.endMin;
-      if(gapMins > MAX_SHIFT_GAP_HOURS * 60){
-        log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: split shift gap ${(gapMins/60).toFixed(1)}h`);
-        return false;
-      }
-    }
-    // Daily cap check
-    if(dayHrs[p.id][di] + dur > effectiveDailyCap(p) + 0.01){
-      log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: daily cap ${dayHrs[p.id][di].toFixed(1)}+${dur}>${effectiveDailyCap(p)}`);
-      return false;
-    }
-    // Weekly cap check
-    if(!p.overrideOver40 && wkHrs[p.id] + dur > p.maxHrs + 0.01){
-      log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: weekly cap ${wkHrs[p.id].toFixed(1)}+${dur}>${p.maxHrs}`);
-      return false;
+    // Weekly cap
+    if(!p.overrideOver40&&wkHrs[p.id]+dur>p.maxHrs+0.01){
+      log(`SKIP ${p.name}: weekly cap`); return false;
     }
     return true;
   }
 
-  // ── Helper: sort candidate pool ──
-  function sortCandidates(pool, di, b){
-    const isWeekend = (di===5||di===6);
+  // ── Sort candidates ──
+  function sortPool(pool,di,b){
     return [...pool].sort((a,b2)=>{
-      // Preferred block: up
-      const aPref = a.preferredBlocks?.includes(b.id) ? -1 : 0;
-      const bPref = b2.preferredBlocks?.includes(b.id) ? -1 : 0;
-      if(aPref!==bPref) return aPref-bPref;
-      // Avoid block: down
-      const aAvoid = a.avoidBlocks?.includes(b.id) ? 1 : 0;
-      const bAvoid = b2.avoidBlocks?.includes(b.id) ? 1 : 0;
-      if(aAvoid!==bAvoid) return aAvoid-bAvoid;
-      // Employees before volunteers for base stations
+      const aP=a.preferredBlocks?.includes(b.id)?-1:0;
+      const bP=b2.preferredBlocks?.includes(b.id)?-1:0;
+      if(aP!==bP) return aP-bP;
+      const aA=a.avoidBlocks?.includes(b.id)?1:0;
+      const bA=b2.avoidBlocks?.includes(b.id)?1:0;
+      if(aA!==bA) return aA-bA;
       if(a.type!==b2.type) return a.type==='emp'?-1:1;
-      // Weekend fairness
-      if(isWeekend && !a.weekendExempt && !b2.weekendExempt){
-        const wA = di===5 ? satWorked[a.id] : sunWorked[a.id];
-        const wB = di===5 ? satWorked[b2.id] : sunWorked[b2.id];
-        if(wA!==wB) return wA-wB;
+      if(!a.weekendExempt&&!b2.weekendExempt){
+        if(di===5){const d=satWorked[a.id]-satWorked[b2.id]; if(d!==0)return d;}
+        if(di===6){const d=sunWorked[a.id]-sunWorked[b2.id]; if(d!==0)return d;}
       }
-      // Higher pref score first
       if(b2.pref!==a.pref) return b2.pref-a.pref;
-      // Lower weekly hours first (fairness)
       return wkHrs[a.id]-wkHrs[b2.id];
     });
   }
 
-  // ── Helper: assign a slot ──
-  function assignSlot(sched, di, b, s, pid){
-    const dur = blockDur(b);
-    const key = b.isLunch ? 'lunch' : s.id;
-    if(!sched[di][b.id][key]) sched[di][b.id][key]=[];
-    sched[di][b.id][key].push({pid, locked:false});
-    wkHrs[pid]  += dur;
-    dayHrs[pid][di] += dur;
-    lastAssigned[pid] = { di, endMin: toMin(b.end) };
-    if(di===5) satWorked[pid]++;
-    if(di===6) sunWorked[pid]++;
-    log(`ASSIGN ${peopleById[pid]?.name} d${di} ${b.id}/${key}`);
+  // ── Assign and update counters ──
+  function assign(sched,di,b,sid,pid){
+    const dur=blockDur(b);
+    if(!sched[di][b.id][sid]) sched[di][b.id][sid]=[];
+    sched[di][b.id][sid].push({pid,locked:false});
+    wkHrs[pid]+=dur;
+    dayHrs[pid][di]+=dur;
+    lastAssigned[pid]={di,endMin:toMin(b.end)};
+    if(di===5&&!satWorkedDay[pid]){satWorked[pid]++;satWorkedDay[pid]=true;}
+    if(di===6&&!sunWorkedDay[pid]){sunWorked[pid]++;sunWorkedDay[pid]=true;}
+    log(`ASSIGN ${peopleById[pid]?.name} → d${di} ${b.id}/${sid}`);
   }
 
-  // ── Main scheduling loop ──
+  // ══ MAIN LOOP ══
   DAYS.forEach((_,di)=>{
-    if(startDay >= 0 && di < startDay) return; // skip preserved days
+    if(startDay>=0&&di<startDay) return;
 
-    const assignedThisBlock = {}; // bid -> Set of pids
+    // Reset per-day weekend tracking
+    state.people.forEach(p=>{
+      if(di===5) satWorkedDay[p.id]=false;
+      if(di===6) sunWorkedDay[p.id]=false;
+    });
 
-    // Phase 1: Non-lunch blocks — base stations first, then field
-    NON_LUNCH_BLOCKS.forEach(b=>{
-      assignedThisBlock[b.id] = new Set();
-      const stationsOrdered = [...BASE_STATIONS, ...FIELD_STATIONS];
+    const assigned=new Set(); // pids assigned in this block (reset per block)
 
-      // b9 closing: must continue from b8 workers
-      if(b.id==='b9'){
-        stationsOrdered.forEach(s=>{
-          const demand = state.demand[b.id]?.[s.id]?.[di]??1;
+    BLOCKS.forEach(b=>{
+      assigned.clear();
+
+      if(b.isLunch){
+        // ── LUNCH BLOCKS (b3/b4/b5) ──
+        // Step 1: fill coverage stations (Gate/Podium/Mandir) first
+        COVERAGE_STATIONS.forEach(s=>{
+          const demand=state.demand[b.id]?.[s.id]?.[di]??0;
           sched[di][b.id][s.id]=[];
           if(demand===0) return;
-          const b8workers = (sched[di]['b8']?.[s.id]||[]).map(slot=>slot?.pid).filter(Boolean);
-          for(let slot=0; slot<demand; slot++){
-            const candidate = b8workers.find(pid=>
-              !sched[di][b.id][s.id].some(x=>x.pid===pid) &&
-              !assignedThisBlock[b.id].has(pid)
-            );
-            if(candidate){
-              sched[di][b.id][s.id].push({pid:candidate,locked:false});
-              assignedThisBlock[b.id].add(candidate);
-              log(`ASSIGN(b9-continuity) ${peopleById[candidate]?.name} d${di} b9/${s.id}`);
-            } else {
-              sched[di][b.id][s.id].push({pid:null,locked:false});
-              log(`UNFILLED b9/${s.id} d${di} slot ${slot}`);
-            }
+          const pool=sortPool(
+            state.people.filter(p=>isEligible(p,di,b,s,assigned)),
+            di,b
+          );
+          for(let slot=0;slot<demand;slot++){
+            const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
+            if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
+            else { sched[di][b.id][s.id].push({pid:null,locked:false}); log(`UNFILLED ${b.id}/${s.id} d${di}`); }
           }
         });
-        return;
-      }
 
-      stationsOrdered.forEach(s=>{
-        const demand = state.demand[b.id]?.[s.id]?.[di]??1;
-        sched[di][b.id][s.id]=[];
-        if(demand===0) return;
+        // Step 2: field stations during lunch (if demand > 0)
+        FIELD_STATIONS.forEach(s=>{
+          const demand=state.demand[b.id]?.[s.id]?.[di]??0;
+          sched[di][b.id][s.id]=[];
+          if(demand===0) return;
+          const pool=sortPool(
+            state.people.filter(p=>isEligible(p,di,b,s,assigned)),
+            di,b
+          );
+          for(let slot=0;slot<demand;slot++){
+            const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
+            if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
+            else { sched[di][b.id][s.id].push({pid:null,locked:false}); }
+          }
+        });
 
-        // Check if any slots are locked (preserved from partial regen)
-        const existingSlots = startDay>=0 ? [] : [];
+        // Step 3: send remaining active employees on lunch break
+        const demand=state.demand[b.id]?.['lunch']?.[di]??1;
+        sched[di][b.id]['lunch']=[];
+        // Count how many non-lunch coverage slots are filled
+        const covFilled=COVERAGE_STATIONS.reduce((n,s)=>{
+          return n+(sched[di][b.id][s.id]||[]).filter(x=>x.pid).length;
+        },0);
+        const covRequired=COVERAGE_STATIONS.reduce((n,s)=>{
+          return n+(state.demand[b.id]?.[s.id]?.[di]??0);
+        },0);
 
-        const pool = sortCandidates(
-          state.people.filter(p=>isEligible(p, di, b, s, assignedThisBlock[b.id])),
-          di, b
+        const lunchPool=sortPool(
+          employees.filter(p=>
+            availMap[p.id][di] &&
+            dayHrs[p.id][di]>0 &&
+            dayHrs[p.id][di]<7 &&
+            !assigned.has(p.id)
+          ),
+          di,b
         );
 
-        for(let slot=0; slot<demand; slot++){
-          const candidate = pool.find(p=>
-            !sched[di][b.id][s.id].some(x=>x.pid===p.id) &&
-            !assignedThisBlock[b.id].has(p.id)
-          );
-          if(candidate){
-            assignSlot(sched, di, b, s, candidate.id);
-            assignedThisBlock[b.id].add(candidate.id);
-          } else {
-            sched[di][b.id][s.id].push({pid:null,locked:false});
-            log(`UNFILLED ${b.id}/${s.id} d${di} slot ${slot}`);
+        let sent=0;
+        for(const p of lunchPool){
+          if(sent>=demand) break;
+          // Only send to lunch if coverage won't drop below required
+          const covAfter=covFilled-(COVERAGE_STATIONS.some(s=>(sched[di][b.id][s.id]||[]).some(x=>x.pid===p.id))?1:0);
+          if(covFilled>0 && covAfter < covRequired && covRequired > 0) {
+            log(`SKIP LUNCH ${p.name} d${di}: would break coverage`); continue;
           }
+          sched[di][b.id]['lunch'].push({pid:p.id,locked:false});
+          assigned.add(p.id);
+          // Lunch break hours: only add if lunchPaid
+          if(state.settings?.lunchPaid){
+            const dur=blockDur(b);
+            wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
+          }
+          sent++;
+          log(`LUNCH ${p.name} d${di} ${b.id}`);
         }
-      });
-    });
 
-    // Phase 2: Lunch blocks — staggered rotation
-    LUNCH_BLOCKS.forEach(b=>{
-      assignedThisBlock[b.id] = new Set();
-      const demand = state.demand[b.id]?.['lunch']?.[di]??1;
-      sched[di][b.id]['lunch']=[];
+      } else {
+        // ── NON-LUNCH BLOCKS ──
 
-      // Lunch eligibility: must be working that day, not near daily cap
-      const minCoverage = BASE_STATIONS.reduce((sum,s)=>{
-        return sum + (state.demand[b.id]?.[s.id]?.[di]??1);
-      },0);
+        // b9 closing: prefer b8 workers for same station, fallback to normal pool
+        const isClosing=(b.id==='b9');
 
-      const activeStaff = employees.filter(p=>
-        availMap[p.id][di] &&
-        dayHrs[p.id][di] > 0 &&
-        dayHrs[p.id][di] < 7 &&
-        !assignedThisBlock[b.id].has(p.id)
-      );
+        const stationsOrdered=[...BASE_STATIONS,...FIELD_STATIONS];
+        stationsOrdered.forEach(s=>{
+          const demand=state.demand[b.id]?.[s.id]?.[di]??1;
+          sched[di][b.id][s.id]=[];
+          if(demand===0) return;
 
-      // Only send to lunch if coverage remains after removal
-      let sentToLunch = 0;
-      const lunchPool = sortCandidates(activeStaff, di, b);
-      for(const p of lunchPool){
-        if(sentToLunch >= demand) break;
-        const remaining = activeStaff.length - sentToLunch - 1;
-        if(remaining < minCoverage){
-          log(`SKIP LUNCH ${p.name} d${di}: coverage would drop below ${minCoverage}`);
-          break;
-        }
-        sched[di][b.id]['lunch'].push({pid:p.id,locked:false});
-        assignedThisBlock[b.id].add(p.id);
-        if(state.settings?.lunchPaid){
-          const dur = blockDur(b);
-          wkHrs[p.id]  += dur;
-          dayHrs[p.id][di] += dur;
-        }
-        sentToLunch++;
-        log(`LUNCH ${p.name} d${di} ${b.id}`);
-      }
-    });
+          let pool;
+          if(isClosing){
+            // Try b8 workers first for continuity
+            const b8pids=(sched[di]['b8']?.[s.id]||[]).map(x=>x?.pid).filter(Boolean);
+            const b8candidates=b8pids.map(id=>peopleById[id]).filter(p=>p&&isEligible(p,di,b,s,assigned));
+            // If b8 was empty or not enough, fall back to full pool
+            const fallback=sortPool(
+              state.people.filter(p=>isEligible(p,di,b,s,assigned)&&!b8pids.includes(p.id)),
+              di,b
+            );
+            pool=[...b8candidates,...fallback];
+          } else {
+            pool=sortPool(state.people.filter(p=>isEligible(p,di,b,s,assigned)),di,b);
+          }
 
-    // Phase 3: Fill-to-40 — try to push under-cap employees into unfilled field slots
-    if(di < 5){ // skip weekend fill-to-40 to preserve natural weekend limits
-      NON_LUNCH_BLOCKS.forEach(b=>{
-        if(b.id==='b8'||b.id==='b9') return; // don't over-fill evening
-        FIELD_STATIONS.forEach(s=>{
-          const slots = sched[di][b.id]?.[s.id]||[];
-          const nullIdx = slots.findIndex(x=>x.pid===null);
-          if(nullIdx===-1) return;
-
-          // Sort by tier: <30 → <35 → <40
-          const fillPool = employees
-            .filter(p=>isEligible(p, di, b, s, assignedThisBlock[b.id]))
-            .sort((a,b2)=>{
-              const tierA = wkHrs[a.id]<30?0:wkHrs[a.id]<35?1:2;
-              const tierB = wkHrs[b2.id]<30?0:wkHrs[b2.id]<35?1:2;
-              if(tierA!==tierB) return tierA-tierB;
-              return wkHrs[a.id]-wkHrs[b2.id];
-            });
-
-          for(const p of fillPool){
-            const ni = slots.findIndex(x=>x.pid===null);
-            if(ni===-1) break;
-            slots[ni]={pid:p.id,locked:false};
-            const dur = blockDur(b);
-            wkHrs[p.id]  += dur;
-            dayHrs[p.id][di] += dur;
-            lastAssigned[p.id] = { di, endMin: toMin(b.end) };
-            assignedThisBlock[b.id].add(p.id);
-            log(`FILL40 ${p.name} d${di} ${b.id}/${s.id}`);
+          for(let slot=0;slot<demand;slot++){
+            const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
+            if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
+            else { sched[di][b.id][s.id].push({pid:null,locked:false}); log(`UNFILLED ${b.id}/${s.id} d${di} slot${slot}`); }
           }
         });
+      }
+    }); // end BLOCKS
+
+    // ── FILL-TO-40 PASS (all days, field stations only) ──
+    // Runs after all blocks for this day are assigned
+    BLOCKS.filter(b=>!b.isLunch&&b.id!=='b8'&&b.id!=='b9').forEach(b=>{
+      FIELD_STATIONS.forEach(s=>{
+        const slots=sched[di][b.id]?.[s.id]||[];
+        const nullSlots=slots.filter(x=>x.pid===null);
+        if(!nullSlots.length) return;
+
+        // Sort by hour tier: <30 → <35 → <40
+        const fillPool=employees
+          .filter(p=>isEligible(p,di,b,s,assigned))
+          .sort((a,b2)=>{
+            const tA=wkHrs[a.id]<30?0:wkHrs[a.id]<35?1:2;
+            const tB=wkHrs[b2.id]<30?0:wkHrs[b2.id]<35?1:2;
+            if(tA!==tB) return tA-tB;
+            return wkHrs[a.id]-wkHrs[b2.id];
+          });
+
+        for(const p of fillPool){
+          const ni=slots.findIndex(x=>x.pid===null);
+          if(ni===-1) break;
+          slots[ni]={pid:p.id,locked:false};
+          const dur=blockDur(b);
+          wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
+          lastAssigned[p.id]={di,endMin:toMin(b.end)};
+          assigned.add(p.id);
+          if(di===5&&!satWorkedDay[p.id]){satWorked[p.id]++;satWorkedDay[p.id]=true;}
+          if(di===6&&!sunWorkedDay[p.id]){sunWorked[p.id]++;sunWorkedDay[p.id]=true;}
+          log(`FILL40 ${p.name} d${di} ${b.id}/${s.id}`);
+        }
       });
-    }
-  });
+    });
 
-  // ── Show log in UI ──
-  const logEl  = document.getElementById('sched-log');
-  const logBody= document.getElementById('sched-log-body');
-  const logCnt = document.getElementById('log-count');
-  if(logEl && logBody){
+  }); // end DAYS
+
+  // ── Render log ──
+  const logEl=document.getElementById('sched-log');
+  const logBody=document.getElementById('sched-log-body');
+  const logCnt=document.getElementById('log-count');
+  if(logEl&&logBody){
     logEl.style.display='block';
-    logBody.innerHTML = schedLog.map(l=>`<div>${esc(l)}</div>`).join('');
-    if(logCnt) logCnt.textContent = `(${schedLog.length} entries)`;
+    logBody.innerHTML=schedLog.map(l=>`<div>${esc(l)}</div>`).join('');
+    if(logCnt) logCnt.textContent=`(${schedLog.length} entries)`;
   }
-
   return sched;
 }
 
     // ══════════════════════════════════════════════
-//  RENDER SCHEDULE GRID
+//  SCHEDULE GRID
 // ══════════════════════════════════════════════
-function getSlots(di,bid,sid){
-  return state.schedule[di]?.[bid]?.[sid] || [];
-}
-function personName(id){
-  if(!id) return '—';
-  const p=peopleById[id];
-  return p?esc(p.name):'?';
-}
+function getSlots(di,bid,sid){ return state.schedule[di]?.[bid]?.[sid]||[]; }
+function personName(id){ if(!id)return'—'; const p=peopleById[id]; return p?esc(p.name):'?'; }
+
 function buildOptions(selectedId){
   return `<option value="">— empty —</option>`+
     state.people.map(p=>`<option value="${p.id}"${p.id===selectedId?' selected':''}>${esc(p.name)} (${p.type==='emp'?'E':'V'})</option>`).join('');
 }
 
-let swapMode=false;
-let swapSource=null;
+let swapMode=false, swapSource=null;
 
 function toggleSwapMode(){
   swapMode=!swapMode; swapSource=null;
@@ -1111,7 +1126,7 @@ function toggleSwapMode(){
   btn.classList.toggle('active',swapMode);
   if(swapMode){
     info.className='show';
-    info.textContent='Swap mode ON — click a slot to select source, then click another to swap.';
+    info.textContent='Swap mode ON — click source slot, then target slot.';
     document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight'));
   } else {
     info.className=''; info.textContent='';
@@ -1121,22 +1136,21 @@ function toggleSwapMode(){
 
 function onSlotClick(el){
   if(!swapMode) return;
-  const di=+el.dataset.di, bid=el.dataset.bid, sid=el.dataset.sid, si=+el.dataset.si;
-  const slot = getSlots(di,bid,sid)[si];
-  if(slot?.locked){ toast('Slot is locked — unlock first'); return; }
-
+  const di=+el.dataset.di,bid=el.dataset.bid,sid=el.dataset.sid,si=+el.dataset.si;
+  const slot=getSlots(di,bid,sid)[si];
+  if(slot?.locked){ toast('Slot is locked'); return; }
   if(!swapSource){
     document.querySelectorAll('.slot-dd').forEach(x=>x.classList.remove('swap-source','swap-highlight'));
     el.classList.add('swap-source');
     swapSource={di,bid,sid,si,el,val:el.value};
     document.getElementById('swap-info').textContent=`Source: ${personName(el.value)||'empty'} — click target.`;
   } else {
-    const targetSlot = getSlots(di,bid,sid)[si];
-    if(targetSlot?.locked){ toast('Target slot is locked'); return; }
-    const targetVal=el.value, sourceEl=swapSource.el, sourceVal=swapSource.val;
-    setSlotValue(swapSource.di,swapSource.bid,swapSource.sid,swapSource.si,targetVal||null,false);
-    setSlotValue(di,bid,sid,si,sourceVal||null,false);
-    sourceEl.value=targetVal; el.value=sourceVal;
+    const tSlot=getSlots(di,bid,sid)[si];
+    if(tSlot?.locked){ toast('Target is locked'); return; }
+    const tv=el.value, se=swapSource.el, sv=swapSource.val;
+    setSlotValue(swapSource.di,swapSource.bid,swapSource.sid,swapSource.si,tv||null,false);
+    setSlotValue(di,bid,sid,si,sv||null,false);
+    se.value=tv; el.value=sv;
     document.querySelectorAll('.slot-dd').forEach(x=>x.classList.remove('swap-source','swap-highlight'));
     swapSource=null;
     save(); validateAndHighlight(); renderHourSummary();
@@ -1149,26 +1163,25 @@ function setSlotValue(di,bid,sid,si,pid,locked){
   if(!state.schedule[di]) state.schedule[di]={};
   if(!state.schedule[di][bid]) state.schedule[di][bid]={};
   if(!state.schedule[di][bid][sid]) state.schedule[di][bid][sid]=[];
-  const existing = state.schedule[di][bid][sid][si];
-  const wasLocked = existing?.locked || false;
-  state.schedule[di][bid][sid][si]={ pid: pid||null, locked: locked!==undefined ? locked : wasLocked };
+  const ex=state.schedule[di][bid][sid][si];
+  state.schedule[di][bid][sid][si]={pid:pid||null, locked:locked!==undefined?locked:(ex?.locked||false)};
 }
 
 function toggleLock(di,bid,sid,si){
-  if(!state.schedule[di]?.[bid]?.[sid]?.[si]) return;
-  const slot = state.schedule[di][bid][sid][si];
-  slot.locked = !slot.locked;
+  const arr=state.schedule[di]?.[bid]?.[sid];
+  if(!arr||!arr[si]) return;
+  arr[si].locked=!arr[si].locked;
   save();
-  // Update lock btn appearance
-  const lockBtn = document.querySelector(`.lock-btn[data-di="${di}"][data-bid="${bid}"][data-sid="${sid}"][data-si="${si}"]`);
-  const dd = document.querySelector(`.slot-dd[data-di="${di}"][data-bid="${bid}"][data-sid="${sid}"][data-si="${si}"]`);
-  if(lockBtn){ lockBtn.textContent = slot.locked ? '🔒' : '🔓'; lockBtn.classList.toggle('locked', slot.locked); }
-  if(dd){ dd.disabled = slot.locked; dd.classList.toggle('locked', slot.locked); }
+  const lb=document.querySelector(`.lock-btn[data-di="${di}"][data-bid="${bid}"][data-sid="${sid}"][data-si="${si}"]`);
+  const dd=document.querySelector(`.slot-dd[data-di="${di}"][data-bid="${bid}"][data-sid="${sid}"][data-si="${si}"]`);
+  const locked=arr[si].locked;
+  if(lb){ lb.textContent=locked?'🔒':'🔓'; lb.classList.toggle('locked',locked); }
+  if(dd){ dd.disabled=locked; dd.classList.toggle('locked',locked); }
 }
 
 function renderScheduleGrid(){
   const wrap=document.getElementById('schedule-wrap');
-  if(!state.schedule || !Object.keys(state.schedule).length){
+  if(!state.schedule||!Object.keys(state.schedule).length){
     wrap.innerHTML='<div class="empty-state">Generate a schedule to see the output grid.</div>'; return;
   }
 
@@ -1179,60 +1192,45 @@ function renderScheduleGrid(){
     </tr></thead><tbody>`;
 
   BLOCKS.forEach(b=>{
-    html+=`<tr class="block-group-header"><td colspan="${DAYS.length+1}">
-      ▸ ${b.label} &nbsp;<span style="color:var(--text3);font-size:10px;">${b.start} – ${b.end} · ${blockDur(b).toFixed(1)}h${b.isLunch?' · Staggered Lunch':''}</span>
+    const hdrCls=b.isLunch?'block-lunch-header':'block-group-header';
+    const lunchNote=b.isLunch?' &nbsp;<span style="font-size:9px;opacity:0.7;">(coverage + break)</span>':'';
+    html+=`<tr class="${hdrCls}"><td colspan="${DAYS.length+1}">
+      ▸ ${b.label}${lunchNote} &nbsp;<span style="opacity:0.5;font-size:10px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
     </td></tr>`;
 
-    if(b.isLunch){
-      html+=`<tr><td class="row-label station-lunch">
-        <div class="row-label-name">Lunch</div>
-        <div class="row-label-time">${b.start}–${b.end}</div>
-      </td>`;
-      DAYS.forEach((_,di)=>{
-        const slots=getSlots(di,b.id,'lunch');
-        html+=`<td class="station-lunch" style="padding:5px 6px;">`;
-        if(slots.length){
-          slots.forEach((slot,si)=>{
-            const pid=slot?.pid||null; const locked=slot?.locked||false;
-            html+=`<div class="slot-wrap">
-              <select class="slot-dd${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="lunch" data-si="${si}"
-                onchange="onSlotChange(this)" onclick="onSlotClick(this)"
-                ${locked?'disabled':''} >${buildOptions(pid)}</select>
-              <button class="lock-btn${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="lunch" data-si="${si}"
-                onclick="toggleLock(${di},'${b.id}','lunch',${si})" title="${locked?'Unlock':'Lock'} slot">${locked?'🔒':'🔓'}</button>
-            </div>`;
-          });
-        } else { html+=`<span class="text-xs text2">—</span>`; }
-        html+=`</td>`;
-      });
-      html+='</tr>';
-      return;
-    }
+    // Determine which stations to render rows for
+    const stationRows = b.isLunch
+      ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
+      : WORK_STATIONS;
 
-    STATIONS.filter(s=>!s.isLunch).forEach(s=>{
+    stationRows.forEach(s=>{
       html+=`<tr><td class="row-label ${s.cls}">
-        <div class="row-label-name">${s.label}</div>
+        <div class="row-label-name">${s.label}${s.isLunch?' 🍽':''}
+        </div>
         <div class="row-label-time">${b.start}–${b.end}</div>
       </td>`;
       DAYS.forEach((_,di)=>{
-        const demand=state.demand[b.id]?.[s.id]?.[di]??1;
+        const demand=state.demand[b.id]?.[s.id]?.[di]??0;
         const slots=getSlots(di,b.id,s.id);
         html+=`<td class="${s.cls}">`;
-        const count=Math.max(demand, slots.length);
-        for(let si=0;si<count;si++){
-          const slot=slots[si]||{pid:null,locked:false};
-          const pid=slot.pid||null; const locked=slot.locked||false;
-          html+=`<div class="slot-wrap">
-            <select class="slot-dd${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
-              onchange="onSlotChange(this)" onclick="onSlotClick(this)"
-              ${locked?'disabled':''}>${buildOptions(pid)}</select>
-            <button class="lock-btn${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
-              onclick="toggleLock(${di},'${b.id}','${s.id}',${si})" title="${locked?'Unlock':'Lock'} slot">${locked?'🔒':'🔓'}</button>
-          </div>`;
+        const count=Math.max(demand,slots.length);
+        if(count===0){
+          html+=`<span style="font-size:10px;color:var(--text3);">—</span>`;
+        } else {
+          for(let si=0;si<count;si++){
+            const slot=slots[si]||{pid:null,locked:false};
+            const pid=slot.pid||null, locked=slot.locked||false;
+            html+=`<div class="slot-wrap">
+              <select class="slot-dd${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
+                onchange="onSlotChange(this)" onclick="onSlotClick(this)" ${locked?'disabled':''}>${buildOptions(pid)}</select>
+              <button class="lock-btn${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
+                onclick="toggleLock(${di},'${b.id}','${s.id}',${si})" title="${locked?'Unlock':'Lock'}">${locked?'🔒':'🔓'}</button>
+            </div>`;
+          }
         }
-        html+='</td>';
+        html+=`</td>`;
       });
-      html+='</tr>';
+      html+=`</tr>`;
     });
   });
 
@@ -1250,25 +1248,23 @@ function onSlotChange(sel){
 }
 
 // ── Context Menu ──
-let ctxTarget = null;
+let ctxTarget=null;
 function setupContextMenu(){
   document.querySelectorAll('.slot-dd').forEach(el=>{
     el.addEventListener('contextmenu',e=>{
       e.preventDefault();
       ctxTarget=el;
-      const menu=document.getElementById('ctx-menu');
       const di=+el.dataset.di,bid=el.dataset.bid,sid=el.dataset.sid,si=+el.dataset.si;
-      const slot=getSlots(di,bid,sid)[si];
-      const locked=slot?.locked||false;
-      document.getElementById('ctx-lock').style.display   = locked?'none':'block';
-      document.getElementById('ctx-unlock').style.display = locked?'block':'none';
-      menu.style.left=e.clientX+'px'; menu.style.top=e.clientY+'px';
-      menu.classList.add('show');
+      const locked=getSlots(di,bid,sid)[si]?.locked||false;
+      document.getElementById('ctx-lock').style.display=locked?'none':'block';
+      document.getElementById('ctx-unlock').style.display=locked?'block':'none';
+      const m=document.getElementById('ctx-menu');
+      m.style.left=e.clientX+'px'; m.style.top=e.clientY+'px';
+      m.classList.add('show');
     });
   });
   document.addEventListener('click',()=>document.getElementById('ctx-menu').classList.remove('show'));
 }
-
 document.getElementById('ctx-lock').onclick=()=>{
   if(!ctxTarget) return;
   const {di,bid,sid,si}=ctxTarget.dataset;
@@ -1284,35 +1280,39 @@ document.getElementById('ctx-unlock').onclick=()=>{
 document.getElementById('ctx-clear').onclick=()=>{
   if(!ctxTarget) return;
   const {di,bid,sid,si}=ctxTarget.dataset;
-  const slot=getSlots(+di,bid,sid)[+si];
-  if(slot?.locked){ toast('Unlock slot first'); return; }
+  if(getSlots(+di,bid,sid)[+si]?.locked){ toast('Unlock first'); return; }
   setSlotValue(+di,bid,sid,+si,null,false);
   ctxTarget.value='';
   save(); validateAndHighlight(); renderHourSummary();
 };
 
 // ══════════════════════════════════════════════
-//  VALIDATION & HIGHLIGHTING
+//  HOUR COMPUTATION (FIXED)
 // ══════════════════════════════════════════════
 function computeWeeklyHours(){
   const wh={};
   state.people.forEach(p=>{wh[p.id]=0;});
   const lunchPaid=!!state.settings?.lunchPaid;
-
   DAYS.forEach((_,di)=>{
     BLOCKS.forEach(b=>{
-      if(b.isLunch && !lunchPaid) return;
       const dur=blockDur(b);
       if(b.isLunch){
-        (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
-          const pid=slot?.pid||null;
-          if(pid && wh[pid]!==undefined) wh[pid]+=dur;
-        });
-      } else {
-        STATIONS.filter(s=>!s.isLunch).forEach(s=>{
+        // Coverage workers during lunch: ALWAYS count
+        [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{
           (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid||null;
-            if(pid && wh[pid]!==undefined) wh[pid]+=dur;
+            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
+          });
+        });
+        // Lunch break takers: only count if lunchPaid
+        if(lunchPaid){
+          (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
+            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
+          });
+        }
+      } else {
+        WORK_STATIONS.forEach(s=>{
+          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
+            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
           });
         });
       }
@@ -1325,21 +1325,24 @@ function computeDailyHours(){
   const dh={};
   state.people.forEach(p=>{dh[p.id]=DAYS.map(()=>0);});
   const lunchPaid=!!state.settings?.lunchPaid;
-
   DAYS.forEach((_,di)=>{
     BLOCKS.forEach(b=>{
-      if(b.isLunch && !lunchPaid) return;
       const dur=blockDur(b);
       if(b.isLunch){
-        (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
-          const pid=slot?.pid||null;
-          if(pid && dh[pid]) dh[pid][di]+=dur;
-        });
-      } else {
-        STATIONS.filter(s=>!s.isLunch).forEach(s=>{
+        [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{
           (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid||null;
-            if(pid && dh[pid]) dh[pid][di]+=dur;
+            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
+          });
+        });
+        if(lunchPaid){
+          (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
+            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
+          });
+        }
+      } else {
+        WORK_STATIONS.forEach(s=>{
+          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
+            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
           });
         });
       }
@@ -1348,24 +1351,39 @@ function computeDailyHours(){
   return dh;
 }
 
+// ══════════════════════════════════════════════
+//  VALIDATION
+// ══════════════════════════════════════════════
 function validateAndHighlight(){
   document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('error','warn','warn-daily-soft','warn-daily-hard'));
   const wh=computeWeeklyHours();
   const dh=computeDailyHours();
   const errors=[];
 
-  // Build double-booking map
-  const personInBlock={};
+  // Double-booking map
+  const pib={};
   DAYS.forEach((_,di)=>{
-    BLOCKS.filter(b=>!b.isLunch).forEach(b=>{
-      STATIONS.filter(s=>!s.isLunch).forEach(s=>{
+    BLOCKS.forEach(b=>{
+      WORK_STATIONS.forEach(s=>{
         (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-          const pid=slot?.pid||null; if(!pid) return;
-          const key=`${pid}_${di}_${b.id}`;
-          if(!personInBlock[key]) personInBlock[key]=[];
-          personInBlock[key].push(s.id);
+          const pid=slot?.pid; if(!pid) return;
+          const k=`${pid}_${di}_${b.id}`;
+          if(!pib[k]) pib[k]=[];
+          pib[k].push(s.id);
         });
       });
+    });
+  });
+
+  // Gate always staffed check (b1–b8)
+  BLOCKS.filter(b=>!b.isLunch&&b.id!=='b9').forEach(b=>{
+    DAYS.forEach((_,di)=>{
+      const demand=state.demand[b.id]?.['gate']?.[di]??1;
+      if(demand===0) return; // admin said 0 = intentional
+      const filled=(state.schedule[di]?.[b.id]?.['gate']||[]).filter(s=>s?.pid).length;
+      if(filled===0){
+        errors.push(`⚠ Gate UNSTAFFED on ${DAYS[di]} ${b.label} — minimum 1 required`);
+      }
     });
   });
 
@@ -1373,33 +1391,32 @@ function validateAndHighlight(){
     const pid=sel.value; if(!pid) return;
     const p=peopleById[pid]; if(!p) return;
     const di=+sel.dataset.di, bid=sel.dataset.bid, sid=sel.dataset.sid;
-    const dayTotal = dh[pid]?.[di]||0;
+    const dayTotal=dh[pid]?.[di]||0;
+    const cap=effectiveDailyCap(p);
 
-    // Daily soft warning (8-9 hrs)
-    if(dayTotal >= 8 && dayTotal < 10){
+    // Daily warnings use person's actual dailyCap as threshold
+    if(dayTotal>=p.dailyCap&&dayTotal<cap){
       sel.classList.add('warn-daily-soft');
     }
-    // Daily hard warning (>=10 hrs) or over cap
-    const cap = effectiveDailyCap(p);
-    if(dayTotal > cap + 0.01){
+    if(dayTotal>cap+0.01){
       sel.classList.add('warn-daily-hard');
       errors.push(`${p.name} over daily cap on ${DAYS[di]} (${dayTotal.toFixed(1)}h > ${cap}h)`);
     }
 
-    // Over weekly hours (only error if no override)
-    if(!p.overrideOver40 && p.type==='emp' && wh[pid]>p.maxHrs+0.01){
+    // Weekly
+    if(!p.overrideOver40&&p.type==='emp'&&wh[pid]>p.maxHrs+0.01){
       sel.classList.add('error');
       errors.push(`${p.name} over weekly cap (${wh[pid].toFixed(1)}/${p.maxHrs}h)`);
     }
 
     // Double booking
-    const key=`${pid}_${di}_${bid}`;
-    if(personInBlock[key] && personInBlock[key].filter(x=>x!==sid).length>0){
+    const k=`${pid}_${di}_${bid}`;
+    if(pib[k]&&pib[k].filter(x=>x!==sid).length>0){
       if(!sel.classList.contains('error')) sel.classList.add('warn');
-      errors.push(`${p.name} double-booked on ${DAYS[di]} block ${bid}`);
+      errors.push(`${p.name} double-booked ${DAYS[di]} ${bid}`);
     }
 
-    // Closing continuity: b9 must have worked b8
+    // Closing continuity
     if(bid==='b9'){
       const b8pids=(state.schedule[di]?.['b8']?.[sid]||[]).map(s=>s?.pid).filter(Boolean);
       if(!b8pids.includes(pid)){
@@ -1408,29 +1425,26 @@ function validateAndHighlight(){
       }
     }
 
-    // No clopen (unless override)
-    if(!p.overrideIgnoreTurnaround && di>0 && bid==='b1'){
-      const prevB8pids=Object.values(state.schedule[di-1]?.['b8']||{}).flatMap(arr=>arr.map(s=>s?.pid));
-      const prevB9pids=Object.values(state.schedule[di-1]?.['b9']||{}).flatMap(arr=>arr.map(s=>s?.pid));
-      if(prevB8pids.includes(pid)||prevB9pids.includes(pid)){
+    // Clopen
+    if(!p.overrideIgnoreTurnaround&&di>0&&bid==='b1'){
+      const prevB8=Object.values(state.schedule[di-1]?.['b8']||{}).flatMap(a=>a.map(s=>s?.pid));
+      const prevB9=Object.values(state.schedule[di-1]?.['b9']||{}).flatMap(a=>a.map(s=>s?.pid));
+      if(prevB8.includes(pid)||prevB9.includes(pid)){
         sel.classList.add('error');
-        errors.push(`${p.name} clopen: evening ${DAYS[di-1]} + opening ${DAYS[di]}`);
+        errors.push(`${p.name} clopen: ${DAYS[di-1]} evening + ${DAYS[di]} opening`);
       }
     }
 
-    // Split shift warning
-    if(!p.allowExtendedDay && !p.overrideIgnoreTurnaround){
-      // check if assigned blocks on this day have a gap > MAX_SHIFT_GAP_HOURS
-      const assignedBlocksToday = BLOCKS.filter(b2=>!b2.isLunch).filter(b2=>{
-        return STATIONS.filter(s=>!s.isLunch).some(s=>{
-          return (state.schedule[di]?.[b2.id]?.[s.id]||[]).some(slot=>slot?.pid===pid);
-        });
+    // Split shift
+    if(!p.allowExtendedDay&&!p.overrideIgnoreTurnaround){
+      const blocksToday=BLOCKS.filter(b2=>!b2.isLunch).filter(b2=>{
+        return WORK_STATIONS.some(s=>(state.schedule[di]?.[b2.id]?.[s.id]||[]).some(sl=>sl?.pid===pid));
       }).sort((a,b2)=>toMin(a.start)-toMin(b2.start));
-      for(let i=1;i<assignedBlocksToday.length;i++){
-        const gap=(toMin(assignedBlocksToday[i].start)-toMin(assignedBlocksToday[i-1].end))/60;
-        if(gap > MAX_SHIFT_GAP_HOURS){
+      for(let i=1;i<blocksToday.length;i++){
+        const gap=(toMin(blocksToday[i].start)-toMin(blocksToday[i-1].end))/60;
+        if(gap>MAX_SHIFT_GAP_HOURS){
           if(!sel.classList.contains('error')) sel.classList.add('warn');
-          errors.push(`${p.name} split shift on ${DAYS[di]}: ${gap.toFixed(1)}h gap`);
+          errors.push(`${p.name} split shift ${DAYS[di]}: ${gap.toFixed(1)}h gap`);
           break;
         }
       }
@@ -1440,12 +1454,12 @@ function validateAndHighlight(){
   const errdiv=document.getElementById('sched-errors');
   if(errors.length){
     const unique=[...new Set(errors)];
-    errdiv.innerHTML=`<div style="background:#2a1015;border:1px solid var(--accent3);border-radius:var(--radius);padding:9px 12px;">
-      <span class="red bold">⚠ ${unique.length} issue(s):</span>
-      ${unique.map(e=>`<div class="text-xs red" style="margin-top:3px;">• ${esc(e)}</div>`).join('')}
+    errdiv.innerHTML=`<div class="alert-box alert-err">
+      <strong>⚠ ${unique.length} issue(s):</strong>
+      ${unique.map(e=>`<div style="margin-top:3px;font-size:11px;">• ${esc(e)}</div>`).join('')}
     </div>`;
   } else {
-    errdiv.innerHTML=`<div style="background:#0a1a10;border:1px solid #1a4a2a;border-radius:var(--radius);padding:8px 12px;font-size:11px;color:var(--green);">✓ No constraint violations detected</div>`;
+    errdiv.innerHTML=`<div class="alert-box alert-ok">✓ No constraint violations detected</div>`;
   }
 }
 
@@ -1455,39 +1469,32 @@ function validateAndHighlight(){
 function renderHourSummary(){
   const wrap=document.getElementById('hour-summary');
   if(!state.people.length){ wrap.innerHTML='<div class="empty-state">No people in roster.</div>'; return; }
-
   const wh=computeWeeklyHours();
   const dh=computeDailyHours();
-  const filterUnder = document.getElementById('filter-under40')?.checked || false;
-
-  let people = state.people;
-  if(filterUnder) people = people.filter(p=>p.type==='emp' && (wh[p.id]||0) < p.maxHrs);
-
+  const filterUnder=document.getElementById('filter-under40')?.checked||false;
+  let people=state.people;
+  if(filterUnder) people=people.filter(p=>p.type==='emp'&&(wh[p.id]||0)<p.maxHrs);
   if(!people.length){ wrap.innerHTML='<div class="empty-state">No employees under weekly cap.</div>'; return; }
 
-  let html=`<table class="hour-table">
-    <thead><tr>
-      <th>Name</th><th>Type</th>
-      ${DAYS.map(d=>`<th>${d}</th>`).join('')}
-      <th>Total</th><th>Cap</th><th>Progress</th>
-    </tr></thead><tbody>`;
+  let html=`<table class="hour-table"><thead><tr>
+    <th>Name</th><th>Type</th>
+    ${DAYS.map(d=>`<th>${d}</th>`).join('')}
+    <th>Total</th><th>Cap</th><th>Progress</th>
+  </tr></thead><tbody>`;
 
   people.forEach(p=>{
-    const total=wh[p.id]||0;
-    const cap=p.maxHrs;
+    const total=wh[p.id]||0, cap=p.maxHrs;
     const pct=Math.min(100,(total/Math.max(cap,0.1))*100);
     const barCls=total>cap?'over':total>cap*0.88?'near':'';
     const totalColor=total>cap?'color:var(--accent3);':total>cap*0.88?'color:var(--accent);':'color:var(--green);';
-    const hasOverride = p.overrideOver40||p.overrideOver9hr||p.allowExtendedDay;
+    const hasOverride=p.overrideOver40||p.overrideOver9hr||p.allowExtendedDay;
 
     html+=`<tr>
-      <td class="bold">${esc(p.name)}${hasOverride?'<span class="override-flag" title="Overrides active"> ★</span>':''}</td>
+      <td class="bold">${esc(p.name)}${hasOverride?'<span class="override-flag" title="Overrides"> ★</span>':''}</td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Emp':'Vol'}</span></td>
       ${dh[p.id].map((h,di)=>{
-        let cls=''; let style='text-align:center;font-size:11px;';
-        if(h>=10) cls='day-cell-hard';
-        else if(h>=8) cls='day-cell-warn';
-        return `<td class="${cls}" style="${style}">${h>0?h.toFixed(1):''}</td>`;
+        const cls=h>=10?'day-cell-hard':h>=(p.dailyCap??8)?'day-cell-warn':'';
+        return `<td class="${cls}" style="text-align:center;font-size:11px;">${h>0?h.toFixed(1):''}</td>`;
       }).join('')}
       <td style="font-size:12px;${totalColor}">${total.toFixed(1)}h</td>
       <td class="text2">${cap}h</td>
@@ -1507,17 +1514,11 @@ function renderHourSummary(){
 //  EXPORT / IMPORT
 // ══════════════════════════════════════════════
 function exportTemplate(){
-  const data={
-    people:state.people, demand:state.demand,
-    settings:state.settings, nextId:state.nextId,
-    exported:new Date().toISOString(), version:4,
-  };
+  const data={people:state.people,demand:state.demand,settings:state.settings,nextId:state.nextId,exported:new Date().toISOString(),version:5};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='workforce-template-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  toast('Template exported!');
+  a.click(); toast('Template exported!');
 }
 
 function importTemplate(evt){
@@ -1526,54 +1527,10 @@ function importTemplate(evt){
   reader.onload=e=>{
     try {
       const data=JSON.parse(e.target.result);
-      if(!data.people) throw new Error('Invalid template file');
-      state.people   = data.people||[];
-      state.demand   = data.demand||{};
-      state.settings = data.settings||{};
-      state.nextId   = data.nextId||state.people.length+1;
-      state.schedule = migrateSched(data.schedule||{});
-      initDemand();
-      save(); rebuildPeopleMap(); renderRoster(); renderDemandGrid();
-      const lp=document.getElementById('lunch-paid');
-      if(lp) lp.checked=!!state.settings?.lunchPaid;
-      toast('Template imported!');
-    } catch(err){ toast('Import failed: '+err.message); }
-  };
-  reader.readAsText(file);
-  evt.target.value='';
-}
-
-// ══════════════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════════════
-function clearSchedule(){
-  if(!confirm('Clear the entire schedule?')) return;
-  state.schedule={};
-  save();
-  document.getElementById('schedule-wrap').innerHTML='<div class="empty-state">Schedule cleared.</div>';
-  document.getElementById('sched-errors').innerHTML='';
-  document.getElementById('sched-status').textContent='';
-  document.getElementById('sched-log').style.display='none';
-  renderHourSummary();
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function toast(msg,dur=2500){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(el._t);
-  el._t=setTimeout(()=>el.classList.remove('show'),dur);
-}
-
-// ══════════════════════════════════════════════
-//  BOOT
-// ══════════════════════════════════════════════
-load();
-seedDefaults();
-renderRoster();
-renderDemandGrid();
-if(state.schedule && Object.keys(state.schedule).length) renderScheduleGrid();
-</script>
-</body>
-</html>
+      if(!data.people) throw new Error('Invalid file');
+      if(data.version&&data.version<5) toast('Note: older template format — some fields may default');
+      state.people=data.people||[];
+      state.demand=data.demand||{};
+      state.settings=data.settings||{};
+      state.nextId=data.nextId||state.people.length+1;
+      state
