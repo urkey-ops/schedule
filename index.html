@@ -19,77 +19,59 @@
     --text2: #8888a0;
     --text3: #555568;
     --green: #47e8a0;
+    --purple: #b880ff;
     --radius: 8px;
     --mono: 'DM Mono', monospace;
     --serif: 'Fraunces', serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; min-height: 100vh; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    min-height: 100vh;
-  }
-
-  /* ─── HEADER ─── */
   header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 32px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    position: sticky; top: 0; z-index: 100;
+    padding: 16px 28px; border-bottom: 1px solid var(--border);
+    background: var(--surface); position: sticky; top: 0; z-index: 100;
   }
-  header h1 {
-    font-family: var(--serif);
-    font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
-    color: var(--accent);
-  }
+  header h1 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--accent); }
+  header .header-right { display: flex; align-items: center; gap: 12px; }
   header span { color: var(--text2); font-size: 11px; }
 
-  /* ─── TABS ─── */
   .tabs {
-    display: flex; gap: 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    padding: 0 32px;
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--surface); padding: 0 28px;
   }
   .tab {
-    padding: 10px 20px; cursor: pointer;
+    padding: 10px 18px; cursor: pointer;
     border-bottom: 2px solid transparent;
-    color: var(--text2); font-family: var(--mono);
-    font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;
+    color: var(--text2); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;
     transition: all 0.15s;
   }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* ─── MAIN LAYOUT ─── */
-  main { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
+  main { padding: 20px 28px; max-width: 1800px; margin: 0 auto; }
   .panel { display: none; }
   .panel.active { display: block; }
 
-  /* ─── SECTION TITLE ─── */
   .sec-title {
-    font-family: var(--serif);
-    font-size: 16px; font-weight: 600;
-    margin-bottom: 14px; padding-bottom: 8px;
+    font-family: var(--serif); font-size: 15px; font-weight: 600;
+    margin-bottom: 12px; padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 10px;
   }
-  .sec-title .badge {
+  .badge {
     background: var(--accent); color: var(--bg);
     font-family: var(--mono); font-size: 10px;
     padding: 2px 7px; border-radius: 20px; font-weight: 500;
   }
+  .badge-blue { background: #0a2a3a; color: var(--accent2); border: 1px solid var(--accent2); }
+  .badge-purple { background: #1a0a2a; color: var(--purple); border: 1px solid var(--purple); }
 
-  /* ─── BUTTONS ─── */
   .btn {
-    padding: 7px 16px; border-radius: var(--radius);
+    padding: 6px 14px; border-radius: var(--radius);
     border: none; cursor: pointer; font-family: var(--mono);
-    font-size: 12px; font-weight: 500; transition: all 0.15s;
+    font-size: 11px; font-weight: 500; transition: all 0.15s; white-space: nowrap;
   }
   .btn-primary { background: var(--accent); color: var(--bg); }
   .btn-primary:hover { background: #f0d060; }
@@ -99,190 +81,200 @@
   .btn-danger:hover { background: var(--accent3); color: #fff; }
   .btn-blue { background: var(--accent2); color: var(--bg); }
   .btn-blue:hover { background: #60c8f0; }
+  .btn-swap { background: #1a1a3a; color: var(--purple); border: 1px solid var(--purple); }
+  .btn-swap:hover { background: #2a1a4a; }
+  .btn-swap.active { background: var(--purple); color: #fff; }
 
-  /* ─── ROSTER TABLE ─── */
-  .roster-controls { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; }
+  /* ROSTER */
+  .roster-controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
   .roster-note { color: var(--text2); font-size: 11px; margin-left: auto; }
 
   .roster-table { width: 100%; border-collapse: collapse; }
   .roster-table th {
-    text-align: left; padding: 8px 10px;
+    text-align: left; padding: 7px 8px;
     background: var(--surface2); color: var(--text2);
     font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase;
     border-bottom: 1px solid var(--border);
-    position: sticky; top: 0;
   }
-  .roster-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .roster-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .roster-table tr:hover td { background: var(--surface2); }
 
   .name-input {
     background: transparent; border: none; color: var(--text);
-    font-family: var(--mono); font-size: 13px; width: 140px;
+    font-family: var(--mono); font-size: 12px; width: 120px;
     padding: 2px 4px; border-radius: 4px;
   }
   .name-input:focus { outline: 1px solid var(--accent2); background: var(--surface); }
 
-  .type-badge {
-    font-size: 10px; padding: 2px 8px; border-radius: 20px;
-    font-weight: 500;
-  }
+  .type-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
   .type-badge.emp { background: #1a3a2a; color: var(--green); }
-  .type-badge.vol { background: #2a1a3a; color: #b880ff; }
+  .type-badge.vol { background: #2a1a3a; color: var(--purple); }
 
-  .day-check { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
-  .role-check { accent-color: var(--accent2); width: 14px; height: 14px; cursor: pointer; }
+  .day-check { accent-color: var(--accent); width: 13px; height: 13px; cursor: pointer; }
+  .role-check { accent-color: var(--accent2); width: 13px; height: 13px; cursor: pointer; }
 
   .pref-select {
     background: var(--surface2); border: 1px solid var(--border);
     color: var(--text); font-family: var(--mono); font-size: 11px;
-    padding: 2px 4px; border-radius: 4px; width: 42px;
+    padding: 2px 4px; border-radius: 4px; width: 40px;
   }
 
-  /* ─── DEMAND CONFIG ─── */
+  .num-input {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 11px;
+    padding: 2px 6px; border-radius: 4px; width: 50px; text-align: center;
+  }
+  .num-input:focus { outline: 1px solid var(--accent); }
+
+  /* DEMAND */
   .demand-grid {
-    display: grid; grid-template-columns: 180px repeat(7, 1fr);
+    display: grid; grid-template-columns: 160px repeat(7, 1fr);
     gap: 0; border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; margin-bottom: 24px;
+    overflow: hidden; margin-bottom: 20px;
   }
   .dg-header {
-    background: var(--surface2); padding: 8px 12px;
+    background: var(--surface2); padding: 7px 10px;
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
     color: var(--text2); border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
   }
   .dg-cell {
-    padding: 6px 8px; border-right: 1px solid var(--border);
+    padding: 5px 6px; border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center;
   }
-  .dg-cell:last-child { border-right: none; }
+  .dg-cell:nth-child(8n) { border-right: none; }
   .dg-label {
-    background: var(--surface); padding: 8px 12px;
-    font-size: 12px; color: var(--text2);
+    background: var(--surface); padding: 7px 10px;
+    font-size: 11px; color: var(--text2);
     border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center;
   }
-  .demand-input {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 12px;
-    padding: 3px 6px; border-radius: 4px; width: 50px; text-align: center;
-  }
-  .demand-input:focus { outline: 1px solid var(--accent); }
 
-  /* ─── SCHEDULE GRID ─── */
+  /* SCHEDULE */
   .schedule-wrap { overflow-x: auto; }
-  .sched-table { border-collapse: collapse; min-width: 900px; width: 100%; }
+  .sched-table { border-collapse: collapse; min-width: 1000px; width: 100%; }
   .sched-table th {
-    padding: 9px 12px; background: var(--surface2); text-align: center;
+    padding: 8px 10px; background: var(--surface2); text-align: center;
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
     color: var(--text2); border: 1px solid var(--border);
   }
   .sched-table td {
-    padding: 5px 6px; border: 1px solid var(--border);
-    vertical-align: top; min-width: 120px;
+    padding: 4px 5px; border: 1px solid var(--border);
+    vertical-align: top; min-width: 110px;
   }
-  .block-label {
-    font-size: 10px; color: var(--text3); margin-bottom: 4px;
-    white-space: nowrap;
+  .sched-table .row-label {
+    padding: 6px 10px; min-width: 150px; max-width: 160px;
+    background: var(--surface2);
   }
+  .row-label-name { font-size: 11px; font-weight: 500; color: var(--text); }
+  .row-label-time { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
   .slot-dd {
     width: 100%; background: var(--surface);
     border: 1px solid var(--border); color: var(--text);
     font-family: var(--mono); font-size: 11px;
-    padding: 3px 5px; border-radius: 4px; cursor: pointer;
-    transition: border-color 0.15s;
+    padding: 3px 4px; border-radius: 4px; cursor: pointer;
+    transition: border-color 0.15s; margin-bottom: 2px;
   }
   .slot-dd:focus { outline: none; border-color: var(--accent2); }
-  .slot-dd.error { border-color: var(--accent3); background: #2a1015; }
-  .slot-dd.warning { border-color: var(--accent); }
-  .slot-dd.ok { border-color: var(--border); }
+  .slot-dd.error { border-color: var(--accent3) !important; background: #2a1015; }
+  .slot-dd.warn { border-color: var(--accent) !important; }
 
-  .station-gate    { background: #1a2a1a; }
-  .station-podium  { background: #1a1a2a; }
-  .station-mandir  { background: #2a1a2a; }
-  .station-field1  { background: #1a2a2a; }
-  .station-field2  { background: #2a2a1a; }
-  .station-lunch   { background: #2a2020; }
+  .swap-highlight { outline: 2px solid var(--purple) !important; }
+  .swap-source { outline: 2px solid var(--accent) !important; background: #1a1a00 !important; }
 
-  .day-col-header { position: relative; }
-  .day-col-header .hours-badge {
-    position: absolute; top: 3px; right: 5px;
-    font-size: 9px; padding: 1px 5px;
-    border-radius: 20px; background: var(--surface);
-    color: var(--text2);
+  .station-gate    { background: rgba(30,60,30,0.4); }
+  .station-podium  { background: rgba(20,30,60,0.4); }
+  .station-mandir  { background: rgba(50,20,50,0.4); }
+  .station-field1  { background: rgba(20,50,50,0.4); }
+  .station-field2  { background: rgba(50,50,20,0.4); }
+  .station-lunch   { background: rgba(60,30,20,0.4); }
+
+  .block-group-header td {
+    background: var(--surface) !important;
+    padding: 5px 10px;
+    font-size: 10px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase;
+    font-weight: 500;
   }
 
-  /* ─── HOUR SUMMARY ─── */
-  .hour-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  /* HOURS */
+  .hour-table { width: 100%; border-collapse: collapse; }
   .hour-table th {
-    padding: 7px 12px; background: var(--surface2);
+    padding: 7px 10px; background: var(--surface2);
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
     color: var(--text2); border: 1px solid var(--border); text-align: left;
   }
-  .hour-table td {
-    padding: 7px 12px; border: 1px solid var(--border);
-    font-size: 12px;
-  }
-  .hour-bar {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .bar-bg {
-    flex: 1; height: 6px; background: var(--surface2);
-    border-radius: 3px; overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%; background: var(--green); border-radius: 3px;
-    transition: width 0.3s;
-  }
+  .hour-table td { padding: 6px 10px; border: 1px solid var(--border); font-size: 12px; }
+  .bar-bg { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
   .bar-fill.over { background: var(--accent3); }
   .bar-fill.near { background: var(--accent); }
-  .hour-val { font-size: 11px; min-width: 50px; text-align: right; }
-  .hour-val.over { color: var(--accent3); }
-  .hour-val.near { color: var(--accent); }
 
-  /* ─── TOOLBAR ─── */
-  .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-  .toolbar .sep { width: 1px; height: 24px; background: var(--border); }
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .toolbar .sep { width: 1px; height: 22px; background: var(--border); }
 
-  /* ─── TOAST ─── */
+  /* SETTINGS ROW */
+  .settings-row {
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; font-size: 12px;
+  }
+  .settings-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  /* TOAST */
   #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     background: var(--surface2); border: 1px solid var(--border);
-    padding: 10px 20px; border-radius: var(--radius);
+    padding: 9px 18px; border-radius: var(--radius);
     font-size: 12px; color: var(--text); z-index: 9999;
     opacity: 0; transition: opacity 0.3s; pointer-events: none;
   }
   #toast.show { opacity: 1; }
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 768px) {
-    main { padding: 14px 12px; }
-    header { padding: 14px 16px; }
-    .tabs { padding: 0 16px; }
+  /* SWAP MODAL */
+  #swap-info {
+    display: none; padding: 8px 14px;
+    background: #1a0a2a; border: 1px solid var(--purple);
+    border-radius: var(--radius); margin-bottom: 12px;
+    font-size: 12px; color: var(--purple);
   }
+  #swap-info.show { display: block; }
 
-  /* small helpers */
-  .flex { display: flex; }
-  .gap-8 { gap: 8px; }
-  .mt-12 { margin-top: 12px; }
-  .mt-20 { margin-top: 20px; }
-  .text2 { color: var(--text2); }
-  .text-xs { font-size: 11px; }
-  .bold { font-weight: 700; }
-  .red { color: var(--accent3); }
-  .green { color: var(--green); }
-  .yellow { color: var(--accent); }
+  .empty-state { padding: 40px; text-align: center; color: var(--text3); font-size: 13px; }
+  .flex { display: flex; } .gap-8 { gap: 8px; } .mt-16 { margin-top: 16px; }
+  .text2 { color: var(--text2); } .text-xs { font-size: 11px; }
+  .bold { font-weight: 700; } .red { color: var(--accent3); }
+  .green { color: var(--green); } .yellow { color: var(--accent); }
   .spin { animation: spin 1s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .empty-state { padding: 40px; text-align: center; color: var(--text3); font-size: 13px; }
+
+  @media print {
+    body { background: #fff !important; color: #000 !important; }
+    header, .tabs, .toolbar, .settings-row, #toast, .btn, #swap-info,
+    #tab-roster, #tab-demand, #tab-hours { display: none !important; }
+    .panel { display: none !important; }
+    #tab-schedule { display: block !important; }
+    .sched-table th, .sched-table td { border: 1px solid #ccc !important; background: #fff !important; }
+    .slot-dd { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px; }
+    * { color: #000 !important; }
+  }
 </style>
 </head>
 <body>
 
 <header>
   <h1>⚙ WorkForce Scheduler</h1>
-  <span id="save-status">All changes saved</span>
+  <div class="header-right">
+    <button class="btn btn-secondary" onclick="exportTemplate()" style="font-size:11px;">⬇ Export Template</button>
+    <label class="btn btn-secondary" style="font-size:11px; cursor:pointer;">
+      ⬆ Import Template
+      <input type="file" accept=".json" style="display:none;" onchange="importTemplate(event)">
+    </label>
+    <span id="save-status">All changes saved</span>
+  </div>
 </header>
 
 <div class="tabs">
@@ -294,25 +286,30 @@
 
 <main>
 
-<!-- ═══════════════ ROSTER TAB ═══════════════ -->
+<!-- ══════════ ROSTER TAB ══════════ -->
 <div class="panel active" id="tab-roster">
   <div class="roster-controls">
-    <button class="btn btn-primary" onclick="addPerson('emp')">+ Add Employee</button>
-    <button class="btn btn-secondary" onclick="addPerson('vol')">+ Add Volunteer</button>
+    <button class="btn btn-primary" onclick="addPerson('emp')">+ Employee</button>
+    <button class="btn btn-secondary" onclick="addPerson('vol')">+ Volunteer</button>
+    <button class="btn btn-danger" onclick="clearRoster()" style="margin-left:4px;">Clear All</button>
     <span class="roster-note" id="roster-count">0 employees · 0 volunteers</span>
   </div>
-  <div id="roster-empty" class="empty-state">No people added yet. Click "Add Employee" or "Add Volunteer" to begin.</div>
+  <div id="roster-empty" class="empty-state">No people added. Click "+ Employee" or "+ Volunteer" to begin, or import a template.</div>
   <div style="overflow-x:auto;">
     <table class="roster-table" id="roster-table" style="display:none;">
       <thead>
         <tr>
-          <th style="width:36px;">#</th>
+          <th>#</th>
           <th>Name</th>
           <th>Type</th>
-          <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
-          <th>Gate</th><th>Podium</th><th>Mandir</th><th>Field</th>
-          <th>Pref⭐</th>
-          <th>Max hrs/wk</th>
+          <th title="Day Off - check = off that day">Mon Off</th>
+          <th>Tue Off</th><th>Wed Off</th><th>Thu Off</th><th>Fri Off</th><th>Sat Off</th><th>Sun Off</th>
+          <th title="Permitted at Gate">Gate</th>
+          <th title="Permitted at Podium">Podium</th>
+          <th title="Permitted at Mandir">Mandir</th>
+          <th title="Permitted in Field Work">Field</th>
+          <th title="Scheduling preference 1=low 5=high">Pref★</th>
+          <th title="Weekly hour cap">Max/Wk</th>
           <th></th>
         </tr>
       </thead>
@@ -321,102 +318,124 @@
   </div>
 </div>
 
-<!-- ═══════════════ DEMAND TAB ═══════════════ -->
+<!-- ══════════ DEMAND TAB ══════════ -->
 <div class="panel" id="tab-demand">
-  <div class="sec-title">Station Demand <span class="badge">per block per day</span></div>
-  <p class="text2 text-xs" style="margin-bottom:16px;">Set how many staff are needed at each station for each day. These values drive the auto-scheduler.</p>
+  <div class="sec-title">Station Demand <span class="badge">slots per block per day</span></div>
+  <p class="text2 text-xs" style="margin-bottom:14px;">Set how many staff are required at each station for each day/block combination. 0 = station closed for that period.</p>
   <div id="demand-grid-wrap"></div>
 
-  <div class="sec-title mt-20">Shift Blocks <span class="badge">configured</span></div>
-  <p class="text2 text-xs" style="margin-bottom:16px;">Reference: the system operates on these fixed time blocks. Durations are calculated in exact minutes.</p>
-  <table class="roster-table" style="max-width:640px;">
-    <thead><tr><th>Block</th><th>Start</th><th>End</th><th>Duration</th></tr></thead>
+  <div class="sec-title mt-16">Time Block Reference <span class="badge">9 blocks</span></div>
+  <table class="roster-table" style="max-width:560px;">
+    <thead><tr><th>#</th><th>Label</th><th>Start</th><th>End</th><th>Duration</th><th>Notes</th></tr></thead>
     <tbody id="blocks-info"></tbody>
   </table>
 </div>
 
-<!-- ═══════════════ SCHEDULE TAB ═══════════════ -->
+<!-- ══════════ SCHEDULE TAB ══════════ -->
 <div class="panel" id="tab-schedule">
+  <div class="settings-row">
+    <label>
+      <input type="checkbox" id="lunch-paid" onchange="saveSetting('lunchPaid',this.checked)" style="accent-color:var(--accent);">
+      Lunch blocks count toward paid hours
+    </label>
+    <span class="text2 text-xs">| Swap mode: click a slot to select source, then click target to swap.</span>
+  </div>
   <div class="toolbar">
-    <button class="btn btn-primary" onclick="runScheduler()">▶ Auto-Generate Schedule</button>
+    <button class="btn btn-primary" onclick="runScheduler()">▶ Auto-Generate</button>
     <div class="sep"></div>
+    <button class="btn btn-swap" id="swap-btn" onclick="toggleSwapMode()">⇄ Swap Mode</button>
     <button class="btn btn-secondary" onclick="clearSchedule()">✕ Clear</button>
-    <button class="btn btn-blue" onclick="exportPrint()">⬇ Print / Export</button>
+    <button class="btn btn-blue" onclick="window.print()">🖨 Print</button>
     <span class="text2 text-xs" style="margin-left:auto;" id="sched-status"></span>
   </div>
-  <div id="sched-errors" style="margin-bottom:12px;"></div>
+  <div id="swap-info"></div>
+  <div id="sched-errors" style="margin-bottom:10px;"></div>
   <div class="schedule-wrap" id="schedule-wrap">
     <div class="empty-state">Generate a schedule to see the output grid.</div>
   </div>
 </div>
 
-<!-- ═══════════════ HOURS TAB ═══════════════ -->
+<!-- ══════════ HOURS TAB ══════════ -->
 <div class="panel" id="tab-hours">
   <div class="sec-title">Weekly Hour Summary</div>
-  <div id="hour-summary">
-    <div class="empty-state">Generate a schedule first to see hour totals.</div>
-  </div>
+  <div id="hour-summary"><div class="empty-state">Generate a schedule first.</div></div>
 </div>
 
 </main>
-
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════
-//  DATA MODEL
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const ROLES = ['gate','podium','mandir','field'];
-const ROLE_LABELS = {gate:'Gate',podium:'Podium',mandir:'Mandir',field:'Field'};
 
+// 9 canonical blocks per spec
 const BLOCKS = [
-  { id:'open',   label:'Opening',        start:'06:00', end:'09:00' },
-  { id:'am',     label:'AM Shift',       start:'09:00', end:'13:00' },
-  { id:'lunch',  label:'Lunch Break',    start:'12:00', end:'12:30', isLunch:true },
-  { id:'pm',     label:'PM Shift',       start:'13:00', end:'16:30' },
-  { id:'eve1',   label:'Evening 1',      start:'16:30', end:'18:30' },
-  { id:'eve2',   label:'Evening 2',      start:'18:30', end:'20:30' },
+  { id:'b1', label:'Early Morning Gate',  start:'06:00', end:'09:00', isLunch:false, notes:'Opening / Gate Lock' },
+  { id:'b2', label:'Mid Morning',         start:'09:00', end:'12:00', isLunch:false, notes:'' },
+  { id:'b3', label:'Lunch Rotation 1',    start:'12:00', end:'12:30', isLunch:true,  notes:'Staggered lunch 1' },
+  { id:'b4', label:'Lunch Rotation 2',    start:'12:30', end:'13:00', isLunch:true,  notes:'Staggered lunch 2' },
+  { id:'b5', label:'Lunch Rotation 3',    start:'13:00', end:'13:30', isLunch:true,  notes:'Staggered lunch 3' },
+  { id:'b6', label:'Afternoon',           start:'13:30', end:'14:30', isLunch:false, notes:'' },
+  { id:'b7', label:'Late Afternoon',      start:'14:30', end:'16:30', isLunch:false, notes:'' },
+  { id:'b8', label:'Evening 1',           start:'16:30', end:'18:30', isLunch:false, notes:'' },
+  { id:'b9', label:'Evening 2 (Closing)', start:'18:30', end:'20:30', isLunch:false, notes:'Closing Shift' },
 ];
-
-function blockDuration(b){
-  const [sh,sm]=b.start.split(':').map(Number);
-  const [eh,em]=b.end.split(':').map(Number);
-  return ((eh*60+em)-(sh*60+sm))/60;
-}
 
 const STATIONS = [
-  {id:'gate',   label:'Gate',      cls:'station-gate'},
-  {id:'podium', label:'Podium',    cls:'station-podium'},
-  {id:'mandir', label:'Mandir',    cls:'station-mandir'},
-  {id:'field1', label:'Field Wk 1',cls:'station-field1'},
-  {id:'field2', label:'Field Wk 2',cls:'station-field2'},
+  { id:'gate',   label:'Gate',        cls:'station-gate',   isField:false },
+  { id:'podium', label:'Podium',      cls:'station-podium', isField:false },
+  { id:'mandir', label:'Mandir',      cls:'station-mandir', isField:false },
+  { id:'field1', label:'Field Work 1',cls:'station-field1', isField:true },
+  { id:'field2', label:'Field Work 2',cls:'station-field2', isField:true },
+  { id:'lunch',  label:'Lunch',       cls:'station-lunch',  isLunch:true },
 ];
 
-// State
+const BASE_STATIONS = STATIONS.filter(s=>!s.isField && !s.isLunch);
+const FIELD_STATIONS = STATIONS.filter(s=>s.isField);
+
+function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function blockDur(b){ return (toMin(b.end)-toMin(b.start))/60; }
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
 let state = {
-  people: [],       // {id, name, type:'emp'|'vol', off:[bool×7], roles:{gate,podium,mandir,field}, pref:1-5, maxHrs:40}
-  demand: {},       // demand[blockId][stationId][dayIdx] = count
-  schedule: {},     // schedule[dayIdx][blockId][stationId][slot] = personId|null
+  people: [],
+  demand: {},
+  schedule: {},
+  settings: { lunchPaid: false },
   nextId: 1,
 };
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  PERSISTENCE
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 function save(){
-  try { localStorage.setItem('wfs_v2', JSON.stringify(state)); } catch(e){}
-  document.getElementById('save-status').textContent = 'Saved ' + new Date().toLocaleTimeString();
+  try { localStorage.setItem('wfs_v3', JSON.stringify(state)); } catch(e){}
+  const el = document.getElementById('save-status');
+  if(el) el.textContent = 'Saved ' + new Date().toLocaleTimeString();
 }
 function load(){
   try {
-    const d = localStorage.getItem('wfs_v2');
-    if(d){ state = JSON.parse(d); }
+    const d = localStorage.getItem('wfs_v3');
+    if(d) state = JSON.parse(d);
   } catch(e){}
-  initDemandIfEmpty();
+  initDemand();
+  // apply settings to UI
+  const lp = document.getElementById('lunch-paid');
+  if(lp) lp.checked = !!state.settings?.lunchPaid;
+}
+function saveSetting(key,val){
+  if(!state.settings) state.settings={};
+  state.settings[key]=val;
+  save();
+  if(Object.keys(state.schedule).length){ computeWeeklyHours(); renderHourSummary(); }
 }
 
-function initDemandIfEmpty(){
+function initDemand(){
+  if(!state.demand) state.demand={};
   BLOCKS.forEach(b=>{
     if(!state.demand[b.id]) state.demand[b.id]={};
     STATIONS.forEach(s=>{
@@ -425,38 +444,65 @@ function initDemandIfEmpty(){
   });
 }
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  TABS
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('tab-'+t.dataset.tab).classList.add('active');
     if(t.dataset.tab==='hours') renderHourSummary();
+    if(t.dataset.tab==='demand') renderDemandGrid();
   });
 });
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  ROSTER
-// ═══════════════════════════════════════════════
-function addPerson(type){
-  const empCount = state.people.filter(p=>p.type==='emp').length;
-  const volCount = state.people.filter(p=>p.type==='vol').length;
-  if(type==='emp' && empCount>=20){ toast('Max 20 employees reached'); return; }
-  if(type==='vol' && volCount>=20){ toast('Max 20 volunteers reached'); return; }
+// ══════════════════════════════════════════════
+const DEFAULT_EMPLOYEES = [
+  {name:'Dh', off:[false,false,false,false,true,false,false]},
+  {name:'S',  off:[false,false,false,false,true,false,false]},
+  {name:'P',  off:[false,false,false,true, false,false,false]},
+  {name:'B',  off:[false,false,false,true, false,false,false]},
+  {name:'K',  off:[true, false,false,false,false,false,false]},
+  {name:'D',  off:[false,true, false,false,false,false,false]},
+  {name:'U',  off:[true, false,false,false,false,false,false]},
+  {name:'A',  off:[false,false,true, false,false,false,false]},
+];
+const DEFAULT_VOLUNTEERS = [{name:'V1'},{name:'V2'}];
 
-  const idx = state.people.filter(p=>p.type===type).length+1;
-  const prefix = type==='emp'?'E':'V';
+function seedDefaults(){
+  if(state.people.length > 0) return;
+  DEFAULT_EMPLOYEES.forEach(e=>{
+    state.people.push({
+      id:'p'+(state.nextId++), name:e.name, type:'emp',
+      off: e.off||DAYS.map(()=>false),
+      roles:{gate:true,podium:true,mandir:true,field:true},
+      pref:3, maxHrs:40,
+    });
+  });
+  DEFAULT_VOLUNTEERS.forEach(v=>{
+    state.people.push({
+      id:'p'+(state.nextId++), name:v.name, type:'vol',
+      off:DAYS.map(()=>false),
+      roles:{gate:true,podium:true,mandir:true,field:true},
+      pref:3, maxHrs:20,
+    });
+  });
+  save();
+}
+
+function addPerson(type){
+  const cnt = state.people.filter(p=>p.type===type).length;
+  if(cnt>=20){ toast('Max 20 '+type+'s reached'); return; }
+  const idx = cnt+1;
   state.people.push({
-    id: 'p'+(state.nextId++),
-    name: prefix+idx,
-    type,
-    off: [false,false,false,false,false,false,false],
-    roles: {gate:true,podium:true,mandir:true,field:true},
-    pref: 3,
-    maxHrs: type==='emp'?40:20,
+    id:'p'+(state.nextId++),
+    name: type==='emp'?'E'+idx:'V'+idx,
+    type, off:DAYS.map(()=>false),
+    roles:{gate:true,podium:true,mandir:true,field:true},
+    pref:3, maxHrs: type==='emp'?40:20,
   });
   save(); renderRoster();
 }
@@ -466,377 +512,446 @@ function removePerson(id){
   save(); renderRoster();
 }
 
+function clearRoster(){
+  if(!confirm('Remove all people from roster?')) return;
+  state.people=[]; state.schedule={};
+  save(); renderRoster();
+}
+
 function renderRoster(){
   const body = document.getElementById('roster-body');
   const table = document.getElementById('roster-table');
   const empty = document.getElementById('roster-empty');
-  body.innerHTML = '';
-
+  body.innerHTML='';
   if(!state.people.length){
     table.style.display='none'; empty.style.display='block'; return;
   }
   table.style.display='table'; empty.style.display='none';
 
   state.people.forEach((p,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="text2">${i+1}</td>
-      <td><input class="name-input" value="${esc(p.name)}" oninput="updateField('${p.id}','name',this.value)"></td>
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="text2" style="font-size:11px;">${i+1}</td>
+      <td><input class="name-input" value="${esc(p.name)}" oninput="pf('${p.id}','name',this.value)"></td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Employee':'Volunteer'}</span></td>
-      ${DAYS.map((_,di)=>`<td style="text-align:center;"><input type="checkbox" class="day-check" ${p.off[di]?'checked':''} onchange="updateOff('${p.id}',${di},this.checked)" title="Day off"></td>`).join('')}
-      ${ROLES.map(r=>`<td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles[r]?'checked':''} onchange="updateRole('${p.id}','${r}',this.checked)"></td>`).join('')}
-      <td><select class="pref-select" onchange="updateField('${p.id}','pref',+this.value)">
+      ${DAYS.map((_,di)=>`<td style="text-align:center;"><input type="checkbox" class="day-check" ${p.off[di]?'checked':''} onchange="pOff('${p.id}',${di},this.checked)" title="${DAYS[di]} off"></td>`).join('')}
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.gate?'checked':''} onchange="pRole('${p.id}','gate',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.podium?'checked':''} onchange="pRole('${p.id}','podium',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.mandir?'checked':''} onchange="pRole('${p.id}','mandir',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.field?'checked':''} onchange="pRole('${p.id}','field',this.checked)"></td>
+      <td><select class="pref-select" onchange="pf('${p.id}','pref',+this.value)">
         ${[1,2,3,4,5].map(v=>`<option ${p.pref===v?'selected':''}>${v}</option>`).join('')}
       </select></td>
-      <td><input type="number" class="demand-input" style="width:60px;" value="${p.maxHrs}" min="0" max="168" onchange="updateField('${p.id}','maxHrs',+this.value)"></td>
-      <td><button class="btn btn-danger" style="padding:3px 8px;font-size:11px;" onclick="removePerson('${p.id}')">✕</button></td>
+      <td><input type="number" class="num-input" value="${p.maxHrs}" min="0" max="80" onchange="pf('${p.id}','maxHrs',+this.value)"></td>
+      <td><button class="btn btn-danger" style="padding:2px 7px;font-size:10px;" onclick="removePerson('${p.id}')">✕</button></td>
     `;
     body.appendChild(tr);
   });
 
-  // count
-  const ec = state.people.filter(p=>p.type==='emp').length;
-  const vc = state.people.filter(p=>p.type==='vol').length;
-  document.getElementById('roster-count').textContent = `${ec} employee${ec!==1?'s':''} · ${vc} volunteer${vc!==1?'s':''}`;
+  const ec=state.people.filter(p=>p.type==='emp').length;
+  const vc=state.people.filter(p=>p.type==='vol').length;
+  document.getElementById('roster-count').textContent=`${ec} employee${ec!==1?'s':''} · ${vc} volunteer${vc!==1?'s':''}`;
 }
 
-function updateField(id,field,val){ const p=state.people.find(x=>x.id===id); if(p){ p[field]=val; save(); }}
-function updateOff(id,di,val){ const p=state.people.find(x=>x.id===id); if(p){ p.off[di]=val; save(); }}
-function updateRole(id,role,val){ const p=state.people.find(x=>x.id===id); if(p){ p.roles[role]=val; save(); }}
+function pf(id,field,val){ const p=state.people.find(x=>x.id===id); if(p){p[field]=val; save();} }
+function pOff(id,di,val){ const p=state.people.find(x=>x.id===id); if(p){p.off[di]=val; save();} }
+function pRole(id,role,val){ const p=state.people.find(x=>x.id===id); if(p){p.roles[role]=val; save();} }
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  DEMAND GRID
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 function renderDemandGrid(){
   const wrap = document.getElementById('demand-grid-wrap');
-  wrap.innerHTML = '';
+  wrap.innerHTML='';
 
-  // Blocks × stations × days
-  BLOCKS.filter(b=>!b.isLunch).forEach(b=>{
-    const sec = document.createElement('div');
-    sec.innerHTML = `<div class="sec-title text-xs" style="font-size:13px;margin-top:18px;">${b.label} <span class="text2" style="font-family:var(--mono);font-size:11px;">${b.start}–${b.end} (${blockDuration(b).toFixed(1)}h)</span></div>`;
+  BLOCKS.forEach(b=>{
+    const sec=document.createElement('div');
+    sec.style.cssText='margin-top:18px;';
+    const isLunch=b.isLunch;
+    sec.innerHTML=`<div class="sec-title" style="font-size:13px;">
+      Block: ${b.label}
+      <span class="text2 text-xs">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
+      ${isLunch?'<span class="badge-purple" style="font-size:10px;padding:2px 7px;border-radius:20px;">Lunch</span>':''}
+    </div>`;
     wrap.appendChild(sec);
 
-    const grid = document.createElement('div');
-    grid.className = 'demand-grid';
-    // header row
-    grid.innerHTML = `<div class="dg-header">Station</div>`+DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
+    const grid=document.createElement('div');
+    grid.className='demand-grid';
+    grid.innerHTML='<div class="dg-header">Station</div>'+
+      DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
 
     STATIONS.forEach(s=>{
-      grid.innerHTML += `<div class="dg-label">${s.label}</div>`;
+      if(b.isLunch && !s.isLunch) return;
+      if(!b.isLunch && s.isLunch) return;
+      grid.innerHTML+=`<div class="dg-label">${s.label}</div>`;
       DAYS.forEach((_,di)=>{
-        const val = (state.demand[b.id]?.[s.id]?.[di]) ?? 1;
-        grid.innerHTML += `<div class="dg-cell"><input type="number" class="demand-input" min="0" max="10" value="${val}" onchange="updateDemand('${b.id}','${s.id}',${di},+this.value)"></div>`;
+        const val=(state.demand[b.id]?.[s.id]?.[di])??1;
+        grid.innerHTML+=`<div class="dg-cell"><input type="number" class="num-input" min="0" max="10" value="${val}" style="width:46px;" onchange="updDemand('${b.id}','${s.id}',${di},+this.value)"></div>`;
       });
     });
     wrap.appendChild(grid);
   });
 
-  // Block reference table
-  const tbody = document.getElementById('blocks-info');
-  tbody.innerHTML = BLOCKS.map(b=>`
-    <tr>
-      <td>${b.label}${b.isLunch?' <span class="text2">(staggered)</span>':''}</td>
-      <td>${b.start}</td><td>${b.end}</td>
-      <td>${blockDuration(b).toFixed(2)} h</td>
-    </tr>`).join('');
+  // Block reference
+  const tbody=document.getElementById('blocks-info');
+  tbody.innerHTML=BLOCKS.map((b,i)=>`<tr>
+    <td class="text2">${i+1}</td>
+    <td>${b.label}</td>
+    <td>${b.start}</td><td>${b.end}</td>
+    <td>${blockDur(b).toFixed(2)} h</td>
+    <td class="text2 text-xs">${b.notes}</td>
+  </tr>`).join('');
 }
 
-function updateDemand(blockId,stationId,dayIdx,val){
-  if(!state.demand[blockId]) state.demand[blockId]={};
-  if(!state.demand[blockId][stationId]) state.demand[blockId][stationId]=DAYS.map(()=>1);
-  state.demand[blockId][stationId][dayIdx]=val;
+function updDemand(bid,sid,di,val){
+  if(!state.demand[bid]) state.demand[bid]={};
+  if(!state.demand[bid][sid]) state.demand[bid][sid]=DAYS.map(()=>1);
+  state.demand[bid][sid][di]=val;
   save();
 }
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  SCHEDULER ALGORITHM
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 function runScheduler(){
   if(!state.people.length){ toast('Add people first'); return; }
-
-  document.getElementById('sched-status').innerHTML = '<span class="spin">⚙</span> Generating…';
+  document.getElementById('sched-status').innerHTML='<span class="spin">⚙</span> Generating…';
   setTimeout(()=>{
-    const sched = generateSchedule();
-    state.schedule = sched;
-    save();
-    renderScheduleGrid();
-    renderHourSummary();
-    document.getElementById('sched-status').textContent = '✓ Schedule generated';
-    toast('Schedule generated!');
-  }, 50);
+    try {
+      state.schedule = generateSchedule();
+      save();
+      renderScheduleGrid();
+      renderHourSummary();
+      document.getElementById('sched-status').textContent='✓ Schedule generated';
+      toast('Schedule generated!');
+    } catch(e){
+      document.getElementById('sched-status').textContent='Error generating';
+      toast('Error: '+e.message);
+      console.error(e);
+    }
+  }, 60);
 }
 
 function generateSchedule(){
   const sched = {};
-  const weeklyHours = {}; // personId -> float
-  const lastShiftEnd = {}; // personId -> {dayIdx, endMinutes}
-  const employees = state.people.filter(p=>p.type==='emp');
-  const volunteers = state.people.filter(p=>p.type==='vol');
+  const wkHrs = {};    // personId -> total weekly hours
+  const lastEnd = {};  // personId -> {di, endMin}
 
-  state.people.forEach(p=>{ weeklyHours[p.id]=0; });
+  state.people.forEach(p=>{ wkHrs[p.id]=0; });
+
+  const employees = state.people.filter(p=>p.type==='emp');
+
+  // Weekend fairness: track who worked last weekend
+  const weekendWorked = {};
+  state.people.forEach(p=>{ weekendWorked[p.id]=0; });
 
   DAYS.forEach((_,di)=>{
-    sched[di] = {};
-    const dailyHours = {}; state.people.forEach(p=>{ dailyHours[p.id]=0; });
-    const assignedThisDay = new Set(); // personId -> blockId set
+    sched[di]={};
+    const dayHrs = {};
+    state.people.forEach(p=>{ dayHrs[p.id]=0; });
 
     BLOCKS.forEach(b=>{
-      sched[di][b.id] = {};
+      sched[di][b.id]={};
+      const bStartMin = toMin(b.start);
+      const bEndMin   = toMin(b.end);
+      const dur = blockDur(b);
 
       if(b.isLunch){
-        // staggered lunch — assign to employees currently on floor, 1 at a time, staggered
-        const active = employees.filter(p=>!p.off[di] && dailyHours[p.id]>0);
-        const maxSimulLunch = Math.max(1, Math.floor(active.length/2));
-        sched[di][b.id].lunch_slots = [];
-        active.slice(0, maxSimulLunch).forEach(p=>{
-          sched[di][b.id].lunch_slots.push(p.id);
-        });
+        // Staggered lunch: pick employees currently active (have hours today), stagger them
+        const active = employees
+          .filter(p=>!p.off[di] && dayHrs[p.id]>0)
+          .sort((a,b2)=>dayHrs[a.id]-dayHrs[b2.id]); // least hours first for lunch
+        const demand = state.demand[b.id]?.['lunch']?.[di]??1;
+        const picks = active.slice(0, demand);
+        sched[di][b.id]['lunch'] = picks.map(p=>p.id);
+        // Lunch is break—don't add to wkHrs unless paid setting on
+        if(state.settings?.lunchPaid){
+          picks.forEach(p=>{ wkHrs[p.id]+=dur; dayHrs[p.id]+=dur; });
+        }
         return;
       }
 
-      const bStartMin = toMin(b.start);
-      const bEndMin = toMin(b.end);
-      const duration = (bEndMin - bStartMin)/60;
+      // Determine eligible workers for each station
+      const assignedThisBlock = new Set(); // prevent double-booking within same block
 
-      STATIONS.forEach(s=>{
-        const demand = state.demand[b.id]?.[s.id]?.[di] ?? 1;
+      const stationsToFill = STATIONS.filter(s=>!s.isLunch);
+
+      // Fill base stations first, then field
+      const orderedStations = [
+        ...stationsToFill.filter(s=>!s.isField),
+        ...stationsToFill.filter(s=>s.isField),
+      ];
+
+      orderedStations.forEach(s=>{
+        const roleKey = s.isField ? 'field' : s.id;
+        const demand  = state.demand[b.id]?.[s.id]?.[di]??1;
         sched[di][b.id][s.id] = [];
 
-        const roleKey = s.id.startsWith('field') ? 'field' : s.id;
+        if(demand===0){ return; }
 
-        // eve2 must come from eve1 workers (no split shift)
-        let eligible;
-        if(b.id==='eve2'){
-          const eve1Workers = sched[di]['eve1']?.[s.id] || [];
-          eligible = eve1Workers.map(id=>state.people.find(p=>p.id===id)).filter(Boolean);
+        // HARD CONSTRAINT: b9 (closing) workers must have been in b8 same station
+        let candidatePool;
+        if(b.id==='b9'){
+          const b8workers = sched[di]['b8']?.[s.id] || [];
+          candidatePool = b8workers
+            .map(id=>state.people.find(p=>p.id===id))
+            .filter(Boolean);
         } else {
-          eligible = state.people.filter(p=>{
+          candidatePool = state.people.filter(p=>{
             if(p.off[di]) return false;
             if(!p.roles[roleKey]) return false;
-            if(weeklyHours[p.id]+duration > p.maxHrs+0.01) return false;
-            // no clopen: worked past 18:00 yesterday?
-            const last = lastShiftEnd[p.id];
-            if(last && last.dayIdx===di-1 && last.endMin>1080){ // 18:00 = 1080
-              if(bStartMin < 360+last.endMin-1080) return false; // next day opening forbidden
+            if(assignedThisBlock.has(p.id)) return false;
+            // Volunteers: only for base stations if role permitted, never auto-fill field
+            if(p.type==='vol' && s.isField) return false;
+            // Weekly hours check
+            if(p.type==='emp' && wkHrs[p.id]+dur > p.maxHrs+0.01) return false;
+            // No clopen: if worked past 18:00 the previous day, cannot work 06:00 opening today
+            const last = lastEnd[p.id];
+            if(last && last.di===di-1 && last.endMin>=1080){ // 18:00=1080 min
+              if(bStartMin===360) return false; // 06:00 opening forbidden
             }
-            // 10h turnaround
-            if(last && last.dayIdx===di-1){
-              if(bStartMin + 24*60 < last.endMin + 600) return false;
-            }
-            // not already in this block
-            const inBlock = sched[di][b.id];
-            for(const sid in inBlock){
-              if(inBlock[sid].includes(p.id)) return false;
+            // 10-hour turnaround
+            if(last && last.di===di-1){
+              const nextDayStart = 24*60 + bStartMin;
+              if(nextDayStart < last.endMin + 600) return false;
             }
             return true;
           });
-          // sort by preference desc, then by weekly hours asc
-          eligible.sort((a,b)=> b.pref-a.pref || weeklyHours[a.id]-weeklyHours[b.id]);
-          // volunteers last unless field
-          if(s.id!=='field1'&&s.id!=='field2'){
-            eligible.sort((a,b)=>(a.type==='vol'?1:0)-(b.type==='vol'?1:0));
-          }
+
+          // Sort: pref desc, volunteers after employees for base stations, then by weekly hours asc (fairness)
+          // Weekend fairness: penalise those who already have more weekend days
+          const isWeekend = (di===5||di===6);
+          candidatePool.sort((a,b2)=>{
+            if(a.type!==b2.type){
+              // For base: emp first, for field: doesn't matter
+              if(!s.isField) return a.type==='emp'?-1:1;
+            }
+            if(isWeekend){
+              // Prefer fewer weekend days worked
+              if(weekendWorked[a.id]!==weekendWorked[b2.id])
+                return weekendWorked[a.id]-weekendWorked[b2.id];
+            }
+            if(b2.pref!==a.pref) return b2.pref-a.pref;
+            return wkHrs[a.id]-wkHrs[b2.id];
+          });
         }
 
         for(let slot=0; slot<demand; slot++){
-          // pick best available
-          const candidate = eligible.find(p=>!sched[di][b.id][s.id].includes(p.id));
+          const candidate = candidatePool.find(p=>!sched[di][b.id][s.id].includes(p.id) && !assignedThisBlock.has(p.id));
           if(candidate){
             sched[di][b.id][s.id].push(candidate.id);
-            weeklyHours[candidate.id]+=duration;
-            dailyHours[candidate.id]+=duration;
-            lastShiftEnd[candidate.id]={dayIdx:di, endMin:bEndMin};
-            // remove from eligible pool for other stations same block
+            wkHrs[candidate.id]+=dur;
+            dayHrs[candidate.id]+=dur;
+            lastEnd[candidate.id]={di, endMin:bEndMin};
+            assignedThisBlock.add(candidate.id);
+            if(di===5||di===6) weekendWorked[candidate.id]++;
           } else {
-            sched[di][b.id][s.id].push(null); // unfilled
+            sched[di][b.id][s.id].push(null);
           }
         }
       });
-    });
 
-    // Fill-to-40: find employees under their maxHrs, fill into field slots
-    if(sched[di]['pm']){
-      employees.forEach(p=>{
-        if(p.off[di]) return;
-        const gap = p.maxHrs - weeklyHours[p.id];
-        if(gap <= 0) return;
-        const fieldBlocks = ['am','pm'];
-        fieldBlocks.forEach(bid=>{
-          ['field1','field2'].forEach(sid=>{
-            const demand = state.demand[bid]?.[sid]?.[di]??1;
-            const slots = sched[di]?.[bid]?.[sid]||[];
-            if(slots.includes(p.id)) return;
-            const hasNull = slots.indexOf(null);
-            const bStart = toMin(BLOCKS.find(x=>x.id===bid).start);
-            const bEnd = toMin(BLOCKS.find(x=>x.id===bid).end);
-            const dur = (bEnd-bStart)/60;
-            if(weeklyHours[p.id]+dur > p.maxHrs+0.01) return;
-            if(hasNull>=0){
-              sched[di][bid][sid][hasNull]=p.id;
-              weeklyHours[p.id]+=dur;
+      // Fill-to-40: after base stations placed, fill remaining field slots with under-limit employees
+      if(b.id!=='b8' && b.id!=='b9'){ // don't over-fill evening
+        FIELD_STATIONS.forEach(s=>{
+          const demand = state.demand[b.id]?.[s.id]?.[di]??1;
+          if(demand===0) return;
+          const slots = sched[di][b.id][s.id]||[];
+
+          employees.forEach(p=>{
+            if(p.off[di]) return;
+            if(!p.roles['field']) return;
+            if(assignedThisBlock.has(p.id)) return;
+            if(wkHrs[p.id]+dur > p.maxHrs+0.01) return;
+            const last = lastEnd[p.id];
+            if(last && last.di===di-1 && last.endMin>=1080 && bStartMin===360) return;
+            if(last && last.di===di-1 && (24*60+bStartMin)<last.endMin+600) return;
+
+            const nullIdx = slots.indexOf(null);
+            if(nullIdx>=0){
+              slots[nullIdx]=p.id;
+              wkHrs[p.id]+=dur;
+              dayHrs[p.id]+=dur;
+              lastEnd[p.id]={di, endMin:bEndMin};
+              assignedThisBlock.add(p.id);
+              if(di===5||di===6) weekendWorked[p.id]++;
             }
           });
+          sched[di][b.id][s.id]=slots;
         });
-      });
-    }
+      }
+    });
   });
 
   return sched;
 }
 
-function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
-
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  RENDER SCHEDULE GRID
-// ═══════════════════════════════════════════════
-function renderScheduleGrid(){
-  const wrap = document.getElementById('schedule-wrap');
-  if(!Object.keys(state.schedule).length){ wrap.innerHTML='<div class="empty-state">Generate a schedule to see the output grid.</div>'; return; }
-
-  const allPeople = state.people;
-  const opts = `<option value="">— empty —</option>` +
-    allPeople.map(p=>`<option value="${p.id}">${esc(p.name)} (${p.type==='emp'?'E':'V'})</option>`).join('');
-
-  let html = `<table class="sched-table" id="sched-tbl">
-    <thead><tr>
-      <th style="min-width:140px;">Block / Station</th>
-      ${DAYS.map(d=>`<th class="day-col-header">${d}</th>`).join('')}
-    </tr></thead>
-    <tbody>`;
-
-  BLOCKS.forEach(b=>{
-    if(b.isLunch){
-      html += `<tr>
-        <td style="padding:6px 10px;background:var(--surface2);" class="station-lunch">
-          <div style="font-size:11px;color:var(--text2);">🍽 Lunch (${b.start}–${b.end})</div>
-          <div style="font-size:10px;color:var(--text3);">Staggered · auto</div>
-        </td>`;
-      DAYS.forEach((_,di)=>{
-        const slots = state.schedule[di]?.[b.id]?.lunch_slots || [];
-        html += `<td class="station-lunch" style="padding:5px 8px;">
-          ${slots.length ? slots.map(id=>`<div style="font-size:11px;padding:1px 0;">${personName(id)}</div>`).join('') : '<span class="text-xs text2">none</span>'}
-        </td>`;
-      });
-      html += '</tr>';
-      return;
-    }
-
-    STATIONS.forEach(s=>{
-      html += `<tr>
-        <td style="padding:6px 10px;" class="${s.cls}">
-          <div style="font-size:11px;font-weight:500;">${s.label}</div>
-          <div style="font-size:10px;color:var(--text3);">${b.label} ${b.start}–${b.end}</div>
-        </td>`;
-
-      DAYS.forEach((_,di)=>{
-        const slots = state.schedule[di]?.[b.id]?.[s.id] || [];
-        html += `<td class="${s.cls}">`;
-        slots.forEach((pid,si)=>{
-          html += `<select class="slot-dd" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}" onchange="onSlotChange(this)">
-            ${opts.replace(`value="${pid}"`,`value="${pid}" selected`)}
-          </select>`;
-        });
-        if(!slots.length){
-          const demand = state.demand[b.id]?.[s.id]?.[di]??1;
-          for(let i=0;i<demand;i++){
-            html += `<select class="slot-dd" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${i}" onchange="onSlotChange(this)">${opts}</select>`;
-          }
-        }
-        html += '</td>';
-      });
-      html += '</tr>';
-    });
-  });
-
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
-  validateAndHighlight();
-}
-
+// ══════════════════════════════════════════════
 function personName(id){
-  if(!id) return '<span class="text2">—</span>';
-  const p = state.people.find(x=>x.id===id);
-  return p ? esc(p.name) : '?';
+  if(!id) return '—';
+  const p=state.people.find(x=>x.id===id);
+  return p?esc(p.name):'?';
 }
 
-function onSlotChange(sel){
-  const di=+sel.dataset.di, bid=sel.dataset.bid, sid=sel.dataset.sid, si=+sel.dataset.si;
+function buildOptions(selectedId){
+  return `<option value="">— empty —</option>`+
+    state.people.map(p=>`<option value="${p.id}"${p.id===selectedId?' selected':''}>${esc(p.name)} (${p.type==='emp'?'E':'V'})</option>`).join('');
+}
+
+let swapMode=false;
+let swapSource=null; // {di,bid,sid,si,el}
+
+function toggleSwapMode(){
+  swapMode=!swapMode;
+  swapSource=null;
+  const btn=document.getElementById('swap-btn');
+  const info=document.getElementById('swap-info');
+  btn.classList.toggle('active',swapMode);
+  if(swapMode){
+    info.className='show'; info.textContent='Swap mode ON — click a slot to select source, then click another slot to swap.';
+    document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight'));
+  } else {
+    info.className=''; info.textContent='';
+    document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight'));
+  }
+}
+
+function onSlotClick(el){
+  if(!swapMode) return;
+  const di=+el.dataset.di, bid=el.dataset.bid, sid=el.dataset.sid, si=+el.dataset.si;
+
+  if(!swapSource){
+    // Select source
+    document.querySelectorAll('.slot-dd').forEach(x=>x.classList.remove('swap-source','swap-highlight'));
+    el.classList.add('swap-source');
+    swapSource={di,bid,sid,si,el,val:el.value};
+    document.getElementById('swap-info').textContent=`Source selected: ${personName(el.value)||'empty'} — now click the target slot.`;
+  } else {
+    // Perform swap
+    const targetVal=el.value;
+    const sourceEl=swapSource.el;
+    const sourceVal=swapSource.val;
+
+    // Update state
+    setSlotValue(swapSource.di,swapSource.bid,swapSource.sid,swapSource.si, targetVal||null);
+    setSlotValue(di,bid,sid,si, sourceVal||null);
+
+    // Update dropdowns
+    sourceEl.value=targetVal;
+    el.value=sourceVal;
+
+    document.querySelectorAll('.slot-dd').forEach(x=>x.classList.remove('swap-source','swap-highlight'));
+    swapSource=null;
+    save();
+    validateAndHighlight();
+    renderHourSummary();
+    document.getElementById('swap-info').textContent='Swap complete! Click another slot or turn off Swap Mode.';
+    toast('Swapped!');
+  }
+}
+
+function setSlotValue(di,bid,sid,si,val){
   if(!state.schedule[di]) state.schedule[di]={};
   if(!state.schedule[di][bid]) state.schedule[di][bid]={};
   if(!state.schedule[di][bid][sid]) state.schedule[di][bid][sid]=[];
-  state.schedule[di][bid][sid][si] = sel.value || null;
+  state.schedule[di][bid][sid][si]=val;
+}
+
+function renderScheduleGrid(){
+  const wrap=document.getElementById('schedule-wrap');
+  if(!state.schedule || !Object.keys(state.schedule).length){
+    wrap.innerHTML='<div class="empty-state">Generate a schedule to see the output grid.</div>'; return;
+  }
+
+  let html=`<table class="sched-table" id="sched-tbl">
+    <thead><tr>
+      <th style="min-width:155px;">Station / Block</th>
+      ${DAYS.map(d=>`<th>${d}</th>`).join('')}
+    </tr></thead><tbody>`;
+
+  BLOCKS.forEach(b=>{
+    // Group header row
+    html+=`<tr class="block-group-header"><td colspan="${DAYS.length+1}">
+      ▸ ${b.label} &nbsp;<span style="color:var(--text3);font-size:10px;">${b.start} – ${b.end} · ${blockDur(b).toFixed(1)}h${b.isLunch?' · Staggered Lunch':''}</span>
+    </td></tr>`;
+
+    if(b.isLunch){
+      html+=`<tr>
+        <td class="row-label station-lunch">
+          <div class="row-label-name">Lunch</div>
+          <div class="row-label-time">${b.start}–${b.end}</div>
+        </td>`;
+      DAYS.forEach((_,di)=>{
+        const slots=state.schedule[di]?.[b.id]?.['lunch']||[];
+        html+=`<td class="station-lunch" style="padding:5px 6px;">`;
+        if(slots.length){
+          slots.forEach((pid,si)=>{
+            html+=`<select class="slot-dd" data-di="${di}" data-bid="${b.id}" data-sid="lunch" data-si="${si}"
+              onchange="onSlotChange(this)" onclick="onSlotClick(this)">${buildOptions(pid)}</select>`;
+          });
+        } else {
+          html+=`<span class="text-xs text2">—</span>`;
+        }
+        html+=`</td>`;
+      });
+      html+='</tr>';
+      return;
+    }
+
+    STATIONS.filter(s=>!s.isLunch).forEach(s=>{
+      html+=`<tr>
+        <td class="row-label ${s.cls}">
+          <div class="row-label-name">${s.label}</div>
+          <div class="row-label-time">${b.start}–${b.end}</div>
+        </td>`;
+      DAYS.forEach((_,di)=>{
+        const demand=state.demand[b.id]?.[s.id]?.[di]??1;
+        const slots=state.schedule[di]?.[b.id]?.[s.id]||[];
+        html+=`<td class="${s.cls}">`;
+        const count=Math.max(demand, slots.length);
+        for(let si=0;si<count;si++){
+          const pid=slots[si]??null;
+          html+=`<select class="slot-dd" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
+            onchange="onSlotChange(this)" onclick="onSlotClick(this)">${buildOptions(pid)}</select>`;
+        }
+        html+='</td>';
+      });
+      html+='</tr>';
+    });
+  });
+
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+  validateAndHighlight();
+}
+
+function onSlotChange(sel){
+  const di=+sel.dataset.di,bid=sel.dataset.bid,sid=sel.dataset.sid,si=+sel.dataset.si;
+  setSlotValue(di,bid,sid,si,sel.value||null);
   save();
   validateAndHighlight();
   renderHourSummary();
 }
 
-function validateAndHighlight(){
-  const errors = [];
-  // reset
-  document.querySelectorAll('.slot-dd').forEach(el=>el.className='slot-dd');
-
-  // Build per-person scheduled blocks
-  const personBlocks = {}; // id -> [{di,bid,sid,start,end}]
-  state.people.forEach(p=>{ personBlocks[p.id]=[]; });
-
-  DAYS.forEach((_,di)=>{
-    BLOCKS.forEach(b=>{
-      if(b.isLunch) return;
-      STATIONS.forEach(s=>{
-        const slots = state.schedule[di]?.[b.id]?.[s.id]||[];
-        slots.forEach(pid=>{
-          if(pid && personBlocks[pid]){
-            personBlocks[pid].push({di,bid:b.id,sid:s.id,start:toMin(b.start),end:toMin(b.end)});
-          }
-        });
-      });
-    });
-  });
-
-  // Check weekly hours and double booking
-  const weekHrs = computeWeeklyHours();
-  document.querySelectorAll('.slot-dd').forEach(sel=>{
-    const pid = sel.value;
-    if(!pid) return;
-    const p = state.people.find(x=>x.id===pid);
-    if(!p) return;
-    const wh = weekHrs[pid]||0;
-    if(p.type==='emp' && wh > p.maxHrs+0.01){
-      sel.classList.add('error');
-      errors.push(`${p.name} exceeds max hours (${wh.toFixed(1)}/${p.maxHrs})`);
-    }
-    // double booking check
-    const di=+sel.dataset.di, bid=sel.dataset.bid;
-    const b = BLOCKS.find(x=>x.id===bid);
-    if(!b) return;
-    const bs=toMin(b.start), be=toMin(b.end);
-    const others = personBlocks[pid].filter(x=>x.di===di && x.bid!==bid && x.start<be && x.end>bs);
-    if(others.length){ sel.classList.add('error'); errors.push(`${p.name} double-booked on day ${di+1}`); }
-  });
-
-  // display errors
-  const errdiv = document.getElementById('sched-errors');
-  if(errors.length){
-    const unique = [...new Set(errors)];
-    errdiv.innerHTML = `<div style="background:#2a1015;border:1px solid var(--accent3);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;">
-      <span class="red bold">⚠ ${unique.length} issue(s):</span>
-      ${unique.map(e=>`<div class="text-xs red" style="margin-top:4px;">• ${e}</div>`).join('')}
-    </div>`;
-  } else {
-    errdiv.innerHTML = '';
-  }
-}
-
+// ══════════════════════════════════════════════
+//  VALIDATION & HIGHLIGHTING
+// ══════════════════════════════════════════════
 function computeWeeklyHours(){
-  const wh = {};
-  state.people.forEach(p=>{ wh[p.id]=0; });
+  const wh={};
+  state.people.forEach(p=>{wh[p.id]=0;});
+  const lunchPaid=state.settings?.lunchPaid;
+
   DAYS.forEach((_,di)=>{
     BLOCKS.forEach(b=>{
-      if(b.isLunch) return;
-      const dur = blockDuration(b);
+      if(b.isLunch && !lunchPaid) return;
+      const dur=blockDur(b);
       STATIONS.forEach(s=>{
-        (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(pid=>{
+        const key = b.isLunch ? 'lunch' : s.id;
+        if(b.isLunch && !s.isLunch) return;
+        if(!b.isLunch && s.isLunch) return;
+        (state.schedule[di]?.[b.id]?.[key]||[]).forEach(pid=>{
           if(pid && wh[pid]!==undefined) wh[pid]+=dur;
         });
       });
@@ -845,29 +960,113 @@ function computeWeeklyHours(){
   return wh;
 }
 
-// ═══════════════════════════════════════════════
-//  HOUR SUMMARY
-// ═══════════════════════════════════════════════
-function renderHourSummary(){
-  const wrap = document.getElementById('hour-summary');
-  if(!state.people.length){ wrap.innerHTML='<div class="empty-state">No people in roster.</div>'; return; }
+function computeDailyHours(){
+  const dh={};
+  state.people.forEach(p=>{dh[p.id]=DAYS.map(()=>0);});
+  const lunchPaid=state.settings?.lunchPaid;
+  DAYS.forEach((_,di)=>{
+    BLOCKS.forEach(b=>{
+      if(b.isLunch&&!lunchPaid) return;
+      const dur=blockDur(b);
+      const keys = b.isLunch ? ['lunch'] : STATIONS.filter(s=>!s.isLunch).map(s=>s.id);
+      keys.forEach(key=>{
+        (state.schedule[di]?.[b.id]?.[key]||[]).forEach(pid=>{
+          if(pid&&dh[pid]) dh[pid][di]+=dur;
+        });
+      });
+    });
+  });
+  return dh;
+}
 
-  const wh = computeWeeklyHours();
-  // daily hours
-  const dailyH = {}; state.people.forEach(p=>{ dailyH[p.id]=DAYS.map(()=>0); });
+function validateAndHighlight(){
+  document.querySelectorAll('.slot-dd').forEach(el=>{
+    el.classList.remove('error','warn');
+  });
+
+  const wh=computeWeeklyHours();
+  const errors=[];
+
+  // Build person-block map per day for double-booking detection
+  const personInBlock={}; // key: pid+'_'+di+'_'+bid -> [sids]
   DAYS.forEach((_,di)=>{
     BLOCKS.forEach(b=>{
       if(b.isLunch) return;
-      const dur = blockDuration(b);
-      STATIONS.forEach(s=>{
+      STATIONS.filter(s=>!s.isLunch).forEach(s=>{
         (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(pid=>{
-          if(pid && dailyH[pid]) dailyH[pid][di]+=dur;
+          if(!pid) return;
+          const key=`${pid}_${di}_${b.id}`;
+          if(!personInBlock[key]) personInBlock[key]=[];
+          personInBlock[key].push(s.id);
         });
       });
     });
   });
 
-  let html = `<table class="hour-table">
+  document.querySelectorAll('.slot-dd').forEach(sel=>{
+    const pid=sel.value;
+    if(!pid) return;
+    const p=state.people.find(x=>x.id===pid);
+    if(!p) return;
+    const di=+sel.dataset.di, bid=sel.dataset.bid, sid=sel.dataset.sid;
+
+    // Over hours
+    if(p.type==='emp' && wh[pid]>p.maxHrs+0.01){
+      sel.classList.add('error');
+      errors.push(`${p.name} over max hrs (${wh[pid].toFixed(1)}/${p.maxHrs}h)`);
+    }
+
+    // Double booking
+    const key=`${pid}_${di}_${bid}`;
+    if(personInBlock[key] && personInBlock[key].filter(x=>x!==sid).length>0){
+      if(!sel.classList.contains('error')) sel.classList.add('warn');
+      errors.push(`${p.name} double-booked on ${DAYS[di]} block ${bid}`);
+    }
+
+    // Closing shift continuity: b9 must have worked b8
+    if(bid==='b9'){
+      const b8workers=(state.schedule[di]?.['b8']?.[sid]||[]);
+      if(!b8workers.includes(pid)){
+        sel.classList.add('error');
+        errors.push(`${p.name} in Closing (b9) but was not in Evening 1 (b8) on ${DAYS[di]}`);
+      }
+    }
+
+    // No clopen
+    if(di>0 && bid==='b1'){
+      const prevB8=(state.schedule[di-1]?.['b8']||{});
+      const prevB9=(state.schedule[di-1]?.['b9']||{});
+      const workedLateYesterday = Object.values(prevB8).flat().includes(pid)||Object.values(prevB9).flat().includes(pid);
+      if(workedLateYesterday){
+        sel.classList.add('error');
+        errors.push(`${p.name} has a clopen: worked evening ${DAYS[di-1]} + opening ${DAYS[di]}`);
+      }
+    }
+  });
+
+  const errdiv=document.getElementById('sched-errors');
+  if(errors.length){
+    const unique=[...new Set(errors)];
+    errdiv.innerHTML=`<div style="background:#2a1015;border:1px solid var(--accent3);border-radius:var(--radius);padding:9px 12px;">
+      <span class="red bold">⚠ ${unique.length} issue(s):</span>
+      ${unique.map(e=>`<div class="text-xs red" style="margin-top:3px;">• ${e}</div>`).join('')}
+    </div>`;
+  } else {
+    errdiv.innerHTML=`<div style="background:#0a1a10;border:1px solid #1a4a2a;border-radius:var(--radius);padding:8px 12px;font-size:11px;color:var(--green);">✓ No constraint violations detected</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  HOUR SUMMARY
+// ══════════════════════════════════════════════
+function renderHourSummary(){
+  const wrap=document.getElementById('hour-summary');
+  if(!state.people.length){ wrap.innerHTML='<div class="empty-state">No people in roster.</div>'; return; }
+
+  const wh=computeWeeklyHours();
+  const dh=computeDailyHours();
+
+  let html=`<table class="hour-table">
     <thead><tr>
       <th>Name</th><th>Type</th>
       ${DAYS.map(d=>`<th>${d}</th>`).join('')}
@@ -875,39 +1074,80 @@ function renderHourSummary(){
     </tr></thead><tbody>`;
 
   state.people.forEach(p=>{
-    const total = wh[p.id]||0;
-    const cap = p.maxHrs;
-    const pct = Math.min(100,(total/cap)*100);
-    const cls = total>cap?'over':total>cap*0.9?'near':'';
-    const barCls = total>cap?'over':total>cap*0.9?'near':'';
-    html += `<tr>
+    const total=wh[p.id]||0;
+    const cap=p.maxHrs;
+    const pct=Math.min(100,(total/Math.max(cap,0.1))*100);
+    const cls=total>cap?'over':total>cap*0.88?'near':'';
+    html+=`<tr>
       <td class="bold">${esc(p.name)}</td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Emp':'Vol'}</span></td>
-      ${dailyH[p.id].map(h=>`<td style="text-align:center;">${h>0?h.toFixed(1):''}</td>`).join('')}
-      <td class="hour-val ${cls}">${total.toFixed(1)}h</td>
+      ${dh[p.id].map(h=>`<td style="text-align:center;font-size:11px;">${h>0?h.toFixed(1):''}</td>`).join('')}
+      <td style="font-size:12px;${total>cap?'color:var(--accent3);':'total>cap*0.88?color:var(--accent);':'color:var(--green);'}">${total.toFixed(1)}h</td>
       <td class="text2">${cap}h</td>
-      <td style="min-width:120px;padding:8px 12px;">
-        <div class="hour-bar">
-          <div class="bar-bg"><div class="bar-fill ${barCls}" style="width:${pct}%;"></div></div>
-          <span class="text-xs ${cls}">${pct.toFixed(0)}%</span>
+      <td style="min-width:130px;padding:7px 10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="bar-bg"><div class="bar-fill ${cls}" style="width:${pct.toFixed(1)}%;"></div></div>
+          <span style="font-size:10px;min-width:32px;${cls==='over'?'color:var(--accent3);':cls==='near'?'color:var(--accent);':''}">${pct.toFixed(0)}%</span>
         </div>
       </td>
     </tr>`;
   });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
 }
 
-// ═══════════════════════════════════════════════
-//  EXPORT / PRINT
-// ═══════════════════════════════════════════════
-function exportPrint(){
-  window.print();
+// ══════════════════════════════════════════════
+//  EXPORT / IMPORT
+// ══════════════════════════════════════════════
+function exportTemplate(){
+  const data={
+    people: state.people,
+    demand: state.demand,
+    settings: state.settings,
+    nextId: state.nextId,
+    exported: new Date().toISOString(),
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='workforce-template-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  toast('Template exported!');
 }
 
+function importTemplate(evt){
+  const file=evt.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try {
+      const data=JSON.parse(e.target.result);
+      if(!data.people) throw new Error('Invalid template file');
+      state.people=data.people||[];
+      state.demand=data.demand||{};
+      state.settings=data.settings||{};
+      state.nextId=data.nextId||state.people.length+1;
+      initDemand();
+      save();
+      renderRoster();
+      renderDemandGrid();
+      const lp=document.getElementById('lunch-paid');
+      if(lp) lp.checked=!!state.settings?.lunchPaid;
+      toast('Template imported!');
+    } catch(err){
+      toast('Import failed: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value=''; // allow re-import same file
+}
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
 function clearSchedule(){
   if(!confirm('Clear the entire schedule?')) return;
-  state.schedule = {};
+  state.schedule={};
   save();
   document.getElementById('schedule-wrap').innerHTML='<div class="empty-state">Schedule cleared.</div>';
   document.getElementById('sched-errors').innerHTML='';
@@ -915,41 +1155,23 @@ function clearSchedule(){
   renderHourSummary();
 }
 
-// ═══════════════════════════════════════════════
-//  UTIL
-// ═══════════════════════════════════════════════
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function toast(msg, dur=2400){
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), dur);
+function toast(msg,dur=2500){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),dur);
 }
 
-// ═══════════════════════════════════════════════
-//  PRINT STYLES
-// ═══════════════════════════════════════════════
-const printCSS = document.createElement('style');
-printCSS.media = 'print';
-printCSS.textContent = `
-  body { background: #fff !important; color: #000 !important; }
-  header, .tabs, .toolbar, #toast, .btn { display: none !important; }
-  .panel { display: block !important; }
-  #tab-roster, #tab-demand, #tab-hours { display: none !important; }
-  #tab-schedule { display: block !important; }
-  .sched-table th, .sched-table td { border: 1px solid #ccc !important; }
-  .slot-dd { border: none !important; background: transparent !important; color: #000 !important; font-size: 11px; }
-  * { color: #000 !important; background: #fff !important; }
-`;
-document.head.appendChild(printCSS);
-
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  BOOT
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 load();
+seedDefaults();
 renderRoster();
 renderDemandGrid();
-if(Object.keys(state.schedule).length) renderScheduleGrid();
+if(state.schedule && Object.keys(state.schedule).length) renderScheduleGrid();
 </script>
 </body>
 </html>
