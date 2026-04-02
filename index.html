@@ -146,6 +146,53 @@
     margin-bottom: 10px;
   }
 
+  /* ── AVAILABILITY EDITOR ── */
+  .avail-editor { display: flex; gap: 4px; flex-wrap: wrap; align-items: flex-start; }
+  .avail-day-col { display: flex; flex-direction: column; gap: 3px; min-width: 82px; }
+  .avail-day-label {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text2); margin-bottom: 1px; font-weight: 500;
+  }
+  .avail-chip {
+    font-size: 10px; padding: 2px 7px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text2); white-space: nowrap; text-align: center;
+    transition: all 0.12s; user-select: none;
+  }
+  .avail-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+  .avail-chip.full { background: #eaf5f0; color: var(--green); border-color: #b8deca; }
+  .avail-chip.off  { background: var(--surface2); color: var(--text3); border-color: var(--border); }
+  .avail-chip.custom { background: #e8f4fb; color: var(--accent2); border-color: var(--accent2); }
+  .avail-window-row {
+    display: flex; align-items: center; gap: 3px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 2px 4px; margin-top: 1px;
+  }
+  .avail-time {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 10px;
+    padding: 1px 3px; border-radius: 3px; width: 56px;
+  }
+  .avail-time:focus { outline: 1px solid var(--accent2); }
+  .avail-sep { font-size: 9px; color: var(--text3); }
+  .avail-rm {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 11px; padding: 0 2px;
+    line-height: 1; border-radius: 3px;
+  }
+  .avail-rm:hover { color: var(--accent3); }
+  .avail-add {
+    font-size: 9px; padding: 1px 5px; border-radius: 20px;
+    background: none; border: 1px dashed var(--border);
+    color: var(--text3); cursor: pointer; margin-top: 2px;
+    font-family: var(--mono);
+  }
+  .avail-add:hover { border-color: var(--accent2); color: var(--accent2); }
+  .avail-eligible {
+    font-size: 9px; color: var(--text3); margin-top: 2px; line-height: 1.4;
+  }
+  .avail-eligible.none { color: var(--accent3); }
+
   /* ── DEMAND ── */
   .demand-grid {
     display: grid; grid-template-columns: 160px repeat(7, 1fr);
@@ -351,7 +398,7 @@
           <th>#</th>
           <th>Name</th>
           <th>Type</th>
-          <th title="Day Off">Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+          <th title="Per-day availability windows">Availability (click day chip to cycle: Full → Off → Custom)</th>
           <th title="Gate role">Gate</th>
           <th title="Podium role">Podium</th>
           <th title="Mandir role">Mandir</th>
@@ -535,6 +582,18 @@ function load(){
       state=d;
       state.schedule=migrateSched(state.schedule||{});
       if(!state.settings) state.settings={};
+      // Migrate old off[] -> availability[] for all loaded people
+      (state.people || []).forEach(p => {
+        if (p.off && !p.availability) {
+          p.availability = p.off.map(isOff =>
+            isOff ? [] : [{ from: '06:00', to: '21:00' }]
+          );
+          delete p.off;
+        }
+        if (!p.availability) {
+          p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
+        }
+      });
     }
   } catch(e){ console.warn('Load error',e); }
   initDemand();
@@ -556,14 +615,10 @@ function initDemand(){
     if(!state.demand[b.id]) state.demand[b.id]={};
     STATIONS.forEach(s=>{
       if(state.demand[b.id][s.id]===undefined){
-        // Smart defaults:
-        // Lunch-break station: 1 per lunch block
-        // Field3/4: default 0 (admin enables as needed)
-        // Lunch window blocks (b3/b4/b5) — coverage stations keep their demand
         let def=1;
         if(s.isLunch && !b.isLunch) def=0;
         if(!s.isLunch && b.isLunch && (s.id==='field3'||s.id==='field4')) def=0;
-        if(s.id==='field3'||s.id==='field4') def=0; // always start at 0
+        if(s.id==='field3'||s.id==='field4') def=0;
         state.demand[b.id][s.id]=DAYS.map(()=>def);
       }
     });
@@ -599,22 +654,30 @@ const DEFAULT_EMPLOYEES=[
 ];
 const DEFAULT_VOLUNTEERS=[{name:'V1'},{name:'V2'}];
 
-function makePerson(type,name,off){
+// SNIPPET 3 — Updated makePerson()
+function makePerson(type, name, offArr) {
+  // Convert legacy offArr (boolean[7]) to availability windows
+  const availability = DAYS.map((_, di) => {
+    const isOff = offArr ? offArr[di] : false;
+    if (isOff) return [];
+    return type === 'vol'
+      ? [] // volunteers start with all days off — admin must set windows
+      : [{ from: '06:00', to: '21:00' }];
+  });
   return {
-    id:'p'+(state.nextId++), name, type,
-    off: off||DAYS.map(()=>false),
-    roles:{gate:true,podium:true,mandir:true,field:true},
-    pref:3,
-    dailyCap:8,
-    allowExtendedDay:false,
-    maxHrs: type==='emp'?40:20,
-    overrideOver40:false,
-    overrideOver9hr:false,
-    overrideIgnoreTurnaround:false,
-    weekendExempt:false,
-    preferredBlocks:[],
-    avoidBlocks:[],
-    availableBlocks:[],
+    id: 'p' + (state.nextId++), name, type,
+    availability,
+    roles: { gate: true, podium: true, mandir: true, field: true },
+    pref: 3,
+    dailyCap: 8,
+    allowExtendedDay: false,
+    maxHrs: type === 'emp' ? 40 : 20,
+    overrideOver40: false,
+    overrideOver9hr: false,
+    overrideIgnoreTurnaround: false,
+    weekendExempt: false,
+    preferredBlocks: [],
+    avoidBlocks: [],
   };
 }
 
@@ -644,29 +707,166 @@ function clearRoster(){
   save(); rebuildPeopleMap(); renderRoster();
 }
 
-function ensurePersonFields(p){
-  if(p.dailyCap===undefined) p.dailyCap=8;
-  if(p.allowExtendedDay===undefined) p.allowExtendedDay=false;
-  if(p.overrideOver40===undefined) p.overrideOver40=false;
-  if(p.overrideOver9hr===undefined) p.overrideOver9hr=false;
-  if(p.overrideIgnoreTurnaround===undefined) p.overrideIgnoreTurnaround=false;
-  if(p.weekendExempt===undefined) p.weekendExempt=false;
-  if(!p.preferredBlocks) p.preferredBlocks=[];
-  if(!p.avoidBlocks) p.avoidBlocks=[];
-  if(!p.availableBlocks) p.availableBlocks=[];
+// SNIPPET 4 — Updated ensurePersonFields()
+function ensurePersonFields(p) {
+  // Migrate old p.off[] -> p.availability[]
+  if (p.off && !p.availability) {
+    p.availability = p.off.map(isOff =>
+      isOff ? [] : [{ from: '06:00', to: '21:00' }]
+    );
+    delete p.off;
+  }
+  if (!p.availability) {
+    p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
+  }
+  if (p.dailyCap === undefined)              p.dailyCap = 8;
+  if (p.allowExtendedDay === undefined)      p.allowExtendedDay = false;
+  if (p.overrideOver40 === undefined)        p.overrideOver40 = false;
+  if (p.overrideOver9hr === undefined)       p.overrideOver9hr = false;
+  if (p.overrideIgnoreTurnaround === undefined) p.overrideIgnoreTurnaround = false;
+  if (p.weekendExempt === undefined)         p.weekendExempt = false;
+  if (!p.preferredBlocks) p.preferredBlocks = [];
+  if (!p.avoidBlocks)     p.avoidBlocks = [];
 }
 
-function renderRosterWarnings(){
-  const wrap=document.getElementById('roster-warnings');
-  if(!wrap) return;
-  const warnings=[];
-  state.people.forEach(p=>{
-    const hasRole=p.roles.gate||p.roles.podium||p.roles.mandir||p.roles.field;
-    if(!hasRole) warnings.push(`⚠ ${p.name} has no roles enabled — cannot be scheduled anywhere.`);
-    const daysOff=p.off.filter(Boolean).length;
-    if(daysOff===7) warnings.push(`⚠ ${p.name} is marked off every day of the week.`);
+// SNIPPET 11 — Updated renderRosterWarnings()
+function renderRosterWarnings() {
+  const wrap = document.getElementById('roster-warnings');
+  if (!wrap) return;
+  const warnings = [];
+
+  state.people.forEach(p => {
+    ensurePersonFields(p);
+    const hasRole = p.roles.gate || p.roles.podium || p.roles.mandir || p.roles.field;
+    if (!hasRole) {
+      warnings.push({ type: 'err', msg: `${p.name} has no roles enabled — cannot be scheduled anywhere.` });
+    }
+
+    const allOff = (p.availability || []).every(wins => wins.length === 0);
+    if (allOff) {
+      warnings.push({ type: 'err', msg: `${p.name} is marked off every day — cannot be scheduled.` });
+      return;
+    }
+
+    // Check for windows that cover no blocks
+    (p.availability || []).forEach((wins, di) => {
+      wins.forEach(w => {
+        const fits = BLOCKS.some(b => toMin(w.from) <= toMin(b.start) && toMin(w.to) >= toMin(b.end));
+        if (!fits) {
+          warnings.push({ type: 'warn', msg: `${p.name} — ${DAYS[di]} window ${w.from}–${w.to} covers no schedulable blocks.` });
+        }
+      });
+    });
+
+    // Warn if 0 eligible blocks all week
+    const totalEligible = DAYS.reduce((n, _, di) => n + eligibleBlocksForDay(p, di).length, 0);
+    if (totalEligible === 0 && !allOff) {
+      warnings.push({ type: 'warn', msg: `${p.name} — availability windows cover no schedulable blocks this week.` });
+    }
+
+    // Warn if maxHrs > actual available hours
+    const availHrs = totalAvailableHours(p);
+    if (availHrs > 0 && availHrs < p.maxHrs) {
+      warnings.push({ type: 'warn', msg: `${p.name} — max hrs set to ${p.maxHrs}h but only ${availHrs.toFixed(1)}h available this week.` });
+    }
   });
-  wrap.innerHTML=warnings.map(w=>`<div class="alert-box alert-warn">${w}</div>`).join('');
+
+  wrap.innerHTML = warnings.map(w =>
+    `<div class="alert-box ${w.type === 'err' ? 'alert-err' : 'alert-warn'}">
+      ${w.type === 'err' ? '🔴' : '⚠'} ${esc(w.msg)}
+    </div>`
+  ).join('');
+}
+
+// SNIPPET 9 — renderAvailEditor()
+function renderAvailEditor(p) {
+  const windows = p.availability || DAYS.map(() => []);
+  let html = '<div class="avail-editor">';
+  DAYS.forEach((day, di) => {
+    const wins = windows[di] || [];
+    const isFull = wins.length === 1 && wins[0].from === '06:00' && wins[0].to === '21:00';
+    const isOff  = wins.length === 0;
+    const chipCls = isFull ? 'full' : isOff ? 'off' : 'custom';
+    const chipLabel = isFull ? '✓ Full' : isOff ? '— Off' : `${wins.length}×`;
+
+    // Eligible blocks preview
+    const eligible = eligibleBlocksForDay(p, di);
+    const eligText = isOff
+      ? ''
+      : eligible.length === 0
+        ? '<div class="avail-eligible none">⚠ no blocks fit</div>'
+        : `<div class="avail-eligible">${eligible.map(b => b.id).join(', ')}</div>`;
+
+    html += `<div class="avail-day-col">
+      <div class="avail-day-label">${day}</div>
+      <div class="avail-chip ${chipCls}" onclick="pAvailCycleDay('${p.id}',${di})">${chipLabel}</div>`;
+
+    if (!isOff && !isFull) {
+      wins.forEach((w, wi) => {
+        html += `<div class="avail-window-row">
+          <input class="avail-time" type="time" value="${w.from}" min="06:00" max="21:00"
+            onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'from',this.value)">
+          <span class="avail-sep">–</span>
+          <input class="avail-time" type="time" value="${w.to}" min="06:00" max="21:00"
+            onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'to',this.value)">
+          <button class="avail-rm" onclick="pAvailRemoveWindow('${p.id}',${di},${wi})" title="Remove">✕</button>
+        </div>`;
+      });
+      html += `<button class="avail-add" onclick="pAvailAddWindow('${p.id}',${di})">+ window</button>`;
+    }
+    html += eligText;
+    html += `</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// SNIPPET 10 — pAvail* handler functions
+// Cycle a day: Full → Off → Custom (with one default window)
+function pAvailCycleDay(pid, di) {
+  const p = peopleById[pid]; if (!p) return;
+  if (!p.availability) p.availability = DAYS.map(() => []);
+  const wins = p.availability[di] || [];
+  const isFull = wins.length === 1 && wins[0].from === '06:00' && wins[0].to === '21:00';
+  const isOff  = wins.length === 0;
+  if (isFull) {
+    p.availability[di] = []; // Full → Off
+  } else if (isOff) {
+    // Off → Custom: default window based on type
+    p.availability[di] = p.type === 'vol'
+      ? [{ from: '09:00', to: '17:00' }]
+      : [{ from: '06:00', to: '21:00' }];
+  } else {
+    p.availability[di] = [{ from: '06:00', to: '21:00' }]; // Custom → Full
+  }
+  save(); renderRoster();
+}
+
+function pAvailAddWindow(pid, di) {
+  const p = peopleById[pid]; if (!p) return;
+  if (!p.availability) p.availability = DAYS.map(() => []);
+  p.availability[di].push({ from: '09:00', to: '17:00' });
+  save(); renderRoster();
+}
+
+function pAvailRemoveWindow(pid, di, wi) {
+  const p = peopleById[pid]; if (!p) return;
+  p.availability[di].splice(wi, 1);
+  save(); renderRoster();
+}
+
+function pAvailUpdateWindow(pid, di, wi, field, val) {
+  const p = peopleById[pid]; if (!p) return;
+  if (!p.availability?.[di]?.[wi]) return;
+  p.availability[di][wi][field] = val;
+  // Validate: from must be before to
+  const w = p.availability[di][wi];
+  if (toMin(w.from) >= toMin(w.to)) {
+    toast(`⚠ Window end must be after start on ${DAYS[di]}`);
+  }
+  save();
+  // Re-render eligible block hints only (lightweight)
+  renderRoster();
 }
 
 function renderRoster(){
@@ -691,7 +891,7 @@ function renderRoster(){
         ${hasOverride?'<span class="override-flag" title="Overrides active">★</span>':''}
       </td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Employee':'Volunteer'}</span></td>
-      ${DAYS.map((_,di)=>`<td style="text-align:center;"><input type="checkbox" class="day-check" ${p.off[di]?'checked':''} onchange="pOff('${p.id}',${di},this.checked)" title="${DAYS[di]} off"></td>`).join('')}
+      <td style="min-width:600px; padding:6px 8px;">${renderAvailEditor(p)}</td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.gate  ?'checked':''} onchange="pRole('${p.id}','gate',  this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.podium?'checked':''} onchange="pRole('${p.id}','podium',this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.mandir?'checked':''} onchange="pRole('${p.id}','mandir',this.checked)"></td>
@@ -718,7 +918,6 @@ function renderRoster(){
 }
 
 function pf(id,field,val){ const p=peopleById[id]; if(p){ p[field]=val; save(); renderRoster(); } }
-function pOff(id,di,val){ const p=peopleById[id]; if(p){ p.off[di]=val; save(); } }
 function pRole(id,role,val){ const p=peopleById[id]; if(p){ p.roles[role]=val; save(); } }
 
 // ══════════════════════════════════════════════
@@ -744,9 +943,6 @@ function renderDemandGrid(){
     grid.innerHTML='<div class="dg-header">Station</div>'+
       DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
 
-    // KEY FIX: show ALL stations for every block — no more mutual exclusion
-    // For lunch blocks: show coverage stations (gate/podium/mandir) AND lunch station
-    // For non-lunch blocks: show work stations (no lunch station)
     const stationsToShow = b.isLunch
       ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
       : WORK_STATIONS;
@@ -776,6 +972,32 @@ function updDemand(bid,sid,di,val){
   if(!state.demand[bid][sid]) state.demand[bid][sid]=DAYS.map(()=>0);
   state.demand[bid][sid][di]=val;
   save();
+}
+
+// ══════════════════════════════════════════════
+//  AVAILABILITY HELPERS (SNIPPET 6)
+// ══════════════════════════════════════════════
+// Returns true if the block's [start, end] fits entirely within
+// at least one of the person's availability windows for that day.
+function blockCoveredByAvailability(b, windows) {
+  if (!windows || windows.length === 0) return false;
+  const bStart = toMin(b.start), bEnd = toMin(b.end);
+  return windows.some(w => toMin(w.from) <= bStart && toMin(w.to) >= bEnd);
+}
+
+// Returns eligible block ids for a person on a given day
+function eligibleBlocksForDay(p, di) {
+  const windows = p.availability?.[di] || [];
+  return BLOCKS.filter(b => blockCoveredByAvailability(b, windows));
+}
+
+// Returns total available hours across the whole week
+function totalAvailableHours(p) {
+  let total = 0;
+  (p.availability || []).forEach(windows => {
+    windows.forEach(w => { total += (toMin(w.to) - toMin(w.from)) / 60; });
+  });
+  return total;
 }
 
 // ══════════════════════════════════════════════
@@ -810,10 +1032,6 @@ function generateSchedule(startDay=-1){
   const schedLog=[];
   const log=msg=>schedLog.push(msg);
 
-  // ── Precompute availability ──
-  const availMap={};
-  state.people.forEach(p=>{ availMap[p.id]=DAYS.map((_,di)=>!p.off[di]); });
-
   // ── Init counters ──
   const wkHrs={}, dayHrs={};
   const satWorkedDay={}, sunWorkedDay={};
@@ -839,7 +1057,7 @@ function generateSchedule(startDay=-1){
         const dur=blockDur(b);
         STATIONS.forEach(s=>{
           const key=s.isLunch?'lunch':s.id;
-          if(b.isLunch && s.isLunch && !state.settings?.lunchPaid) return; // skip unpaid break
+          if(b.isLunch && s.isLunch && !state.settings?.lunchPaid) return;
           if(b.isLunch && !s.isLunch) { /* coverage during lunch — always count */ }
           (sched[di][b.id]?.[key]||[]).forEach(slot=>{
             const pid=slot?.pid; if(!pid||wkHrs[pid]===undefined) return;
@@ -857,13 +1075,14 @@ function generateSchedule(startDay=-1){
 
   const employees=state.people.filter(p=>p.type==='emp');
 
-  // ── Eligibility check ──
+  // ── Eligibility check (SNIPPET 7 — uses blockCoveredByAvailability) ──
   function isEligible(p,di,b,s,assignedSet){
-    if(!availMap[p.id][di]) return false;
+    // SNIPPET 7: replaced availMap check with blockCoveredByAvailability
+    if (!blockCoveredByAvailability(b, p.availability?.[di] || [])) return false;
     if(assignedSet.has(p.id)) return false;
     const roleKey=s.isField?'field':s.isLunch?null:s.id;
     if(roleKey && !p.roles[roleKey]) return false;
-    if(s.isLunch && p.type==='vol') return false; // vols don't get formal lunch slot
+    if(s.isLunch && p.type==='vol') return false;
     if(p.type==='vol' && s.isField) return false;
     if(p.type==='vol' && p.availableBlocks?.length>0 && !p.availableBlocks.includes(b.id)) return false;
 
@@ -872,17 +1091,14 @@ function generateSchedule(startDay=-1){
     const last=lastAssigned[p.id];
 
     if(!p.overrideIgnoreTurnaround){
-      // No clopen: worked ≥18:00 previous day → can't do 06:00 today
       if(last&&last.di===di-1&&last.endMin>=1080&&bStartMin===360){
         log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: clopen`); return false;
       }
-      // 10h turnaround across days
       if(last&&last.di===di-1){
         if(24*60+bStartMin < last.endMin+600){
           log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: turnaround`); return false;
         }
       }
-      // Same-day split shift gap
       if(last&&last.di===di){
         const gap=bStartMin-last.endMin;
         if(gap>MAX_SHIFT_GAP_HOURS*60&&!p.allowExtendedDay){
@@ -891,11 +1107,9 @@ function generateSchedule(startDay=-1){
       }
     }
 
-    // Daily cap
     if(dayHrs[p.id][di]+dur>effectiveDailyCap(p)+0.01){
       log(`SKIP ${p.name} d${di}: daily cap`); return false;
     }
-    // Weekly cap
     if(!p.overrideOver40&&wkHrs[p.id]+dur>p.maxHrs+0.01){
       log(`SKIP ${p.name}: weekly cap`); return false;
     }
@@ -938,20 +1152,18 @@ function generateSchedule(startDay=-1){
   DAYS.forEach((_,di)=>{
     if(startDay>=0&&di<startDay) return;
 
-    // Reset per-day weekend tracking
     state.people.forEach(p=>{
       if(di===5) satWorkedDay[p.id]=false;
       if(di===6) sunWorkedDay[p.id]=false;
     });
 
-    const assigned=new Set(); // pids assigned in this block (reset per block)
+    const assigned=new Set();
 
     BLOCKS.forEach(b=>{
       assigned.clear();
 
       if(b.isLunch){
         // ── LUNCH BLOCKS (b3/b4/b5) ──
-        // Step 1: fill coverage stations (Gate/Podium/Mandir) first
         COVERAGE_STATIONS.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??0;
           sched[di][b.id][s.id]=[];
@@ -967,7 +1179,6 @@ function generateSchedule(startDay=-1){
           }
         });
 
-        // Step 2: field stations during lunch (if demand > 0)
         FIELD_STATIONS.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??0;
           sched[di][b.id][s.id]=[];
@@ -983,10 +1194,8 @@ function generateSchedule(startDay=-1){
           }
         });
 
-        // Step 3: send remaining active employees on lunch break
         const demand=state.demand[b.id]?.['lunch']?.[di]??1;
         sched[di][b.id]['lunch']=[];
-        // Count how many non-lunch coverage slots are filled
         const covFilled=COVERAGE_STATIONS.reduce((n,s)=>{
           return n+(sched[di][b.id][s.id]||[]).filter(x=>x.pid).length;
         },0);
@@ -996,7 +1205,7 @@ function generateSchedule(startDay=-1){
 
         const lunchPool=sortPool(
           employees.filter(p=>
-            availMap[p.id][di] &&
+            blockCoveredByAvailability(b, p.availability?.[di] || []) &&
             dayHrs[p.id][di]>0 &&
             dayHrs[p.id][di]<7 &&
             !assigned.has(p.id)
@@ -1007,14 +1216,12 @@ function generateSchedule(startDay=-1){
         let sent=0;
         for(const p of lunchPool){
           if(sent>=demand) break;
-          // Only send to lunch if coverage won't drop below required
           const covAfter=covFilled-(COVERAGE_STATIONS.some(s=>(sched[di][b.id][s.id]||[]).some(x=>x.pid===p.id))?1:0);
           if(covFilled>0 && covAfter < covRequired && covRequired > 0) {
             log(`SKIP LUNCH ${p.name} d${di}: would break coverage`); continue;
           }
           sched[di][b.id]['lunch'].push({pid:p.id,locked:false});
           assigned.add(p.id);
-          // Lunch break hours: only add if lunchPaid
           if(state.settings?.lunchPaid){
             const dur=blockDur(b);
             wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
@@ -1025,10 +1232,7 @@ function generateSchedule(startDay=-1){
 
       } else {
         // ── NON-LUNCH BLOCKS ──
-
-        // b9 closing: prefer b8 workers for same station, fallback to normal pool
         const isClosing=(b.id==='b9');
-
         const stationsOrdered=[...BASE_STATIONS,...FIELD_STATIONS];
         stationsOrdered.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??1;
@@ -1037,10 +1241,8 @@ function generateSchedule(startDay=-1){
 
           let pool;
           if(isClosing){
-            // Try b8 workers first for continuity
             const b8pids=(sched[di]['b8']?.[s.id]||[]).map(x=>x?.pid).filter(Boolean);
             const b8candidates=b8pids.map(id=>peopleById[id]).filter(p=>p&&isEligible(p,di,b,s,assigned));
-            // If b8 was empty or not enough, fall back to full pool
             const fallback=sortPool(
               state.people.filter(p=>isEligible(p,di,b,s,assigned)&&!b8pids.includes(p.id)),
               di,b
@@ -1059,15 +1261,13 @@ function generateSchedule(startDay=-1){
       }
     }); // end BLOCKS
 
-    // ── FILL-TO-40 PASS (all days, field stations only) ──
-    // Runs after all blocks for this day are assigned
+    // ── FILL-TO-40 PASS ──
     BLOCKS.filter(b=>!b.isLunch&&b.id!=='b8'&&b.id!=='b9').forEach(b=>{
       FIELD_STATIONS.forEach(s=>{
         const slots=sched[di][b.id]?.[s.id]||[];
         const nullSlots=slots.filter(x=>x.pid===null);
         if(!nullSlots.length) return;
 
-        // Sort by hour tier: <30 → <35 → <40
         const fillPool=employees
           .filter(p=>isEligible(p,di,b,s,assigned))
           .sort((a,b2)=>{
@@ -1106,7 +1306,7 @@ function generateSchedule(startDay=-1){
   return sched;
 }
 
-    // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 //  SCHEDULE GRID
 // ══════════════════════════════════════════════
 function getSlots(di,bid,sid){ return state.schedule[di]?.[bid]?.[sid]||[]; }
@@ -1198,7 +1398,6 @@ function renderScheduleGrid(){
       ▸ ${b.label}${lunchNote} &nbsp;<span style="opacity:0.5;font-size:10px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
     </td></tr>`;
 
-    // Determine which stations to render rows for
     const stationRows = b.isLunch
       ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
       : WORK_STATIONS;
@@ -1287,7 +1486,7 @@ document.getElementById('ctx-clear').onclick=()=>{
 };
 
 // ══════════════════════════════════════════════
-//  HOUR COMPUTATION (FIXED)
+//  HOUR COMPUTATION
 // ══════════════════════════════════════════════
 function computeWeeklyHours(){
   const wh={};
@@ -1297,13 +1496,11 @@ function computeWeeklyHours(){
     BLOCKS.forEach(b=>{
       const dur=blockDur(b);
       if(b.isLunch){
-        // Coverage workers during lunch: ALWAYS count
         [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{
           (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
             const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
           });
         });
-        // Lunch break takers: only count if lunchPaid
         if(lunchPaid){
           (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
             const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
@@ -1360,7 +1557,6 @@ function validateAndHighlight(){
   const dh=computeDailyHours();
   const errors=[];
 
-  // Double-booking map
   const pib={};
   DAYS.forEach((_,di)=>{
     BLOCKS.forEach(b=>{
@@ -1375,11 +1571,10 @@ function validateAndHighlight(){
     });
   });
 
-  // Gate always staffed check (b1–b8)
   BLOCKS.filter(b=>!b.isLunch&&b.id!=='b9').forEach(b=>{
     DAYS.forEach((_,di)=>{
       const demand=state.demand[b.id]?.['gate']?.[di]??1;
-      if(demand===0) return; // admin said 0 = intentional
+      if(demand===0) return;
       const filled=(state.schedule[di]?.[b.id]?.['gate']||[]).filter(s=>s?.pid).length;
       if(filled===0){
         errors.push(`⚠ Gate UNSTAFFED on ${DAYS[di]} ${b.label} — minimum 1 required`);
@@ -1394,7 +1589,6 @@ function validateAndHighlight(){
     const dayTotal=dh[pid]?.[di]||0;
     const cap=effectiveDailyCap(p);
 
-    // Daily warnings use person's actual dailyCap as threshold
     if(dayTotal>=p.dailyCap&&dayTotal<cap){
       sel.classList.add('warn-daily-soft');
     }
@@ -1403,20 +1597,17 @@ function validateAndHighlight(){
       errors.push(`${p.name} over daily cap on ${DAYS[di]} (${dayTotal.toFixed(1)}h > ${cap}h)`);
     }
 
-    // Weekly
     if(!p.overrideOver40&&p.type==='emp'&&wh[pid]>p.maxHrs+0.01){
       sel.classList.add('error');
       errors.push(`${p.name} over weekly cap (${wh[pid].toFixed(1)}/${p.maxHrs}h)`);
     }
 
-    // Double booking
     const k=`${pid}_${di}_${bid}`;
     if(pib[k]&&pib[k].filter(x=>x!==sid).length>0){
       if(!sel.classList.contains('error')) sel.classList.add('warn');
       errors.push(`${p.name} double-booked ${DAYS[di]} ${bid}`);
     }
 
-    // Closing continuity
     if(bid==='b9'){
       const b8pids=(state.schedule[di]?.['b8']?.[sid]||[]).map(s=>s?.pid).filter(Boolean);
       if(!b8pids.includes(pid)){
@@ -1425,7 +1616,6 @@ function validateAndHighlight(){
       }
     }
 
-    // Clopen
     if(!p.overrideIgnoreTurnaround&&di>0&&bid==='b1'){
       const prevB8=Object.values(state.schedule[di-1]?.['b8']||{}).flatMap(a=>a.map(s=>s?.pid));
       const prevB9=Object.values(state.schedule[di-1]?.['b9']||{}).flatMap(a=>a.map(s=>s?.pid));
@@ -1435,7 +1625,6 @@ function validateAndHighlight(){
       }
     }
 
-    // Split shift
     if(!p.allowExtendedDay&&!p.overrideIgnoreTurnaround){
       const blocksToday=BLOCKS.filter(b2=>!b2.isLunch).filter(b2=>{
         return WORK_STATIONS.some(s=>(state.schedule[di]?.[b2.id]?.[s.id]||[]).some(sl=>sl?.pid===pid));
@@ -1464,7 +1653,7 @@ function validateAndHighlight(){
 }
 
 // ══════════════════════════════════════════════
-//  HOUR SUMMARY
+//  HOUR SUMMARY (SNIPPET 12)
 // ══════════════════════════════════════════════
 function renderHourSummary(){
   const wrap=document.getElementById('hour-summary');
@@ -1478,8 +1667,8 @@ function renderHourSummary(){
 
   let html=`<table class="hour-table"><thead><tr>
     <th>Name</th><th>Type</th>
-    ${DAYS.map(d=>`<th>${d}</th>`).join('')}
-    <th>Total</th><th>Cap</th><th>Progress</th>
+    ${DAYS.map(d => `<th>${d}</th>`).join('')}
+    <th>Total</th><th>Cap</th><th>Avail/Wk</th><th>Progress</th>
   </tr></thead><tbody>`;
 
   people.forEach(p=>{
@@ -1498,6 +1687,9 @@ function renderHourSummary(){
       }).join('')}
       <td style="font-size:12px;${totalColor}">${total.toFixed(1)}h</td>
       <td class="text2">${cap}h</td>
+      <td class="text2" style="font-size:11px;" title="Total hours available this week based on availability windows">
+        ${totalAvailableHours(p).toFixed(1)}h
+      </td>
       <td style="min-width:130px;padding:7px 10px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="bar-bg"><div class="bar-fill ${barCls}" style="width:${pct.toFixed(1)}%;"></div></div>
@@ -1533,19 +1725,32 @@ function importTemplate(evt){
       state.demand=data.demand||{};
       state.settings=data.settings||{};
       state.nextId=data.nextId||state.people.length+1;
-                 state.schedule = migrateSched(state.schedule || {});
-      if(!state.settings) state.settings = {};
+      state.schedule=migrateSched(state.schedule||{});
+      if(!state.settings) state.settings={};
+      // Migrate availability on import
+      (state.people || []).forEach(p => {
+        if (p.off && !p.availability) {
+          p.availability = p.off.map(isOff =>
+            isOff ? [] : [{ from: '06:00', to: '21:00' }]
+          );
+          delete p.off;
+        }
+        if (!p.availability) {
+          p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
+        }
+      });
       initDemand();
       rebuildPeopleMap();
-      const lp = document.getElementById('lunch-paid');
-      if(lp) lp.checked = !!state.settings?.lunchPaid;
+      const lp=document.getElementById('lunch-paid');
+      if(lp) lp.checked=!!state.settings?.lunchPaid;
+      save(); renderRoster(); renderDemandGrid();
       toast('Template imported!');
     } catch(err) {
-      toast('Import failed: ' + err.message);
+      toast('Import failed: '+err.message);
     }
   };
   reader.readAsText(file);
-  evt.target.value = '';
+  evt.target.value='';
 }
 
 // ══════════════════════════════════════════════
@@ -1557,19 +1762,19 @@ function esc(s){
 }
 
 function toast(msg, dur=2200){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
+  const el=document.getElementById('toast');
+  el.textContent=msg;
   el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), dur);
+  setTimeout(()=>el.classList.remove('show'),dur);
 }
 
 function clearSchedule(){
   if(!confirm('Clear entire schedule? Locked slots will also be cleared.')) return;
-  state.schedule = {};
+  state.schedule={};
   save();
   renderScheduleGrid();
   renderHourSummary();
-  document.getElementById('sched-errors').innerHTML = '';
+  document.getElementById('sched-errors').innerHTML='';
   toast('Schedule cleared');
 }
 
