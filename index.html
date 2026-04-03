@@ -654,7 +654,6 @@ const DEFAULT_EMPLOYEES=[
 ];
 const DEFAULT_VOLUNTEERS=[{name:'V1'},{name:'V2'}];
 
-// SNIPPET 3 — Updated makePerson()
 function makePerson(type, name, offArr) {
   // Convert legacy offArr (boolean[7]) to availability windows
   const availability = DAYS.map((_, di) => {
@@ -707,7 +706,6 @@ function clearRoster(){
   save(); rebuildPeopleMap(); renderRoster();
 }
 
-// SNIPPET 4 — Updated ensurePersonFields()
 function ensurePersonFields(p) {
   // Migrate old p.off[] -> p.availability[]
   if (p.off && !p.availability) {
@@ -729,7 +727,6 @@ function ensurePersonFields(p) {
   if (!p.avoidBlocks)     p.avoidBlocks = [];
 }
 
-// SNIPPET 11 — Updated renderRosterWarnings()
 function renderRosterWarnings() {
   const wrap = document.getElementById('roster-warnings');
   if (!wrap) return;
@@ -778,7 +775,6 @@ function renderRosterWarnings() {
   ).join('');
 }
 
-// SNIPPET 9 — renderAvailEditor()
 function renderAvailEditor(p) {
   const windows = p.availability || DAYS.map(() => []);
   let html = '<div class="avail-editor">';
@@ -821,8 +817,6 @@ function renderAvailEditor(p) {
   return html;
 }
 
-// SNIPPET 10 — pAvail* handler functions
-// Cycle a day: Full → Off → Custom (with one default window)
 function pAvailCycleDay(pid, di) {
   const p = peopleById[pid]; if (!p) return;
   if (!p.availability) p.availability = DAYS.map(() => []);
@@ -865,7 +859,6 @@ function pAvailUpdateWindow(pid, di, wi, field, val) {
     toast(`⚠ Window end must be after start on ${DAYS[di]}`);
   }
   save();
-  // Re-render eligible block hints only (lightweight)
   renderRoster();
 }
 
@@ -918,7 +911,13 @@ function renderRoster(){
 }
 
 function pf(id,field,val){ const p=peopleById[id]; if(p){ p[field]=val; save(); renderRoster(); } }
-function pRole(id,role,val){ const p=peopleById[id]; if(p){ p.roles[role]=val; save(); } }
+
+// FIX #4: pRole() now calls renderRosterWarnings() so "no roles" warning
+// appears/clears immediately when a role checkbox is toggled.
+function pRole(id,role,val){
+  const p=peopleById[id];
+  if(p){ p.roles[role]=val; save(); renderRosterWarnings(); }
+}
 
 // ══════════════════════════════════════════════
 //  DEMAND GRID
@@ -975,27 +974,26 @@ function updDemand(bid,sid,di,val){
 }
 
 // ══════════════════════════════════════════════
-//  AVAILABILITY HELPERS (SNIPPET 6)
+//  AVAILABILITY HELPERS
 // ══════════════════════════════════════════════
-// Returns true if the block's [start, end] fits entirely within
-// at least one of the person's availability windows for that day.
 function blockCoveredByAvailability(b, windows) {
   if (!windows || windows.length === 0) return false;
   const bStart = toMin(b.start), bEnd = toMin(b.end);
   return windows.some(w => toMin(w.from) <= bStart && toMin(w.to) >= bEnd);
 }
 
-// Returns eligible block ids for a person on a given day
 function eligibleBlocksForDay(p, di) {
   const windows = p.availability?.[di] || [];
   return BLOCKS.filter(b => blockCoveredByAvailability(b, windows));
 }
 
-// Returns total available hours across the whole week
+// FIX #5: totalAvailableHours now sums only actual schedulable block hours
+// that fit within availability windows, instead of raw window durations.
+// This prevents the ~30-min over-count and keeps the roster warning accurate.
 function totalAvailableHours(p) {
   let total = 0;
-  (p.availability || []).forEach(windows => {
-    windows.forEach(w => { total += (toMin(w.to) - toMin(w.from)) / 60; });
+  DAYS.forEach((_, di) => {
+    eligibleBlocksForDay(p, di).forEach(b => { total += blockDur(b); });
   });
   return total;
 }
@@ -1075,34 +1073,33 @@ function generateSchedule(startDay=-1){
 
   const employees=state.people.filter(p=>p.type==='emp');
 
-  // ── Eligibility check (SNIPPET 7 — uses blockCoveredByAvailability) ──
-  function isEligible(p,di,b,s,assignedSet){
-    // SNIPPET 7: replaced availMap check with blockCoveredByAvailability
-    if (!blockCoveredByAvailability(b, p.availability?.[di] || [])) return false;
+  // ── Eligibility check ──
+  function isEligible(p,di,blk,s,assignedSet){
+    if (!blockCoveredByAvailability(blk, p.availability?.[di] || [])) return false;
     if(assignedSet.has(p.id)) return false;
     const roleKey=s.isField?'field':s.isLunch?null:s.id;
     if(roleKey && !p.roles[roleKey]) return false;
     if(s.isLunch && p.type==='vol') return false;
     if(p.type==='vol' && s.isField) return false;
-    if(p.type==='vol' && p.availableBlocks?.length>0 && !p.availableBlocks.includes(b.id)) return false;
+    if(p.type==='vol' && p.availableBlocks?.length>0 && !p.availableBlocks.includes(blk.id)) return false;
 
-    const dur=blockDur(b);
-    const bStartMin=toMin(b.start);
+    const dur=blockDur(blk);
+    const bStartMin=toMin(blk.start);
     const last=lastAssigned[p.id];
 
     if(!p.overrideIgnoreTurnaround){
       if(last&&last.di===di-1&&last.endMin>=1080&&bStartMin===360){
-        log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: clopen`); return false;
+        log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: clopen`); return false;
       }
       if(last&&last.di===di-1){
         if(24*60+bStartMin < last.endMin+600){
-          log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: turnaround`); return false;
+          log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: turnaround`); return false;
         }
       }
       if(last&&last.di===di){
         const gap=bStartMin-last.endMin;
         if(gap>MAX_SHIFT_GAP_HOURS*60&&!p.allowExtendedDay){
-          log(`SKIP ${p.name} d${di} ${b.id}/${s.id}: split gap ${(gap/60).toFixed(1)}h`); return false;
+          log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: split gap ${(gap/60).toFixed(1)}h`); return false;
         }
       }
     }
@@ -1116,22 +1113,23 @@ function generateSchedule(startDay=-1){
     return true;
   }
 
-  // ── Sort candidates ──
-  function sortPool(pool,di,b){
-    return [...pool].sort((a,b2)=>{
-      const aP=a.preferredBlocks?.includes(b.id)?-1:0;
-      const bP=b2.preferredBlocks?.includes(b.id)?-1:0;
+  // FIX #6: renamed outer param from 'b' to 'blk' to avoid shadowing the
+  // sort comparator's second argument and prevent future confusion.
+  function sortPool(pool, di, blk){
+    return [...pool].sort((a,b)=>{
+      const aP=a.preferredBlocks?.includes(blk.id)?-1:0;
+      const bP=b.preferredBlocks?.includes(blk.id)?-1:0;
       if(aP!==bP) return aP-bP;
-      const aA=a.avoidBlocks?.includes(b.id)?1:0;
-      const bA=b2.avoidBlocks?.includes(b.id)?1:0;
+      const aA=a.avoidBlocks?.includes(blk.id)?1:0;
+      const bA=b.avoidBlocks?.includes(blk.id)?1:0;
       if(aA!==bA) return aA-bA;
-      if(a.type!==b2.type) return a.type==='emp'?-1:1;
-      if(!a.weekendExempt&&!b2.weekendExempt){
-        if(di===5){const d=satWorked[a.id]-satWorked[b2.id]; if(d!==0)return d;}
-        if(di===6){const d=sunWorked[a.id]-sunWorked[b2.id]; if(d!==0)return d;}
+      if(a.type!==b.type) return a.type==='emp'?-1:1;
+      if(!a.weekendExempt&&!b.weekendExempt){
+        if(di===5){const d=satWorked[a.id]-satWorked[b.id]; if(d!==0)return d;}
+        if(di===6){const d=sunWorked[a.id]-sunWorked[b.id]; if(d!==0)return d;}
       }
-      if(b2.pref!==a.pref) return b2.pref-a.pref;
-      return wkHrs[a.id]-wkHrs[b2.id];
+      if(b.pref!==a.pref) return b.pref-a.pref;
+      return wkHrs[a.id]-wkHrs[b.id];
     });
   }
 
@@ -1262,6 +1260,19 @@ function generateSchedule(startDay=-1){
     }); // end BLOCKS
 
     // ── FILL-TO-40 PASS ──
+    // FIX #1: Build a fresh "who actually worked today" set from the completed
+    // schedule instead of relying on the stale `assigned` set (which was
+    // cleared at the start of the last block iteration and is now empty).
+    // Without this fix, fill-to-40 could double-book people already in b8/b9.
+    const workedToday = new Set();
+    BLOCKS.forEach(b2 => {
+      WORK_STATIONS.forEach(s => {
+        (sched[di][b2.id]?.[s.id] || []).forEach(slot => {
+          if (slot?.pid) workedToday.add(slot.pid);
+        });
+      });
+    });
+
     BLOCKS.filter(b=>!b.isLunch&&b.id!=='b8'&&b.id!=='b9').forEach(b=>{
       FIELD_STATIONS.forEach(s=>{
         const slots=sched[di][b.id]?.[s.id]||[];
@@ -1269,7 +1280,7 @@ function generateSchedule(startDay=-1){
         if(!nullSlots.length) return;
 
         const fillPool=employees
-          .filter(p=>isEligible(p,di,b,s,assigned))
+          .filter(p=>isEligible(p,di,b,s,workedToday))
           .sort((a,b2)=>{
             const tA=wkHrs[a.id]<30?0:wkHrs[a.id]<35?1:2;
             const tB=wkHrs[b2.id]<30?0:wkHrs[b2.id]<35?1:2;
@@ -1284,7 +1295,7 @@ function generateSchedule(startDay=-1){
           const dur=blockDur(b);
           wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
           lastAssigned[p.id]={di,endMin:toMin(b.end)};
-          assigned.add(p.id);
+          workedToday.add(p.id);
           if(di===5&&!satWorkedDay[p.id]){satWorked[p.id]++;satWorkedDay[p.id]=true;}
           if(di===6&&!sunWorkedDay[p.id]){sunWorked[p.id]++;sunWorkedDay[p.id]=true;}
           log(`FILL40 ${p.name} d${di} ${b.id}/${s.id}`);
@@ -1608,8 +1619,14 @@ function validateAndHighlight(){
       errors.push(`${p.name} double-booked ${DAYS[di]} ${bid}`);
     }
 
+    // FIX #2: Check ALL stations in b8 (not just same sid) to determine if
+    // someone qualifies for the closing shift b9. Previously this only looked
+    // at the same station, incorrectly flagging e.g. Gate-b9 if person worked
+    // Podium-b8.
     if(bid==='b9'){
-      const b8pids=(state.schedule[di]?.['b8']?.[sid]||[]).map(s=>s?.pid).filter(Boolean);
+      const b8pids = WORK_STATIONS.flatMap(s =>
+        (state.schedule[di]?.['b8']?.[s.id] || []).map(sl => sl?.pid)
+      ).filter(Boolean);
       if(!b8pids.includes(pid)){
         sel.classList.add('error');
         errors.push(`${p.name} in Closing (b9) but not in Evening 1 (b8) on ${DAYS[di]}`);
@@ -1653,7 +1670,7 @@ function validateAndHighlight(){
 }
 
 // ══════════════════════════════════════════════
-//  HOUR SUMMARY (SNIPPET 12)
+//  HOUR SUMMARY
 // ══════════════════════════════════════════════
 function renderHourSummary(){
   const wrap=document.getElementById('hour-summary');
@@ -1687,7 +1704,7 @@ function renderHourSummary(){
       }).join('')}
       <td style="font-size:12px;${totalColor}">${total.toFixed(1)}h</td>
       <td class="text2">${cap}h</td>
-      <td class="text2" style="font-size:11px;" title="Total hours available this week based on availability windows">
+      <td class="text2" style="font-size:11px;" title="Schedulable block hours available this week">
         ${totalAvailableHours(p).toFixed(1)}h
       </td>
       <td style="min-width:130px;padding:7px 10px;">
@@ -1725,7 +1742,9 @@ function importTemplate(evt){
       state.demand=data.demand||{};
       state.settings=data.settings||{};
       state.nextId=data.nextId||state.people.length+1;
-      state.schedule=migrateSched(state.schedule||{});
+      // FIX #3: Clear the schedule on import so the stale grid doesn't remain
+      // visible with old data while the new roster is active.
+      state.schedule={};
       if(!state.settings) state.settings={};
       // Migrate availability on import
       (state.people || []).forEach(p => {
@@ -1743,7 +1762,12 @@ function importTemplate(evt){
       rebuildPeopleMap();
       const lp=document.getElementById('lunch-paid');
       if(lp) lp.checked=!!state.settings?.lunchPaid;
-      save(); renderRoster(); renderDemandGrid();
+      save();
+      renderRoster();
+      renderDemandGrid();
+      // Re-render schedule grid to show the cleared/empty state
+      renderScheduleGrid();
+      document.getElementById('sched-errors').innerHTML='';
       toast('Template imported!');
     } catch(err) {
       toast('Import failed: '+err.message);
