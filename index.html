@@ -42,7 +42,7 @@
     box-shadow: var(--shadow);
   }
   header h1 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--text); }
-  header .header-right { display: flex; align-items: center; gap: 12px; }
+  header .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   header span { color: var(--text2); font-size: 11px; }
 
   .tabs {
@@ -69,230 +69,179 @@
     display: flex; align-items: center; gap: 10px;
     color: var(--text);
   }
-  .badge {
-    background: var(--accent2); color: #fff;
-    font-family: var(--mono); font-size: 10px;
-    padding: 2px 7px; border-radius: 20px; font-weight: 500;
-  }
+  .badge { background: var(--accent2); color: #fff; font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
   .badge-blue  { background: #e8f4fb; color: var(--accent2); border: 1px solid var(--accent2); }
   .badge-purple{ background: #f3eeff; color: var(--purple);  border: 1px solid var(--purple); }
   .badge-warn  { background: var(--warn-bg); color: var(--accent); border: 1px solid var(--warn-border); }
 
-  .btn {
-    padding: 6px 14px; border-radius: var(--radius);
-    border: none; cursor: pointer; font-family: var(--mono);
-    font-size: 11px; font-weight: 500; transition: all 0.15s; white-space: nowrap;
-  }
+  .btn { padding: 6px 14px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
   .btn-primary   { background: var(--accent2); color: #fff; }
   .btn-primary:hover { background: #005c87; }
   .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { background: var(--surface2); border-color: var(--text2); }
   .btn-danger    { background: transparent; color: var(--accent3); border: 1px solid var(--accent3); }
   .btn-danger:hover { background: var(--accent3); color: #fff; }
-  .btn-blue      { background: var(--accent2); color: #fff; }
-  .btn-blue:hover{ background: #005c87; }
+  .btn-green     { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #1f5e39; }
   .btn-swap      { background: #f3eeff; color: var(--purple); border: 1px solid var(--purple); }
   .btn-swap:hover{ background: #e8ddff; }
   .btn-swap.active { background: var(--purple); color: #fff; }
   .btn-sm { padding: 2px 7px; font-size: 10px; }
+  .btn-xs { padding: 1px 5px; font-size: 10px; }
+
+  /* ── UNDO BAR ── */
+  #undo-bar {
+    display: none; position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--surface); padding: 8px 16px;
+    border-radius: var(--radius); font-size: 12px; z-index: 9998;
+    display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  #undo-bar.show { opacity: 1; pointer-events: all; }
+  #undo-bar button { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-family: var(--mono); font-size: 11px; }
+  #undo-bar button:hover { background: rgba(255,255,255,0.35); }
 
   /* ── ROSTER ── */
   .roster-controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
   .roster-note { color: var(--text2); font-size: 11px; margin-left: auto; }
 
   .roster-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-  .roster-table th {
-    text-align: left; padding: 7px 8px;
-    background: var(--surface2); color: var(--text2);
-    font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase;
-    border-bottom: 2px solid var(--border);
-  }
+  .roster-table th { text-align: left; padding: 7px 8px; background: var(--surface2); color: var(--text2); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
   .roster-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .roster-table tr:last-child td { border-bottom: none; }
   .roster-table tr:hover td { background: var(--surface2); }
 
-  .name-input {
-    background: transparent; border: none; color: var(--text);
-    font-family: var(--mono); font-size: 12px; width: 100px;
-    padding: 2px 4px; border-radius: 4px;
-  }
+  /* Row color coding */
+  .roster-row-emp td { background: rgba(42,122,75,0.04); }
+  .roster-row-vol td { background: rgba(107,63,170,0.04); }
+  .roster-row-atrisk td { background: rgba(192,48,74,0.07) !important; }
+  .roster-row-offweek td { background: rgba(168,166,158,0.1) !important; opacity: 0.7; }
+
+  .name-input { background: transparent; border: none; color: var(--text); font-family: var(--mono); font-size: 12px; width: 100px; padding: 2px 4px; border-radius: 4px; }
   .name-input:focus { outline: 1px solid var(--accent2); background: var(--bg); }
 
   .type-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
   .type-badge.emp { background: #eaf5f0; color: var(--green); border: 1px solid #b8deca; }
   .type-badge.vol { background: #f3eeff; color: var(--purple); border: 1px solid #cdb8f0; }
 
-  .day-check  { accent-color: var(--accent);  width: 13px; height: 13px; cursor: pointer; }
   .role-check { accent-color: var(--accent2); width: 13px; height: 13px; cursor: pointer; }
   .over-check { accent-color: var(--purple);  width: 13px; height: 13px; cursor: pointer; }
+  .offweek-check { accent-color: var(--accent3); width: 13px; height: 13px; cursor: pointer; }
 
-  .pref-select {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 11px;
-    padding: 2px 4px; border-radius: 4px; width: 40px;
-  }
-  .num-input {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 11px;
-    padding: 2px 6px; border-radius: 4px; width: 50px; text-align: center;
-  }
+  .pref-select { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 11px; padding: 2px 4px; border-radius: 4px; width: 40px; }
+  .num-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; width: 50px; text-align: center; }
   .num-input:focus { outline: 1px solid var(--accent2); }
-
   .override-flag { font-size: 10px; color: var(--purple); margin-left: 3px; }
 
-  .roster-warn {
-    padding: 8px 12px; background: var(--warn-bg); border: 1px solid var(--warn-border);
-    border-radius: var(--radius); font-size: 11px; color: var(--accent);
-    margin-bottom: 10px;
-  }
+  /* mini hour bar in roster */
+  .mini-bar-bg { width: 60px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); display: inline-block; vertical-align: middle; }
+  .mini-bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .mini-bar-fill.over { background: var(--accent3); }
+  .mini-bar-fill.near { background: var(--accent); }
 
   /* ── AVAILABILITY EDITOR ── */
   .avail-editor { display: flex; gap: 4px; flex-wrap: wrap; align-items: flex-start; }
   .avail-day-col { display: flex; flex-direction: column; gap: 3px; min-width: 82px; }
-  .avail-day-label {
-    font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
-    color: var(--text2); margin-bottom: 1px; font-weight: 500;
-  }
-  .avail-chip {
-    font-size: 10px; padding: 2px 7px; border-radius: 20px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--surface2);
-    color: var(--text2); white-space: nowrap; text-align: center;
-    transition: all 0.12s; user-select: none;
-  }
+  .avail-day-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text2); margin-bottom: 1px; font-weight: 500; }
+  .avail-chip { font-size: 10px; padding: 2px 7px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); white-space: nowrap; text-align: center; transition: all 0.12s; user-select: none; }
   .avail-chip:hover { border-color: var(--accent2); color: var(--accent2); }
   .avail-chip.full { background: #eaf5f0; color: var(--green); border-color: #b8deca; }
   .avail-chip.off  { background: var(--surface2); color: var(--text3); border-color: var(--border); }
   .avail-chip.custom { background: #e8f4fb; color: var(--accent2); border-color: var(--accent2); }
-  .avail-window-row {
-    display: flex; align-items: center; gap: 3px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 5px; padding: 2px 4px; margin-top: 1px;
-  }
-  .avail-time {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 10px;
-    padding: 1px 3px; border-radius: 3px; width: 56px;
-  }
+  .avail-window-row { display: flex; align-items: center; gap: 3px; background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 4px; margin-top: 1px; }
+  .avail-time { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 10px; padding: 1px 3px; border-radius: 3px; width: 56px; }
   .avail-time:focus { outline: 1px solid var(--accent2); }
   .avail-sep { font-size: 9px; color: var(--text3); }
-  .avail-rm {
-    background: none; border: none; cursor: pointer;
-    color: var(--text3); font-size: 11px; padding: 0 2px;
-    line-height: 1; border-radius: 3px;
-  }
+  .avail-rm { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 11px; padding: 0 2px; line-height: 1; border-radius: 3px; }
   .avail-rm:hover { color: var(--accent3); }
-  .avail-add {
-    font-size: 9px; padding: 1px 5px; border-radius: 20px;
-    background: none; border: 1px dashed var(--border);
-    color: var(--text3); cursor: pointer; margin-top: 2px;
-    font-family: var(--mono);
-  }
+  .avail-add { font-size: 9px; padding: 1px 5px; border-radius: 20px; background: none; border: 1px dashed var(--border); color: var(--text3); cursor: pointer; margin-top: 2px; font-family: var(--mono); }
   .avail-add:hover { border-color: var(--accent2); color: var(--accent2); }
-  .avail-eligible {
-    font-size: 9px; color: var(--text3); margin-top: 2px; line-height: 1.4;
-  }
+  .avail-eligible { font-size: 9px; color: var(--text3); margin-top: 2px; line-height: 1.4; }
   .avail-eligible.none { color: var(--accent3); }
+  .avail-bulk { display: flex; gap: 4px; margin-bottom: 6px; flex-wrap: wrap; }
 
   /* ── DEMAND ── */
-  .demand-grid {
-    display: grid; grid-template-columns: 160px repeat(7, 1fr);
-    gap: 0; border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; margin-bottom: 20px; background: var(--surface); box-shadow: var(--shadow);
-  }
-  .dg-header {
-    background: var(--surface2); padding: 7px 10px;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
-    color: var(--text2); border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .dg-cell {
-    padding: 5px 6px; border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border); display: flex; align-items: center;
-    background: var(--surface);
-  }
+  .demand-grid { display: grid; grid-template-columns: 160px repeat(7, 1fr); gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; background: var(--surface); box-shadow: var(--shadow); }
+  .dg-header { background: var(--surface2); padding: 7px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .dg-cell { padding: 5px 6px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; background: var(--surface); }
   .dg-cell:nth-child(8n) { border-right: none; }
-  .dg-label {
-    background: var(--surface2); padding: 7px 10px;
-    font-size: 11px; color: var(--text2);
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-  }
+  .dg-label { background: var(--surface2); padding: 7px 10px; font-size: 11px; color: var(--text2); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; }
   .dg-lunch-marker { font-size: 9px; color: var(--purple); margin-left: 4px; }
 
   /* ── SCHEDULE ── */
-  .schedule-wrap { overflow-x: auto; }
+  .schedule-wrap { overflow-x: auto; position: relative; }
   .sched-table { border-collapse: collapse; min-width: 1100px; width: 100%; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
-  .sched-table th {
-    padding: 8px 10px; background: var(--surface2); text-align: center;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
-    color: var(--text2); border: 1px solid var(--border);
-  }
+  .sched-table th { padding: 8px 10px; background: var(--surface2); text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); border: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
   .sched-table td { padding: 4px 5px; border: 1px solid var(--border); vertical-align: top; min-width: 130px; }
-  .sched-table .row-label { padding: 6px 10px; min-width: 150px; max-width: 160px; background: var(--surface2); }
+  .sched-table .row-label { padding: 6px 10px; min-width: 150px; max-width: 160px; background: var(--surface2); position: sticky; left: 0; z-index: 5; box-shadow: 2px 0 4px rgba(0,0,0,0.06); }
   .row-label-name { font-size: 11px; font-weight: 500; color: var(--text); }
   .row-label-time { font-size: 10px; color: var(--text3); margin-top: 1px; }
 
-  .slot-wrap { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; }
-  .slot-dd {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 11px;
-    padding: 3px 4px; border-radius: 4px; cursor: pointer; transition: border-color 0.15s;
-  }
+  .slot-wrap { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; position: relative; }
+  .slot-dd { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 11px; padding: 3px 4px; border-radius: 4px; cursor: pointer; transition: border-color 0.15s; }
   .slot-dd:focus { outline: none; border-color: var(--accent2); }
-  .slot-dd.error          { border-color: var(--accent3) !important; background: var(--err-bg); }
-  .slot-dd.warn           { border-color: var(--accent) !important; background: var(--warn-bg); }
-  .slot-dd.warn-daily-soft{ border-color: var(--accent) !important; background: var(--warn-bg); }
-  .slot-dd.warn-daily-hard{ border-color: var(--accent3) !important; background: var(--err-bg); }
-  .slot-dd.locked         { opacity: 0.7; cursor: not-allowed; background: #f3eeff; border-color: var(--purple) !important; }
+  .slot-dd.error           { border-color: var(--accent3) !important; background: var(--err-bg); }
+  .slot-dd.warn            { border-color: var(--accent) !important; background: var(--warn-bg); }
+  .slot-dd.warn-daily-soft { border-color: var(--accent) !important; background: var(--warn-bg); }
+  .slot-dd.warn-daily-hard { border-color: var(--accent3) !important; background: var(--err-bg); }
+  .slot-dd.locked          { opacity: 0.7; cursor: not-allowed; background: #f3eeff; border-color: var(--purple) !important; }
 
-  .lock-btn {
-    background: none; border: none; cursor: pointer; font-size: 12px;
-    padding: 1px 3px; border-radius: 3px; color: var(--text3);
-    transition: color 0.15s; flex-shrink: 0;
-  }
+  .lock-btn { background: none; border: none; cursor: pointer; font-size: 12px; padding: 1px 3px; border-radius: 3px; color: var(--text3); transition: color 0.15s; flex-shrink: 0; }
   .lock-btn:hover { color: var(--purple); }
   .lock-btn.locked { color: var(--purple); }
 
   .swap-highlight { outline: 2px solid var(--purple) !important; }
   .swap-source    { outline: 2px solid var(--accent2) !important; background: #e8f4fb !important; }
 
-  /* Station colours — light, distinguishable */
-  .station-gate    { background: #edf7ed; }
-  .station-podium  { background: #edf2fd; }
-  .station-mandir  { background: #f5eeff; }
-  .station-field1  { background: #fffbe8; }
-  .station-field2  { background: #fff4e8; }
-  .station-field3  { background: #edfaf5; }
-  .station-field4  { background: #fef3f0; }
-  .station-lunch   { background: #fdf0e8; }
+  /* Who's free tooltip */
+  .wf-tooltip {
+    display: none; position: absolute; left: 0; top: 100%; z-index: 200;
+    background: var(--text); color: var(--surface); font-size: 10px;
+    padding: 6px 10px; border-radius: 6px; min-width: 140px; max-width: 200px;
+    white-space: normal; line-height: 1.6; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    pointer-events: none;
+  }
+  .slot-wrap:hover .wf-tooltip { display: block; }
 
-  .block-group-header td {
-    background: var(--surface2) !important; padding: 5px 10px;
-    font-size: 10px; color: var(--accent2); letter-spacing: 1px;
-    text-transform: uppercase; font-weight: 500; border-top: 2px solid var(--border);
-  }
-  .block-lunch-header td {
-    background: #fdf5e8 !important; padding: 5px 10px;
-    font-size: 10px; color: #8a5c00; letter-spacing: 1px;
-    text-transform: uppercase; font-weight: 500; border-top: 2px solid #e8c870;
-  }
+  /* Day column highlight */
+  .col-highlight { background: #e8f4fb !important; }
+  .sched-table th.col-highlight { background: #cce8f6 !important; }
+
+  /* Day totals row */
+  .day-totals-row td { background: var(--surface2) !important; font-size: 10px; color: var(--text2); text-align: center; padding: 4px 5px; border-top: 2px solid var(--border); }
+  .day-totals-row .row-label { text-align: left; font-weight: 500; color: var(--text); }
+  .total-ok   { color: var(--green);   font-weight: 700; }
+  .total-warn { color: var(--accent);  font-weight: 700; }
+  .total-err  { color: var(--accent3); font-weight: 700; }
+
+  /* Station colours */
+  .station-gate   { background: #edf7ed; }
+  .station-podium { background: #edf2fd; }
+  .station-mandir { background: #f5eeff; }
+  .station-field1 { background: #fffbe8; }
+  .station-field2 { background: #fff4e8; }
+  .station-field3 { background: #edfaf5; }
+  .station-field4 { background: #fef3f0; }
+  .station-lunch  { background: #fdf0e8; }
+
+  .block-group-header td { background: var(--surface2) !important; padding: 5px 10px; font-size: 10px; color: var(--accent2); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; border-top: 2px solid var(--border); }
+  .block-group-header td.row-label { position: sticky; left: 0; z-index: 5; }
+  .block-lunch-header td { background: #fdf5e8 !important; padding: 5px 10px; font-size: 10px; color: #8a5c00; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; border-top: 2px solid #e8c870; }
+  .block-lunch-header.collapsed-lunch { display: none; }
+  .lunch-section-row { display: table-row; }
+  .lunch-section-row.collapsed-lunch { display: none; }
 
   /* ── CONTEXT MENU ── */
-  .ctx-menu {
-    position: fixed; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 4px 0; z-index: 9999;
-    min-width: 150px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); display: none;
-  }
+  .ctx-menu { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 0; z-index: 9999; min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); display: none; }
   .ctx-menu.show { display: block; }
   .ctx-item { padding: 7px 14px; font-size: 11px; cursor: pointer; color: var(--text); transition: background 0.1s; }
   .ctx-item:hover { background: var(--surface2); }
   .ctx-item.danger { color: var(--accent3); }
+  .ctx-sep { border-top: 1px solid var(--border); margin: 3px 0; }
 
   /* ── SCHED LOG ── */
   .sched-log { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .sched-log summary { padding: 8px 14px; background: var(--surface2); cursor: pointer; font-size: 11px; color: var(--text2); user-select: none; }
-  .sched-log summary:hover { color: var(--text); }
   .sched-log-body { max-height: 220px; overflow-y: auto; padding: 8px 14px; background: var(--bg); font-size: 10px; color: var(--text2); line-height: 1.8; }
 
   /* ── HOURS ── */
@@ -306,31 +255,55 @@
   .day-cell-warn { color: var(--accent)  !important; font-weight: 700; }
   .day-cell-hard { color: var(--accent3) !important; font-weight: 700; }
 
+  /* ── SCHEDULE CARDS ── */
+  @media print {
+    body { background: #fff !important; color: #000 !important; }
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    .panel { display: none !important; }
+    #tab-schedule.active { display: none !important; }
+    #print-cards { display: block !important; }
+    .person-card { page-break-after: always; padding: 20px; border: 1px solid #ccc; margin-bottom: 20px; }
+    .person-card:last-child { page-break-after: auto; }
+  }
+  #print-cards { display: none; }
+  .print-only { display: none; }
+
   /* ── TOOLBAR / SETTINGS ── */
   .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .toolbar .sep { width: 1px; height: 22px; background: var(--border); }
-
-  .settings-row {
-    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
-    padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); margin-bottom: 16px; font-size: 12px; box-shadow: var(--shadow);
-  }
+  .settings-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; font-size: 12px; box-shadow: var(--shadow); }
   .settings-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
+  /* ── PRE-FLIGHT ── */
+  .preflight-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .preflight-panel h3 { font-family: var(--serif); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .preflight-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+  .pf-item { padding: 8px 12px; border-radius: var(--radius); font-size: 11px; }
+  .pf-ok   { background: var(--ok-bg);   border: 1px solid var(--ok-border);   color: var(--green); }
+  .pf-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: #7a5500; }
+  .pf-err  { background: var(--err-bg);  border: 1px solid var(--err-border);  color: var(--accent3); }
+
+  /* ── NAMED TEMPLATES ── */
+  .tmpl-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .tmpl-row  { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
+  .tmpl-name { flex: 1; font-size: 12px; }
+  .tmpl-meta { font-size: 10px; color: var(--text3); }
+
+  /* ── MODAL ── */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: center; justify-content: center; }
+  .modal-backdrop.show { display: flex; }
+  .modal { background: var(--surface); border-radius: var(--radius); padding: 24px; min-width: 340px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .modal h3 { font-family: var(--serif); font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+  .modal input[type=text] { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--mono); font-size: 13px; background: var(--bg); color: var(--text); }
+  .modal input[type=text]:focus { outline: 1px solid var(--accent2); }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
   /* ── TOAST ── */
-  #toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--text); color: var(--surface);
-    padding: 9px 18px; border-radius: var(--radius);
-    font-size: 12px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--surface); padding: 9px 18px; border-radius: var(--radius); font-size: 12px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
   #toast.show { opacity: 1; }
 
-  #swap-info {
-    display: none; padding: 8px 14px; background: #f3eeff;
-    border: 1px solid var(--purple); border-radius: var(--radius);
-    margin-bottom: 12px; font-size: 12px; color: var(--purple);
-  }
+  #swap-info { display: none; padding: 8px 14px; background: #f3eeff; border: 1px solid var(--purple); border-radius: var(--radius); margin-bottom: 12px; font-size: 12px; color: var(--purple); }
   #swap-info.show { display: block; }
 
   .empty-state { padding: 40px; text-align: center; color: var(--text3); font-size: 13px; }
@@ -344,35 +317,25 @@
   .bold { font-weight: 700; }
   .spin { animation: spin 1s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media print {
-    body { background: #fff !important; color: #000 !important; }
-    header, .tabs, .toolbar, .settings-row, #toast, .btn, #swap-info,
-    #tab-roster, #tab-demand, #tab-hours { display: none !important; }
-    .panel { display: none !important; }
-    #tab-schedule { display: block !important; }
-    .sched-table th, .sched-table td { border: 1px solid #ccc !important; background: #fff !important; }
-    .slot-dd { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px; }
-    .lock-btn, .ctx-menu { display: none !important; }
-  }
 </style>
-
-  </head>
+</head>
 <body>
 
-<header>
+<header class="no-print">
   <h1>⚙ WorkForce Scheduler</h1>
   <div class="header-right">
-    <button class="btn btn-secondary" onclick="exportTemplate()">⬇ Export Template</button>
-    <label class="btn btn-secondary" style="cursor:pointer;">
-      ⬆ Import Template
-      <input type="file" accept=".json" style="display:none;" onchange="importTemplate(event)">
-    </label>
+    <button class="btn btn-secondary" onclick="undoAction()" id="undo-btn" title="Undo (Ctrl+Z)" style="opacity:0.4;" disabled>↩ Undo</button>
+    <button class="btn btn-secondary" onclick="redoAction()" id="redo-btn" title="Redo (Ctrl+Y)" style="opacity:0.4;" disabled>↪ Redo</button>
+    <div class="sep" style="width:1px;height:22px;background:var(--border);"></div>
+    <button class="btn btn-secondary" onclick="showSaveAsModal()">💾 Save As…</button>
+    <button class="btn btn-secondary" onclick="showLoadModal()">📂 Load…</button>
+    <button class="btn btn-secondary" onclick="exportTemplate()">⬇ Export</button>
+    <label class="btn btn-secondary" style="cursor:pointer;">⬆ Import <input type="file" accept=".json" style="display:none;" onchange="importTemplate(event)"></label>
     <span id="save-status">All changes saved</span>
   </div>
 </header>
 
-<div class="tabs">
+<div class="tabs no-print">
   <div class="tab active" data-tab="roster">Roster</div>
   <div class="tab" data-tab="demand">Station Demand</div>
   <div class="tab" data-tab="schedule">Schedule</div>
@@ -398,19 +361,22 @@
           <th>#</th>
           <th>Name</th>
           <th>Type</th>
-          <th title="Per-day availability windows">Availability (click day chip to cycle: Full → Off → Custom)</th>
-          <th title="Gate role">Gate</th>
-          <th title="Podium role">Podium</th>
-          <th title="Mandir role">Mandir</th>
-          <th title="Field work role">Field</th>
+          <th>Availability</th>
+          <th title="Gate">Gate</th>
+          <th title="Podium">Podium</th>
+          <th title="Mandir">Mandir</th>
+          <th title="Field">Field</th>
           <th title="Preference 1–5">Pref</th>
-          <th title="Default daily hour cap">Day Cap</th>
-          <th title="Allow up to 10 hrs/day">+10h</th>
-          <th title="Weekly hour cap">Max/Wk</th>
+          <th title="Min hrs/wk">Min/Wk</th>
+          <th title="Daily cap">Day Cap</th>
+          <th title="+10h day">+10h</th>
+          <th title="Max hrs/wk">Max/Wk</th>
           <th title="Override weekly cap">Ov40</th>
-          <th title="Override daily 9h cap">Ov9h</th>
-          <th title="Ignore turnaround rules">NoTurn</th>
+          <th title="Override 9h/day">Ov9h</th>
+          <th title="No turnaround">NoTurn</th>
           <th title="Weekend exempt">WkndEx</th>
+          <th title="Off this week (vacation)">Off Wk</th>
+          <th title="Hours this week">Hrs</th>
           <th></th>
         </tr>
       </thead>
@@ -422,12 +388,8 @@
 <!-- ══════════ DEMAND TAB ══════════ -->
 <div class="panel" id="tab-demand">
   <div class="sec-title">Station Demand <span class="badge">slots required per block per day</span></div>
-  <p class="text2 text-xs" style="margin-bottom:14px;">
-    Set how many staff are required at each station per day. 0 = closed.
-    <strong>Lunch blocks (b3–b5) show ALL stations</strong> — Gate/Podium/Mandir still need coverage during lunch.
-  </p>
+  <p class="text2 text-xs" style="margin-bottom:14px;">Set how many staff are required at each station per day. 0 = closed. <strong>Lunch blocks (b3–b5) show ALL stations</strong> — Gate/Podium/Mandir still need coverage during lunch.</p>
   <div id="demand-grid-wrap"></div>
-
   <div class="sec-title mt-16">Time Block Reference <span class="badge">9 blocks</span></div>
   <table class="roster-table" style="max-width:600px;">
     <thead><tr><th>#</th><th>Label</th><th>Start</th><th>End</th><th>Duration</th><th>Notes</th></tr></thead>
@@ -437,35 +399,37 @@
 
 <!-- ══════════ SCHEDULE TAB ══════════ -->
 <div class="panel" id="tab-schedule">
-  <div class="settings-row">
-    <label>
-      <input type="checkbox" id="lunch-paid" onchange="saveSetting('lunchPaid',this.checked)" style="accent-color:var(--accent2);">
-      Lunch <em>break</em> blocks count toward paid hours
-    </label>
+  <div class="settings-row no-print">
+    <label><input type="checkbox" id="lunch-paid" onchange="saveSetting('lunchPaid',this.checked)" style="accent-color:var(--accent2);"> Lunch <em>break</em> blocks count toward paid hours</label>
     <span class="text2 text-xs">Station coverage during lunch is always counted.</span>
+    <label><input type="checkbox" id="lunch-collapsed" onchange="toggleLunchCollapse()" style="accent-color:var(--accent2);"> Collapse lunch blocks</label>
     <span class="text2 text-xs">| Right-click any slot for options.</span>
   </div>
-  <div class="toolbar">
-    <button class="btn btn-primary" onclick="runScheduler()">▶ Auto-Generate</button>
-    <select id="regen-from" class="pref-select" style="width:auto;padding:4px 8px;font-size:11px;" title="Regenerate from this day onward">
+  <div class="toolbar no-print">
+    <button class="btn btn-primary" onclick="showPreFlight()">🔍 Pre-flight Check</button>
+    <button class="btn btn-green" onclick="runScheduler()">▶ Auto-Generate</button>
+    <select id="regen-from" class="pref-select" style="width:auto;padding:4px 8px;font-size:11px;">
       <option value="-1">Full week</option>
       <option value="0">From Mon</option><option value="1">From Tue</option>
       <option value="2">From Wed</option><option value="3">From Thu</option>
       <option value="4">From Fri</option><option value="5">From Sat</option>
       <option value="6">From Sun</option>
     </select>
+    <button class="btn btn-secondary" onclick="fillEmpties()">⬛ Fill Empties</button>
     <div class="sep"></div>
     <button class="btn btn-swap" id="swap-btn" onclick="toggleSwapMode()">⇄ Swap Mode</button>
+    <button class="btn btn-secondary" onclick="lockAllSlots(true)">🔒 Lock All</button>
+    <button class="btn btn-secondary" onclick="lockAllSlots(false)">🔓 Unlock All</button>
     <button class="btn btn-secondary" onclick="clearSchedule()">✕ Clear</button>
-    <button class="btn btn-secondary" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-secondary" onclick="printScheduleCards()">🖨 Print Cards</button>
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print Grid</button>
     <span class="text2 text-xs" style="margin-left:auto;" id="sched-status"></span>
   </div>
+  <div id="preflight-wrap" style="display:none;"></div>
   <div id="swap-info"></div>
   <div id="sched-errors" style="margin-bottom:10px;"></div>
-  <div class="schedule-wrap" id="schedule-wrap">
-    <div class="empty-state">Generate a schedule to see the output grid.</div>
-  </div>
-  <details class="sched-log" id="sched-log" style="display:none;">
+  <div class="schedule-wrap" id="schedule-wrap"><div class="empty-state">Generate a schedule to see the output grid.</div></div>
+  <details class="sched-log no-print" id="sched-log" style="display:none;">
     <summary>📋 Scheduler Log <span id="log-count" class="text2"></span></summary>
     <div class="sched-log-body" id="sched-log-body"></div>
   </details>
@@ -485,14 +449,47 @@
 
 </main>
 
+<!-- Print cards container -->
+<div id="print-cards"></div>
+
+<!-- Toast -->
 <div id="toast"></div>
+
+<!-- Undo bar -->
+<div id="undo-bar"><span id="undo-msg">Action undone</span><button onclick="redoAction()">↪ Redo</button></div>
+
+<!-- Context Menu -->
 <div class="ctx-menu" id="ctx-menu">
   <div class="ctx-item" id="ctx-lock">🔒 Lock slot</div>
   <div class="ctx-item" id="ctx-unlock">🔓 Unlock slot</div>
   <div class="ctx-item danger" id="ctx-clear">✕ Clear slot</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-lock-day">🔒 Lock this day (all slots)</div>
+  <div class="ctx-item" id="ctx-unlock-day">🔓 Unlock this day (all slots)</div>
 </div>
 
-  <script>
+<!-- Save As Modal -->
+<div class="modal-backdrop" id="saveas-modal">
+  <div class="modal">
+    <h3>Save Template As…</h3>
+    <input type="text" id="saveas-name" placeholder="e.g. Regular Week, Event Week…" maxlength="60">
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('saveas-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSaveAs()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Load Modal -->
+<div class="modal-backdrop" id="load-modal">
+  <div class="modal" style="min-width:400px;">
+    <h3>Load Saved Template</h3>
+    <div id="load-tmpl-list" class="tmpl-list"></div>
+    <div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('load-modal')">Cancel</button></div>
+  </div>
+</div>
+
+<script>
 // ══════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════
@@ -522,11 +519,10 @@ const STATIONS = [
   { id:'lunch',  label:'Lunch Break',  cls:'station-lunch',  isField:false, isLunch:true  },
 ];
 
-// Grouped for convenience
-const BASE_STATIONS    = STATIONS.filter(s => !s.isField && !s.isLunch); // gate, podium, mandir
-const FIELD_STATIONS   = STATIONS.filter(s =>  s.isField);               // field1–4
-const WORK_STATIONS    = STATIONS.filter(s => !s.isLunch);               // all non-lunch
-const COVERAGE_STATIONS= BASE_STATIONS; // stations that must stay staffed during lunch
+const BASE_STATIONS     = STATIONS.filter(s => !s.isField && !s.isLunch);
+const FIELD_STATIONS    = STATIONS.filter(s =>  s.isField);
+const WORK_STATIONS     = STATIONS.filter(s => !s.isLunch);
+const COVERAGE_STATIONS = BASE_STATIONS;
 
 function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
 function blockDur(b){ return (toMin(b.end)-toMin(b.start))/60; }
@@ -544,11 +540,80 @@ let state = {
 let peopleById = {};
 function rebuildPeopleMap(){ peopleById={}; state.people.forEach(p=>{ peopleById[p.id]=p; }); }
 
+// ── Undo/Redo ──
+const UNDO_LIMIT = 10;
+let undoStack = [];
+let redoStack = [];
+
+function pushUndo(label){
+  undoStack.push({ label, snap: JSON.stringify(state) });
+  if(undoStack.length > UNDO_LIMIT) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoBtns();
+}
+
+function undoAction(){
+  if(!undoStack.length) return;
+  const entry = undoStack.pop();
+  redoStack.push({ label: entry.label, snap: JSON.stringify(state) });
+  state = JSON.parse(entry.snap);
+  rebuildPeopleMap();
+  afterStateRestore();
+  updateUndoRedoBtns();
+  showUndoBar('Undone: ' + entry.label);
+}
+
+function redoAction(){
+  if(!redoStack.length) return;
+  const entry = redoStack.pop();
+  undoStack.push({ label: entry.label, snap: JSON.stringify(state) });
+  state = JSON.parse(entry.snap);
+  rebuildPeopleMap();
+  afterStateRestore();
+  updateUndoRedoBtns();
+  showUndoBar('Redone: ' + entry.label);
+}
+
+function afterStateRestore(){
+  initDemand();
+  renderRoster();
+  renderDemandGrid();
+  if(Object.keys(state.schedule).length) renderScheduleGrid();
+  else document.getElementById('schedule-wrap').innerHTML='<div class="empty-state">Generate a schedule to see the output grid.</div>';
+  renderHourSummary();
+  save();
+}
+
+function updateUndoRedoBtns(){
+  const ub = document.getElementById('undo-btn');
+  const rb = document.getElementById('redo-btn');
+  const hasUndo = undoStack.length > 0;
+  const hasRedo = redoStack.length > 0;
+  ub.disabled = !hasUndo; ub.style.opacity = hasUndo ? '1' : '0.4';
+  rb.disabled = !hasRedo; rb.style.opacity = hasRedo ? '1' : '0.4';
+  const last = undoStack[undoStack.length-1];
+  ub.title = last ? `Undo: ${last.label} (Ctrl+Z)` : 'Nothing to undo';
+}
+
+let undoBarTimer = null;
+function showUndoBar(msg){
+  const bar = document.getElementById('undo-bar');
+  document.getElementById('undo-msg').textContent = msg;
+  bar.classList.add('show');
+  clearTimeout(undoBarTimer);
+  undoBarTimer = setTimeout(()=>bar.classList.remove('show'), 3000);
+}
+
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey||e.metaKey) && e.key==='z' && !e.shiftKey){ e.preventDefault(); undoAction(); }
+  if((e.ctrlKey||e.metaKey) && (e.key==='y'||(e.key==='z'&&e.shiftKey))){ e.preventDefault(); redoAction(); }
+});
+
 // ══════════════════════════════════════════════
-//  PERSISTENCE & MIGRATION
+//  PERSISTENCE
 // ══════════════════════════════════════════════
 function save(){
-  try { localStorage.setItem('wfs_v5', JSON.stringify(state)); } catch(e){}
+  try { localStorage.setItem('wfs_v6', JSON.stringify(state)); } catch(e){}
   const el=document.getElementById('save-status');
   if(el) el.textContent='Saved '+new Date().toLocaleTimeString();
 }
@@ -576,30 +641,31 @@ function migrateSched(raw){
 
 function load(){
   try {
-    const raw=localStorage.getItem('wfs_v5')||localStorage.getItem('wfs_v4')||localStorage.getItem('wfs_v3');
+    const raw=localStorage.getItem('wfs_v6')||localStorage.getItem('wfs_v5')||localStorage.getItem('wfs_v4');
     if(raw){
       const d=JSON.parse(raw);
       state=d;
       state.schedule=migrateSched(state.schedule||{});
       if(!state.settings) state.settings={};
-      // Migrate old off[] -> availability[] for all loaded people
-      (state.people || []).forEach(p => {
-        if (p.off && !p.availability) {
-          p.availability = p.off.map(isOff =>
-            isOff ? [] : [{ from: '06:00', to: '21:00' }]
-          );
-          delete p.off;
-        }
-        if (!p.availability) {
-          p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
-        }
-      });
+      migrateAllPeople(state.people||[]);
     }
   } catch(e){ console.warn('Load error',e); }
   initDemand();
   rebuildPeopleMap();
   const lp=document.getElementById('lunch-paid');
   if(lp) lp.checked=!!state.settings?.lunchPaid;
+}
+
+function migrateAllPeople(arr){
+  arr.forEach(p => {
+    if(p.off && !p.availability){
+      p.availability = p.off.map(isOff => isOff ? [] : [{from:'06:00',to:'21:00'}]);
+      delete p.off;
+    }
+    if(!p.availability) p.availability = DAYS.map(()=>[{from:'06:00',to:'21:00'}]);
+    if(p.minHrs === undefined) p.minHrs = 0;
+    if(p.offWeek === undefined) p.offWeek = false;
+  });
 }
 
 function saveSetting(key,val){
@@ -623,6 +689,72 @@ function initDemand(){
       }
     });
   });
+}
+
+// ── Named Templates ──
+function getNamedTemplates(){
+  try{ return JSON.parse(localStorage.getItem('wfs_named_templates')||'[]'); }
+  catch(e){ return []; }
+}
+function saveNamedTemplates(arr){
+  localStorage.setItem('wfs_named_templates', JSON.stringify(arr));
+}
+
+function showSaveAsModal(){
+  document.getElementById('saveas-name').value='';
+  document.getElementById('saveas-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('saveas-name').focus(),100);
+}
+function showLoadModal(){
+  const list=document.getElementById('load-tmpl-list');
+  const tmpls=getNamedTemplates();
+  if(!tmpls.length){ list.innerHTML='<div class="text2 text-xs" style="padding:8px;">No saved templates yet.</div>'; }
+  else {
+    list.innerHTML=tmpls.map((t,i)=>`
+      <div class="tmpl-row">
+        <div>
+          <div class="tmpl-name bold">${esc(t.name)}</div>
+          <div class="tmpl-meta">${t.date} · ${(t.data.people||[]).length} people</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="loadNamedTemplate(${i})">Load</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteNamedTemplate(${i})">✕</button>
+      </div>`).join('');
+  }
+  document.getElementById('load-modal').classList.add('show');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function doSaveAs(){
+  const name=document.getElementById('saveas-name').value.trim();
+  if(!name){ toast('Enter a template name'); return; }
+  const tmpls=getNamedTemplates();
+  tmpls.unshift({ name, date: new Date().toLocaleDateString(), data: { people:state.people, demand:state.demand, settings:state.settings, nextId:state.nextId } });
+  if(tmpls.length>20) tmpls.length=20;
+  saveNamedTemplates(tmpls);
+  closeModal('saveas-modal');
+  toast(`Saved as "${name}"`);
+}
+function loadNamedTemplate(idx){
+  const tmpls=getNamedTemplates();
+  const t=tmpls[idx]; if(!t) return;
+  if(!confirm(`Load "${t.name}"? Current roster will be replaced.`)) return;
+  pushUndo('Load template: '+t.name);
+  state.people=t.data.people||[];
+  state.demand=t.data.demand||{};
+  state.settings=t.data.settings||{};
+  state.nextId=t.data.nextId||state.people.length+1;
+  state.schedule={};
+  migrateAllPeople(state.people);
+  initDemand(); rebuildPeopleMap();
+  save(); closeModal('load-modal');
+  renderRoster(); renderDemandGrid(); renderScheduleGrid();
+  document.getElementById('sched-errors').innerHTML='';
+  toast(`Loaded "${t.name}"`);
+}
+function deleteNamedTemplate(idx){
+  const tmpls=getNamedTemplates();
+  tmpls.splice(idx,1);
+  saveNamedTemplates(tmpls);
+  showLoadModal();
 }
 
 // ══════════════════════════════════════════════
@@ -654,29 +786,28 @@ const DEFAULT_EMPLOYEES=[
 ];
 const DEFAULT_VOLUNTEERS=[{name:'V1'},{name:'V2'}];
 
-function makePerson(type, name, offArr) {
-  // Convert legacy offArr (boolean[7]) to availability windows
-  const availability = DAYS.map((_, di) => {
+function makePerson(type, name, offArr){
+  const availability = DAYS.map((_,di)=>{
     const isOff = offArr ? offArr[di] : false;
-    if (isOff) return [];
-    return type === 'vol'
-      ? [] // volunteers start with all days off — admin must set windows
-      : [{ from: '06:00', to: '21:00' }];
+    if(isOff) return [];
+    return type==='vol' ? [] : [{from:'06:00',to:'21:00'}];
   });
   return {
-    id: 'p' + (state.nextId++), name, type,
+    id:'p'+(state.nextId++), name, type,
     availability,
-    roles: { gate: true, podium: true, mandir: true, field: true },
-    pref: 3,
-    dailyCap: 8,
-    allowExtendedDay: false,
-    maxHrs: type === 'emp' ? 40 : 20,
-    overrideOver40: false,
-    overrideOver9hr: false,
-    overrideIgnoreTurnaround: false,
-    weekendExempt: false,
-    preferredBlocks: [],
-    avoidBlocks: [],
+    roles:{ gate:true, podium:true, mandir:true, field:true },
+    pref:3,
+    minHrs:0,
+    dailyCap:8,
+    allowExtendedDay:false,
+    maxHrs: type==='emp'?40:20,
+    overrideOver40:false,
+    overrideOver9hr:false,
+    overrideIgnoreTurnaround:false,
+    weekendExempt:false,
+    offWeek:false,
+    preferredBlocks:[],
+    avoidBlocks:[],
   };
 }
 
@@ -690,176 +821,145 @@ function seedDefaults(){
 function addPerson(type){
   const cnt=state.people.filter(p=>p.type===type).length;
   if(cnt>=20){ toast('Max 20 '+type+'s'); return; }
+  pushUndo('Add '+type);
   const idx=cnt+1;
   state.people.push(makePerson(type,type==='emp'?'E'+idx:'V'+idx,null));
   save(); rebuildPeopleMap(); renderRoster();
 }
 
 function removePerson(id){
-  state.people=state.people.filter(p=>p.id!==id);
+  const p=peopleById[id];
+  if(!p||!confirm(`Remove ${p.name}?`)) return;
+  pushUndo('Remove '+p.name);
+  state.people=state.people.filter(x=>x.id!==id);
   save(); rebuildPeopleMap(); renderRoster();
 }
 
 function clearRoster(){
   if(!confirm('Remove all people?')) return;
+  pushUndo('Clear roster');
   state.people=[]; state.schedule={};
   save(); rebuildPeopleMap(); renderRoster();
 }
 
-function ensurePersonFields(p) {
-  // Migrate old p.off[] -> p.availability[]
-  if (p.off && !p.availability) {
-    p.availability = p.off.map(isOff =>
-      isOff ? [] : [{ from: '06:00', to: '21:00' }]
-    );
-    delete p.off;
-  }
-  if (!p.availability) {
-    p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
-  }
-  if (p.dailyCap === undefined)              p.dailyCap = 8;
-  if (p.allowExtendedDay === undefined)      p.allowExtendedDay = false;
-  if (p.overrideOver40 === undefined)        p.overrideOver40 = false;
-  if (p.overrideOver9hr === undefined)       p.overrideOver9hr = false;
-  if (p.overrideIgnoreTurnaround === undefined) p.overrideIgnoreTurnaround = false;
-  if (p.weekendExempt === undefined)         p.weekendExempt = false;
-  if (!p.preferredBlocks) p.preferredBlocks = [];
-  if (!p.avoidBlocks)     p.avoidBlocks = [];
+function ensurePersonFields(p){
+  if(p.off && !p.availability){ p.availability=p.off.map(isOff=>isOff?[]:[{from:'06:00',to:'21:00'}]); delete p.off; }
+  if(!p.availability) p.availability=DAYS.map(()=>[{from:'06:00',to:'21:00'}]);
+  if(p.dailyCap===undefined) p.dailyCap=8;
+  if(p.minHrs===undefined) p.minHrs=0;
+  if(p.allowExtendedDay===undefined) p.allowExtendedDay=false;
+  if(p.overrideOver40===undefined) p.overrideOver40=false;
+  if(p.overrideOver9hr===undefined) p.overrideOver9hr=false;
+  if(p.overrideIgnoreTurnaround===undefined) p.overrideIgnoreTurnaround=false;
+  if(p.weekendExempt===undefined) p.weekendExempt=false;
+  if(p.offWeek===undefined) p.offWeek=false;
+  if(!p.preferredBlocks) p.preferredBlocks=[];
+  if(!p.avoidBlocks) p.avoidBlocks=[];
 }
 
-function renderRosterWarnings() {
-  const wrap = document.getElementById('roster-warnings');
-  if (!wrap) return;
-  const warnings = [];
-
-  state.people.forEach(p => {
+function renderRosterWarnings(){
+  const wrap=document.getElementById('roster-warnings');
+  if(!wrap) return;
+  const warnings=[];
+  state.people.forEach(p=>{
     ensurePersonFields(p);
-    const hasRole = p.roles.gate || p.roles.podium || p.roles.mandir || p.roles.field;
-    if (!hasRole) {
-      warnings.push({ type: 'err', msg: `${p.name} has no roles enabled — cannot be scheduled anywhere.` });
-    }
-
-    const allOff = (p.availability || []).every(wins => wins.length === 0);
-    if (allOff) {
-      warnings.push({ type: 'err', msg: `${p.name} is marked off every day — cannot be scheduled.` });
-      return;
-    }
-
-    // Check for windows that cover no blocks
-    (p.availability || []).forEach((wins, di) => {
-      wins.forEach(w => {
-        const fits = BLOCKS.some(b => toMin(w.from) <= toMin(b.start) && toMin(w.to) >= toMin(b.end));
-        if (!fits) {
-          warnings.push({ type: 'warn', msg: `${p.name} — ${DAYS[di]} window ${w.from}–${w.to} covers no schedulable blocks.` });
-        }
+    if(p.offWeek) return;
+    const hasRole=p.roles.gate||p.roles.podium||p.roles.mandir||p.roles.field;
+    if(!hasRole) warnings.push({type:'err',msg:`${p.name} has no roles — cannot be scheduled.`});
+    const allOff=(p.availability||[]).every(w=>w.length===0);
+    if(allOff){ warnings.push({type:'err',msg:`${p.name} is off every day — cannot be scheduled.`}); return; }
+    (p.availability||[]).forEach((wins,di)=>{
+      wins.forEach(w=>{
+        const fits=BLOCKS.some(b=>toMin(w.from)<=toMin(b.start)&&toMin(w.to)>=toMin(b.end));
+        if(!fits) warnings.push({type:'warn',msg:`${p.name} — ${DAYS[di]} window ${w.from}–${w.to} covers no blocks.`});
       });
     });
-
-    // Warn if 0 eligible blocks all week
-    const totalEligible = DAYS.reduce((n, _, di) => n + eligibleBlocksForDay(p, di).length, 0);
-    if (totalEligible === 0 && !allOff) {
-      warnings.push({ type: 'warn', msg: `${p.name} — availability windows cover no schedulable blocks this week.` });
-    }
-
-    // Warn if maxHrs > actual available hours
-    const availHrs = totalAvailableHours(p);
-    if (availHrs > 0 && availHrs < p.maxHrs) {
-      warnings.push({ type: 'warn', msg: `${p.name} — max hrs set to ${p.maxHrs}h but only ${availHrs.toFixed(1)}h available this week.` });
-    }
+    const totalElig=DAYS.reduce((n,_,di)=>n+eligibleBlocksForDay(p,di).length,0);
+    if(totalElig===0&&!allOff) warnings.push({type:'warn',msg:`${p.name} — availability covers no schedulable blocks.`});
+    const availHrs=totalAvailableHours(p);
+    if(availHrs>0&&availHrs<p.maxHrs) warnings.push({type:'warn',msg:`${p.name} — max hrs ${p.maxHrs}h but only ${availHrs.toFixed(1)}h available.`});
+    if(p.minHrs>0&&p.minHrs>availHrs) warnings.push({type:'warn',msg:`${p.name} — min hrs ${p.minHrs}h exceeds available ${availHrs.toFixed(1)}h.`});
   });
-
-  wrap.innerHTML = warnings.map(w =>
-    `<div class="alert-box ${w.type === 'err' ? 'alert-err' : 'alert-warn'}">
-      ${w.type === 'err' ? '🔴' : '⚠'} ${esc(w.msg)}
-    </div>`
-  ).join('');
+  wrap.innerHTML=warnings.map(w=>`<div class="alert-box ${w.type==='err'?'alert-err':'alert-warn'}">${w.type==='err'?'🔴':'⚠'} ${esc(w.msg)}</div>`).join('');
 }
 
-function renderAvailEditor(p) {
-  const windows = p.availability || DAYS.map(() => []);
-  let html = '<div class="avail-editor">';
-  DAYS.forEach((day, di) => {
-    const wins = windows[di] || [];
-    const isFull = wins.length === 1 && wins[0].from === '06:00' && wins[0].to === '21:00';
-    const isOff  = wins.length === 0;
-    const chipCls = isFull ? 'full' : isOff ? 'off' : 'custom';
-    const chipLabel = isFull ? '✓ Full' : isOff ? '— Off' : `${wins.length}×`;
-
-    // Eligible blocks preview
-    const eligible = eligibleBlocksForDay(p, di);
-    const eligText = isOff
-      ? ''
-      : eligible.length === 0
-        ? '<div class="avail-eligible none">⚠ no blocks fit</div>'
-        : `<div class="avail-eligible">${eligible.map(b => b.id).join(', ')}</div>`;
-
-    html += `<div class="avail-day-col">
-      <div class="avail-day-label">${day}</div>
-      <div class="avail-chip ${chipCls}" onclick="pAvailCycleDay('${p.id}',${di})">${chipLabel}</div>`;
-
-    if (!isOff && !isFull) {
-      wins.forEach((w, wi) => {
-        html += `<div class="avail-window-row">
-          <input class="avail-time" type="time" value="${w.from}" min="06:00" max="21:00"
-            onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'from',this.value)">
+function renderAvailEditor(p){
+  const windows=p.availability||DAYS.map(()=>[]);
+  let html=`<div style="margin-bottom:4px;" class="avail-bulk">
+    <button class="btn btn-xs btn-secondary" onclick="bulkAvail('${p.id}','wkdays','full')">Wkdays Full</button>
+    <button class="btn btn-xs btn-secondary" onclick="bulkAvail('${p.id}','all','full')">All Full</button>
+    <button class="btn btn-xs btn-secondary" onclick="bulkAvail('${p.id}','all','off')">All Off</button>
+    <select class="pref-select" style="font-size:10px;padding:1px 3px;width:auto;" onchange="copyAvailFrom('${p.id}',this.value);this.value=''">
+      <option value="">Copy from…</option>
+      ${state.people.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}
+    </select>
+  </div>`;
+  html+='<div class="avail-editor">';
+  DAYS.forEach((day,di)=>{
+    const wins=windows[di]||[];
+    const isFull=wins.length===1&&wins[0].from==='06:00'&&wins[0].to==='21:00';
+    const isOff=wins.length===0;
+    const chipCls=isFull?'full':isOff?'off':'custom';
+    const chipLabel=isFull?'✓ Full':isOff?'— Off':`${wins.length}×`;
+    const eligible=eligibleBlocksForDay(p,di);
+    const eligText=isOff?'':eligible.length===0?'<div class="avail-eligible none">⚠ no blocks fit</div>':`<div class="avail-eligible">${eligible.map(b=>b.id).join(', ')}</div>`;
+    html+=`<div class="avail-day-col"><div class="avail-day-label">${day}</div><div class="avail-chip ${chipCls}" onclick="pAvailCycleDay('${p.id}',${di})">${chipLabel}</div>`;
+    if(!isOff&&!isFull){
+      wins.forEach((w,wi)=>{
+        html+=`<div class="avail-window-row">
+          <input class="avail-time" type="time" value="${w.from}" min="06:00" max="21:00" onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'from',this.value)">
           <span class="avail-sep">–</span>
-          <input class="avail-time" type="time" value="${w.to}" min="06:00" max="21:00"
-            onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'to',this.value)">
+          <input class="avail-time" type="time" value="${w.to}" min="06:00" max="21:00" onchange="pAvailUpdateWindow('${p.id}',${di},${wi},'to',this.value)">
           <button class="avail-rm" onclick="pAvailRemoveWindow('${p.id}',${di},${wi})" title="Remove">✕</button>
         </div>`;
       });
-      html += `<button class="avail-add" onclick="pAvailAddWindow('${p.id}',${di})">+ window</button>`;
+      html+=`<button class="avail-add" onclick="pAvailAddWindow('${p.id}',${di})">+ window</button>`;
     }
-    html += eligText;
-    html += `</div>`;
+    html+=eligText+'</div>';
   });
-  html += '</div>';
+  html+='</div>';
   return html;
 }
 
-function pAvailCycleDay(pid, di) {
-  const p = peopleById[pid]; if (!p) return;
-  if (!p.availability) p.availability = DAYS.map(() => []);
-  const wins = p.availability[di] || [];
-  const isFull = wins.length === 1 && wins[0].from === '06:00' && wins[0].to === '21:00';
-  const isOff  = wins.length === 0;
-  if (isFull) {
-    p.availability[di] = []; // Full → Off
-  } else if (isOff) {
-    // Off → Custom: default window based on type
-    p.availability[di] = p.type === 'vol'
-      ? [{ from: '09:00', to: '17:00' }]
-      : [{ from: '06:00', to: '21:00' }];
-  } else {
-    p.availability[di] = [{ from: '06:00', to: '21:00' }]; // Custom → Full
-  }
+function bulkAvail(pid, scope, mode){
+  const p=peopleById[pid]; if(!p) return;
+  pushUndo('Bulk avail '+p.name);
+  const days = scope==='wkdays' ? [0,1,2,3,4] : [0,1,2,3,4,5,6];
+  days.forEach(di=>{
+    p.availability[di] = mode==='full' ? [{from:'06:00',to:'21:00'}] : [];
+  });
   save(); renderRoster();
 }
 
-function pAvailAddWindow(pid, di) {
-  const p = peopleById[pid]; if (!p) return;
-  if (!p.availability) p.availability = DAYS.map(() => []);
-  p.availability[di].push({ from: '09:00', to: '17:00' });
+function copyAvailFrom(pid, srcId){
+  if(!srcId) return;
+  const p=peopleById[pid], src=peopleById[srcId];
+  if(!p||!src) return;
+  pushUndo('Copy avail to '+p.name);
+  p.availability=JSON.parse(JSON.stringify(src.availability));
   save(); renderRoster();
 }
 
-function pAvailRemoveWindow(pid, di, wi) {
-  const p = peopleById[pid]; if (!p) return;
-  p.availability[di].splice(wi, 1);
+function pAvailCycleDay(pid,di){
+  const p=peopleById[pid]; if(!p) return;
+  if(!p.availability) p.availability=DAYS.map(()=>[]);
+  const wins=p.availability[di]||[];
+  const isFull=wins.length===1&&wins[0].from==='06:00'&&wins[0].to==='21:00';
+  const isOff=wins.length===0;
+  if(isFull) p.availability[di]=[];
+  else if(isOff) p.availability[di]=p.type==='vol'?[{from:'09:00',to:'17:00'}]:[{from:'06:00',to:'21:00'}];
+  else p.availability[di]=[{from:'06:00',to:'21:00'}];
   save(); renderRoster();
 }
-
-function pAvailUpdateWindow(pid, di, wi, field, val) {
-  const p = peopleById[pid]; if (!p) return;
-  if (!p.availability?.[di]?.[wi]) return;
-  p.availability[di][wi][field] = val;
-  // Validate: from must be before to
-  const w = p.availability[di][wi];
-  if (toMin(w.from) >= toMin(w.to)) {
-    toast(`⚠ Window end must be after start on ${DAYS[di]}`);
-  }
-  save();
-  renderRoster();
+function pAvailAddWindow(pid,di){ const p=peopleById[pid]; if(!p) return; p.availability[di].push({from:'09:00',to:'17:00'}); save(); renderRoster(); }
+function pAvailRemoveWindow(pid,di,wi){ const p=peopleById[pid]; if(!p) return; p.availability[di].splice(wi,1); save(); renderRoster(); }
+function pAvailUpdateWindow(pid,di,wi,field,val){
+  const p=peopleById[pid]; if(!p) return;
+  if(!p.availability?.[di]?.[wi]) return;
+  p.availability[di][wi][field]=val;
+  const w=p.availability[di][wi];
+  if(toMin(w.from)>=toMin(w.to)) toast(`⚠ Window end must be after start on ${DAYS[di]}`);
+  save(); renderRoster();
 }
 
 function renderRoster(){
@@ -867,24 +967,34 @@ function renderRoster(){
   const table=document.getElementById('roster-table');
   const empty=document.getElementById('roster-empty');
   body.innerHTML='';
-  if(!state.people.length){
-    table.style.display='none'; empty.style.display='block';
-    renderRosterWarnings(); return;
-  }
+  if(!state.people.length){ table.style.display='none'; empty.style.display='block'; renderRosterWarnings(); return; }
   table.style.display='table'; empty.style.display='none';
+
+  const wh=computeWeeklyHours();
 
   state.people.forEach((p,i)=>{
     ensurePersonFields(p);
+    const hasRole=p.roles.gate||p.roles.podium||p.roles.mandir||p.roles.field;
+    const allOff=(p.availability||[]).every(w=>w.length===0);
+    const atRisk=(!hasRole||allOff)&&!p.offWeek;
     const hasOverride=p.overrideOver40||p.overrideOver9hr||p.overrideIgnoreTurnaround||p.allowExtendedDay;
+    const rowCls=p.offWeek?'roster-row-offweek':atRisk?'roster-row-atrisk':p.type==='emp'?'roster-row-emp':'roster-row-vol';
+
+    const total=wh[p.id]||0, cap=p.maxHrs;
+    const pct=Math.min(100,(total/Math.max(cap,0.1))*100);
+    const barFillCls=total>cap?'over':total>cap*0.88?'near':'';
+
     const tr=document.createElement('tr');
+    tr.className=rowCls;
     tr.innerHTML=`
       <td class="text2" style="font-size:11px;">${i+1}</td>
       <td>
         <input class="name-input" value="${esc(p.name)}" oninput="pf('${p.id}','name',this.value)">
         ${hasOverride?'<span class="override-flag" title="Overrides active">★</span>':''}
+        ${p.offWeek?'<span style="font-size:10px;color:var(--accent3);margin-left:3px;">🏖 off</span>':''}
       </td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Employee':'Volunteer'}</span></td>
-      <td style="min-width:600px; padding:6px 8px;">${renderAvailEditor(p)}</td>
+      <td style="min-width:600px;padding:6px 8px;">${renderAvailEditor(p)}</td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.gate  ?'checked':''} onchange="pRole('${p.id}','gate',  this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.podium?'checked':''} onchange="pRole('${p.id}','podium',this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="role-check" ${p.roles.mandir?'checked':''} onchange="pRole('${p.id}','mandir',this.checked)"></td>
@@ -892,6 +1002,7 @@ function renderRoster(){
       <td><select class="pref-select" onchange="pf('${p.id}','pref',+this.value)">
         ${[1,2,3,4,5].map(v=>`<option ${p.pref===v?'selected':''}>${v}</option>`).join('')}
       </select></td>
+      <td><input type="number" class="num-input" value="${p.minHrs}" min="0" max="40" style="width:44px;" title="Min hours/week" onchange="pf('${p.id}','minHrs',+this.value)"></td>
       <td><input type="number" class="num-input" value="${p.dailyCap}" min="6" max="10" style="width:44px;" onchange="pf('${p.id}','dailyCap',+this.value)"></td>
       <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.allowExtendedDay?'checked':''} onchange="pf('${p.id}','allowExtendedDay',this.checked)"></td>
       <td><input type="number" class="num-input" value="${p.maxHrs}" min="0" max="80" onchange="pf('${p.id}','maxHrs',+this.value)"></td>
@@ -899,6 +1010,11 @@ function renderRoster(){
       <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideOver9hr?'checked':''} onchange="pf('${p.id}','overrideOver9hr',this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.overrideIgnoreTurnaround?'checked':''} onchange="pf('${p.id}','overrideIgnoreTurnaround',this.checked)"></td>
       <td style="text-align:center;"><input type="checkbox" class="over-check" ${p.weekendExempt?'checked':''} onchange="pf('${p.id}','weekendExempt',this.checked)"></td>
+      <td style="text-align:center;"><input type="checkbox" class="offweek-check" ${p.offWeek?'checked':''} title="Off this week (vacation)" onchange="pOffWeek('${p.id}',this.checked)"></td>
+      <td style="min-width:90px;padding:4px 8px;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:2px;">${total.toFixed(1)}/${cap}h</div>
+        <div class="mini-bar-bg"><div class="mini-bar-fill ${barFillCls}" style="width:${pct.toFixed(0)}%;"></div></div>
+      </td>
       <td><button class="btn btn-danger btn-sm" onclick="removePerson('${p.id}')">✕</button></td>
     `;
     body.appendChild(tr);
@@ -911,12 +1027,11 @@ function renderRoster(){
 }
 
 function pf(id,field,val){ const p=peopleById[id]; if(p){ p[field]=val; save(); renderRoster(); } }
-
-// FIX #4: pRole() now calls renderRosterWarnings() so "no roles" warning
-// appears/clears immediately when a role checkbox is toggled.
-function pRole(id,role,val){
-  const p=peopleById[id];
-  if(p){ p.roles[role]=val; save(); renderRosterWarnings(); }
+function pRole(id,role,val){ const p=peopleById[id]; if(p){ p.roles[role]=val; save(); renderRosterWarnings(); } }
+function pOffWeek(id,val){
+  const p=peopleById[id]; if(!p) return;
+  pushUndo((val?'Mark off week: ':'Mark back: ')+p.name);
+  p.offWeek=val; save(); renderRoster();
 }
 
 // ══════════════════════════════════════════════
@@ -926,28 +1041,16 @@ function renderDemandGrid(){
   const wrap=document.getElementById('demand-grid-wrap');
   wrap.innerHTML='';
   BLOCKS.forEach(b=>{
-    const sec=document.createElement('div');
-    sec.style.cssText='margin-top:20px;';
-    const lunchNote = b.isLunch
-      ? '<span class="badge-purple" style="font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;">Lunch Window — set coverage AND break slots</span>'
-      : '';
-    sec.innerHTML=`<div class="sec-title" style="font-size:13px;">
-      ${b.label} ${lunchNote}
-      <span class="text2 text-xs" style="margin-left:4px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
-    </div>`;
+    const sec=document.createElement('div'); sec.style.cssText='margin-top:20px;';
+    const lunchNote=b.isLunch?'<span class="badge-purple" style="font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;">Lunch Window</span>':'';
+    sec.innerHTML=`<div class="sec-title" style="font-size:13px;">${b.label}${lunchNote}<span class="text2 text-xs" style="margin-left:4px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span></div>`;
     wrap.appendChild(sec);
-
     const grid=document.createElement('div');
     grid.className='demand-grid';
-    grid.innerHTML='<div class="dg-header">Station</div>'+
-      DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
-
-    const stationsToShow = b.isLunch
-      ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
-      : WORK_STATIONS;
-
+    grid.innerHTML='<div class="dg-header">Station</div>'+DAYS.map(d=>`<div class="dg-header">${d}</div>`).join('');
+    const stationsToShow=b.isLunch?[...COVERAGE_STATIONS,...FIELD_STATIONS,STATIONS.find(s=>s.isLunch)]:WORK_STATIONS;
     stationsToShow.forEach(s=>{
-      const lunchMark = s.isLunch ? '<span class="dg-lunch-marker">(break)</span>' : '';
+      const lunchMark=s.isLunch?'<span class="dg-lunch-marker">(break)</span>':'';
       grid.innerHTML+=`<div class="dg-label">${s.label}${lunchMark}</div>`;
       DAYS.forEach((_,di)=>{
         const val=(state.demand[b.id]?.[s.id]?.[di])??0;
@@ -956,14 +1059,8 @@ function renderDemandGrid(){
     });
     wrap.appendChild(grid);
   });
-
   const tbody=document.getElementById('blocks-info');
-  tbody.innerHTML=BLOCKS.map((b,i)=>`<tr>
-    <td class="text2">${i+1}</td><td>${b.label}</td>
-    <td>${b.start}</td><td>${b.end}</td>
-    <td>${blockDur(b).toFixed(2)} h</td>
-    <td class="text2 text-xs">${b.notes}</td>
-  </tr>`).join('');
+  tbody.innerHTML=BLOCKS.map((b,i)=>`<tr><td class="text2">${i+1}</td><td>${b.label}</td><td>${b.start}</td><td>${b.end}</td><td>${blockDur(b).toFixed(2)} h</td><td class="text2 text-xs">${b.notes}</td></tr>`).join('');
 }
 
 function updDemand(bid,sid,di,val){
@@ -976,26 +1073,72 @@ function updDemand(bid,sid,di,val){
 // ══════════════════════════════════════════════
 //  AVAILABILITY HELPERS
 // ══════════════════════════════════════════════
-function blockCoveredByAvailability(b, windows) {
-  if (!windows || windows.length === 0) return false;
-  const bStart = toMin(b.start), bEnd = toMin(b.end);
-  return windows.some(w => toMin(w.from) <= bStart && toMin(w.to) >= bEnd);
+function blockCoveredByAvailability(b,windows){
+  if(!windows||windows.length===0) return false;
+  const bStart=toMin(b.start),bEnd=toMin(b.end);
+  return windows.some(w=>toMin(w.from)<=bStart&&toMin(w.to)>=bEnd);
 }
-
-function eligibleBlocksForDay(p, di) {
-  const windows = p.availability?.[di] || [];
-  return BLOCKS.filter(b => blockCoveredByAvailability(b, windows));
+function eligibleBlocksForDay(p,di){
+  if(p.offWeek) return [];
+  const windows=p.availability?.[di]||[];
+  return BLOCKS.filter(b=>blockCoveredByAvailability(b,windows));
 }
-
-// FIX #5: totalAvailableHours now sums only actual schedulable block hours
-// that fit within availability windows, instead of raw window durations.
-// This prevents the ~30-min over-count and keeps the roster warning accurate.
-function totalAvailableHours(p) {
-  let total = 0;
-  DAYS.forEach((_, di) => {
-    eligibleBlocksForDay(p, di).forEach(b => { total += blockDur(b); });
-  });
+function totalAvailableHours(p){
+  let total=0;
+  DAYS.forEach((_,di)=>{ eligibleBlocksForDay(p,di).forEach(b=>{ total+=blockDur(b); }); });
   return total;
+}
+
+// ══════════════════════════════════════════════
+//  PRE-FLIGHT CHECK
+// ══════════════════════════════════════════════
+function showPreFlight(){
+  const wrap=document.getElementById('preflight-wrap');
+  wrap.style.display='block';
+  const items=[];
+
+  // Check people
+  const active=state.people.filter(p=>!p.offWeek);
+  const noRole=active.filter(p=>!p.roles.gate&&!p.roles.podium&&!p.roles.mandir&&!p.roles.field);
+  const allOff=active.filter(p=>(p.availability||[]).every(w=>w.length===0));
+  if(noRole.length) items.push({type:'err',msg:`${noRole.map(p=>p.name).join(', ')} — no roles assigned`});
+  if(allOff.length) items.push({type:'err',msg:`${allOff.map(p=>p.name).join(', ')} — no availability set`});
+
+  // Check demand vs available heads per day per block
+  DAYS.forEach((day,di)=>{
+    BLOCKS.forEach(b=>{
+      const stns=b.isLunch?[...COVERAGE_STATIONS,...FIELD_STATIONS]:WORK_STATIONS;
+      stns.forEach(s=>{
+        const demand=(state.demand[b.id]?.[s.id]?.[di])??0;
+        if(demand===0) return;
+        const available=active.filter(p=>{
+          if(!blockCoveredByAvailability(b,p.availability?.[di]||[])) return false;
+          const roleKey=s.isField?'field':s.isLunch?null:s.id;
+          if(roleKey&&!p.roles[roleKey]) return false;
+          if(s.isLunch&&p.type==='vol') return false;
+          if(p.type==='vol'&&s.isField) return false;
+          return true;
+        }).length;
+        if(available<demand){
+          items.push({type:available===0?'err':'warn',
+            msg:`${day} ${b.label} → ${s.label}: need ${demand}, only ${available} eligible`});
+        }
+      });
+    });
+  });
+
+  // Min hours feasibility
+  active.filter(p=>p.type==='emp'&&p.minHrs>0).forEach(p=>{
+    const avail=totalAvailableHours(p);
+    if(p.minHrs>avail) items.push({type:'warn',msg:`${p.name} min hrs ${p.minHrs}h > available ${avail.toFixed(1)}h`});
+  });
+
+  if(!items.length) items.push({type:'ok',msg:'✓ All checks passed — safe to generate'});
+
+  wrap.innerHTML=`<div class="preflight-panel">
+    <h3>🔍 Pre-flight Check <button class="btn btn-secondary btn-sm" style="float:right;" onclick="document.getElementById('preflight-wrap').style.display='none'">✕</button></h3>
+    <div class="preflight-grid">${items.map(i=>`<div class="pf-item ${i.type==='err'?'pf-err':i.type==='warn'?'pf-warn':'pf-ok'}">${i.msg}</div>`).join('')}</div>
+  </div>`;
 }
 
 // ══════════════════════════════════════════════
@@ -1004,11 +1147,12 @@ function totalAvailableHours(p) {
 function effectiveDailyCap(p){
   if(p.overrideOver9hr) return 10;
   if(p.allowExtendedDay) return 10;
-  return Math.min(p.dailyCap??8, 10);
+  return Math.min(p.dailyCap??8,10);
 }
 
 function runScheduler(){
   if(!state.people.length){ toast('Add people first'); return; }
+  pushUndo('Auto-generate schedule');
   const startDay=parseInt(document.getElementById('regen-from').value);
   document.getElementById('sched-status').innerHTML='<span class="spin">⚙</span> Generating…';
   setTimeout(()=>{
@@ -1019,6 +1163,7 @@ function runScheduler(){
       save(); renderScheduleGrid(); renderHourSummary();
       document.getElementById('sched-status').textContent=`✓ Done in ${ms}ms`;
       toast('Schedule generated!');
+      document.getElementById('sched-errors').scrollIntoView({behavior:'smooth',block:'nearest'});
     } catch(e){
       document.getElementById('sched-status').textContent='Error';
       toast('Error: '+e.message); console.error(e);
@@ -1029,265 +1174,194 @@ function runScheduler(){
 function generateSchedule(startDay=-1){
   const schedLog=[];
   const log=msg=>schedLog.push(msg);
-
-  // ── Init counters ──
-  const wkHrs={}, dayHrs={};
-  const satWorkedDay={}, sunWorkedDay={};
-  const satWorked={}, sunWorked={};
-  const lastAssigned={}; // pid -> {di, endMin}
+  const wkHrs={},dayHrs={};
+  const satWorkedDay={},sunWorkedDay={},satWorked={},sunWorked={};
+  const lastAssigned={};
 
   state.people.forEach(p=>{
-    wkHrs[p.id]=0;
-    dayHrs[p.id]=DAYS.map(()=>0);
+    wkHrs[p.id]=0; dayHrs[p.id]=DAYS.map(()=>0);
     satWorked[p.id]=0; sunWorked[p.id]=0;
     satWorkedDay[p.id]=false; sunWorkedDay[p.id]=false;
     lastAssigned[p.id]=null;
   });
 
-  // ── Build sched skeleton, preserve locked days ──
   const sched={};
   DAYS.forEach((_,di)=>{
     sched[di]={};
-    if(startDay>=0 && di<startDay && state.schedule[di]){
+    if(startDay>=0&&di<startDay&&state.schedule[di]){
       sched[di]=JSON.parse(JSON.stringify(state.schedule[di]));
-      // Recount hours from preserved days
       BLOCKS.forEach(b=>{
         const dur=blockDur(b);
         STATIONS.forEach(s=>{
           const key=s.isLunch?'lunch':s.id;
-          if(b.isLunch && s.isLunch && !state.settings?.lunchPaid) return;
-          if(b.isLunch && !s.isLunch) { /* coverage during lunch — always count */ }
+          if(b.isLunch&&s.isLunch&&!state.settings?.lunchPaid) return;
           (sched[di][b.id]?.[key]||[]).forEach(slot=>{
             const pid=slot?.pid; if(!pid||wkHrs[pid]===undefined) return;
             wkHrs[pid]+=dur; dayHrs[pid][di]+=dur;
             lastAssigned[pid]={di,endMin:toMin(b.end)};
-            if(di===5){ if(!satWorkedDay[pid]){ satWorked[pid]++; satWorkedDay[pid]=true; } }
-            if(di===6){ if(!sunWorkedDay[pid]){ sunWorked[pid]++; sunWorkedDay[pid]=true; } }
+            if(di===5){if(!satWorkedDay[pid]){satWorked[pid]++;satWorkedDay[pid]=true;}}
+            if(di===6){if(!sunWorkedDay[pid]){sunWorked[pid]++;sunWorkedDay[pid]=true;}}
           });
         });
       });
-    } else {
-      BLOCKS.forEach(b=>{ sched[di][b.id]={}; });
-    }
+    } else { BLOCKS.forEach(b=>{ sched[di][b.id]={}; }); }
   });
 
-  const employees=state.people.filter(p=>p.type==='emp');
+  // Only active (non-offWeek) people
+  const activePeople=state.people.filter(p=>!p.offWeek);
+  const employees=activePeople.filter(p=>p.type==='emp');
 
-  // ── Eligibility check ──
   function isEligible(p,di,blk,s,assignedSet){
-    if (!blockCoveredByAvailability(blk, p.availability?.[di] || [])) return false;
+    if(p.offWeek) return false;
+    if(!blockCoveredByAvailability(blk,p.availability?.[di]||[])) return false;
     if(assignedSet.has(p.id)) return false;
     const roleKey=s.isField?'field':s.isLunch?null:s.id;
-    if(roleKey && !p.roles[roleKey]) return false;
-    if(s.isLunch && p.type==='vol') return false;
-    if(p.type==='vol' && s.isField) return false;
-    if(p.type==='vol' && p.availableBlocks?.length>0 && !p.availableBlocks.includes(blk.id)) return false;
-
+    if(roleKey&&!p.roles[roleKey]) return false;
+    if(s.isLunch&&p.type==='vol') return false;
+    if(p.type==='vol'&&s.isField) return false;
     const dur=blockDur(blk);
     const bStartMin=toMin(blk.start);
     const last=lastAssigned[p.id];
-
     if(!p.overrideIgnoreTurnaround){
-      if(last&&last.di===di-1&&last.endMin>=1080&&bStartMin===360){
-        log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: clopen`); return false;
-      }
-      if(last&&last.di===di-1){
-        if(24*60+bStartMin < last.endMin+600){
-          log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: turnaround`); return false;
-        }
-      }
-      if(last&&last.di===di){
-        const gap=bStartMin-last.endMin;
-        if(gap>MAX_SHIFT_GAP_HOURS*60&&!p.allowExtendedDay){
-          log(`SKIP ${p.name} d${di} ${blk.id}/${s.id}: split gap ${(gap/60).toFixed(1)}h`); return false;
-        }
-      }
+      if(last&&last.di===di-1&&last.endMin>=1080&&bStartMin===360){ log(`SKIP ${p.name} d${di}: clopen`); return false; }
+      if(last&&last.di===di-1){ if(24*60+bStartMin<last.endMin+600){ log(`SKIP ${p.name} d${di}: turnaround`); return false; } }
+      if(last&&last.di===di){ const gap=bStartMin-last.endMin; if(gap>MAX_SHIFT_GAP_HOURS*60&&!p.allowExtendedDay){ log(`SKIP ${p.name} d${di}: split gap`); return false; } }
     }
-
-    if(dayHrs[p.id][di]+dur>effectiveDailyCap(p)+0.01){
-      log(`SKIP ${p.name} d${di}: daily cap`); return false;
-    }
-    if(!p.overrideOver40&&wkHrs[p.id]+dur>p.maxHrs+0.01){
-      log(`SKIP ${p.name}: weekly cap`); return false;
-    }
+    if(dayHrs[p.id][di]+dur>effectiveDailyCap(p)+0.01){ log(`SKIP ${p.name} d${di}: daily cap`); return false; }
+    if(!p.overrideOver40&&wkHrs[p.id]+dur>p.maxHrs+0.01){ log(`SKIP ${p.name}: weekly cap`); return false; }
     return true;
   }
 
-  // FIX #6: renamed outer param from 'b' to 'blk' to avoid shadowing the
-  // sort comparator's second argument and prevent future confusion.
-  function sortPool(pool, di, blk){
+  function sortPool(pool,di,blk){
     return [...pool].sort((a,b)=>{
+      // Employees before volunteers
+      if(a.type!==b.type) return a.type==='emp'?-1:1;
       const aP=a.preferredBlocks?.includes(blk.id)?-1:0;
       const bP=b.preferredBlocks?.includes(blk.id)?-1:0;
       if(aP!==bP) return aP-bP;
       const aA=a.avoidBlocks?.includes(blk.id)?1:0;
       const bA=b.avoidBlocks?.includes(blk.id)?1:0;
       if(aA!==bA) return aA-bA;
-      if(a.type!==b.type) return a.type==='emp'?-1:1;
       if(!a.weekendExempt&&!b.weekendExempt){
         if(di===5){const d=satWorked[a.id]-satWorked[b.id]; if(d!==0)return d;}
         if(di===6){const d=sunWorked[a.id]-sunWorked[b.id]; if(d!==0)return d;}
       }
       if(b.pref!==a.pref) return b.pref-a.pref;
+      // Min hours boost: prioritize people below their floor
+      const aNeedsHrs = a.minHrs>0 && wkHrs[a.id]<a.minHrs ? -1 : 0;
+      const bNeedsHrs = b.minHrs>0 && wkHrs[b.id]<b.minHrs ? -1 : 0;
+      if(aNeedsHrs!==bNeedsHrs) return aNeedsHrs-bNeedsHrs;
       return wkHrs[a.id]-wkHrs[b.id];
     });
   }
 
-  // ── Assign and update counters ──
   function assign(sched,di,b,sid,pid){
     const dur=blockDur(b);
     if(!sched[di][b.id][sid]) sched[di][b.id][sid]=[];
     sched[di][b.id][sid].push({pid,locked:false});
-    wkHrs[pid]+=dur;
-    dayHrs[pid][di]+=dur;
+    wkHrs[pid]+=dur; dayHrs[pid][di]+=dur;
     lastAssigned[pid]={di,endMin:toMin(b.end)};
     if(di===5&&!satWorkedDay[pid]){satWorked[pid]++;satWorkedDay[pid]=true;}
     if(di===6&&!sunWorkedDay[pid]){sunWorked[pid]++;sunWorkedDay[pid]=true;}
     log(`ASSIGN ${peopleById[pid]?.name} → d${di} ${b.id}/${sid}`);
   }
 
-  // ══ MAIN LOOP ══
   DAYS.forEach((_,di)=>{
     if(startDay>=0&&di<startDay) return;
-
-    state.people.forEach(p=>{
-      if(di===5) satWorkedDay[p.id]=false;
-      if(di===6) sunWorkedDay[p.id]=false;
-    });
-
+    activePeople.forEach(p=>{ if(di===5)satWorkedDay[p.id]=false; if(di===6)sunWorkedDay[p.id]=false; });
     const assigned=new Set();
 
     BLOCKS.forEach(b=>{
       assigned.clear();
 
       if(b.isLunch){
-        // ── LUNCH BLOCKS (b3/b4/b5) ──
+        // Coverage stations first (Gate must be covered)
         COVERAGE_STATIONS.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??0;
           sched[di][b.id][s.id]=[];
           if(demand===0) return;
-          const pool=sortPool(
-            state.people.filter(p=>isEligible(p,di,b,s,assigned)),
-            di,b
-          );
+          const pool=sortPool(activePeople.filter(p=>isEligible(p,di,b,s,assigned)),di,b);
           for(let slot=0;slot<demand;slot++){
             const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
             if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
             else { sched[di][b.id][s.id].push({pid:null,locked:false}); log(`UNFILLED ${b.id}/${s.id} d${di}`); }
           }
         });
-
         FIELD_STATIONS.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??0;
           sched[di][b.id][s.id]=[];
           if(demand===0) return;
-          const pool=sortPool(
-            state.people.filter(p=>isEligible(p,di,b,s,assigned)),
-            di,b
-          );
+          const pool=sortPool(activePeople.filter(p=>isEligible(p,di,b,s,assigned)),di,b);
           for(let slot=0;slot<demand;slot++){
             const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
             if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
             else { sched[di][b.id][s.id].push({pid:null,locked:false}); }
           }
         });
-
+        // Lunch break slots
         const demand=state.demand[b.id]?.['lunch']?.[di]??1;
         sched[di][b.id]['lunch']=[];
-        const covFilled=COVERAGE_STATIONS.reduce((n,s)=>{
-          return n+(sched[di][b.id][s.id]||[]).filter(x=>x.pid).length;
-        },0);
-        const covRequired=COVERAGE_STATIONS.reduce((n,s)=>{
-          return n+(state.demand[b.id]?.[s.id]?.[di]??0);
-        },0);
-
-        const lunchPool=sortPool(
-          employees.filter(p=>
-            blockCoveredByAvailability(b, p.availability?.[di] || []) &&
-            dayHrs[p.id][di]>0 &&
-            dayHrs[p.id][di]<7 &&
-            !assigned.has(p.id)
-          ),
-          di,b
-        );
-
+        const covFilled=COVERAGE_STATIONS.reduce((n,s)=>n+(sched[di][b.id][s.id]||[]).filter(x=>x.pid).length,0);
+        const covRequired=COVERAGE_STATIONS.reduce((n,s)=>n+(state.demand[b.id]?.[s.id]?.[di]??0),0);
+        const lunchPool=sortPool(employees.filter(p=>
+          blockCoveredByAvailability(b,p.availability?.[di]||[])&&dayHrs[p.id][di]>0&&dayHrs[p.id][di]<7&&!assigned.has(p.id)&&!p.offWeek
+        ),di,b);
         let sent=0;
         for(const p of lunchPool){
           if(sent>=demand) break;
           const covAfter=covFilled-(COVERAGE_STATIONS.some(s=>(sched[di][b.id][s.id]||[]).some(x=>x.pid===p.id))?1:0);
-          if(covFilled>0 && covAfter < covRequired && covRequired > 0) {
-            log(`SKIP LUNCH ${p.name} d${di}: would break coverage`); continue;
-          }
+          if(covFilled>0&&covAfter<covRequired&&covRequired>0){ log(`SKIP LUNCH ${p.name}: breaks coverage`); continue; }
           sched[di][b.id]['lunch'].push({pid:p.id,locked:false});
           assigned.add(p.id);
-          if(state.settings?.lunchPaid){
-            const dur=blockDur(b);
-            wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
-          }
+          if(state.settings?.lunchPaid){ const dur=blockDur(b); wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur; }
           sent++;
           log(`LUNCH ${p.name} d${di} ${b.id}`);
         }
-
       } else {
-        // ── NON-LUNCH BLOCKS ──
+        // Non-lunch: Gate filled FIRST, always
         const isClosing=(b.id==='b9');
-        const stationsOrdered=[...BASE_STATIONS,...FIELD_STATIONS];
+        const stationsOrdered=[STATIONS.find(s=>s.id==='gate'),...BASE_STATIONS.filter(s=>s.id!=='gate'),...FIELD_STATIONS];
         stationsOrdered.forEach(s=>{
           const demand=state.demand[b.id]?.[s.id]?.[di]??1;
           sched[di][b.id][s.id]=[];
           if(demand===0) return;
-
           let pool;
           if(isClosing){
             const b8pids=(sched[di]['b8']?.[s.id]||[]).map(x=>x?.pid).filter(Boolean);
             const b8candidates=b8pids.map(id=>peopleById[id]).filter(p=>p&&isEligible(p,di,b,s,assigned));
-            const fallback=sortPool(
-              state.people.filter(p=>isEligible(p,di,b,s,assigned)&&!b8pids.includes(p.id)),
-              di,b
-            );
+            const fallback=sortPool(activePeople.filter(p=>isEligible(p,di,b,s,assigned)&&!b8pids.includes(p.id)),di,b);
             pool=[...b8candidates,...fallback];
           } else {
-            pool=sortPool(state.people.filter(p=>isEligible(p,di,b,s,assigned)),di,b);
+            pool=sortPool(activePeople.filter(p=>isEligible(p,di,b,s,assigned)),di,b);
           }
-
           for(let slot=0;slot<demand;slot++){
             const c=pool.find(p=>!assigned.has(p.id)&&!sched[di][b.id][s.id].some(x=>x.pid===p.id));
             if(c){ assign(sched,di,b,s.id,c.id); assigned.add(c.id); }
-            else { sched[di][b.id][s.id].push({pid:null,locked:false}); log(`UNFILLED ${b.id}/${s.id} d${di} slot${slot}`); }
+            else { sched[di][b.id][s.id].push({pid:null,locked:false}); log(`UNFILLED ${b.id}/${s.id} d${di}`); }
           }
         });
       }
-    }); // end BLOCKS
-
-    // ── FILL-TO-40 PASS ──
-    // FIX #1: Build a fresh "who actually worked today" set from the completed
-    // schedule instead of relying on the stale `assigned` set (which was
-    // cleared at the start of the last block iteration and is now empty).
-    // Without this fix, fill-to-40 could double-book people already in b8/b9.
-    const workedToday = new Set();
-    BLOCKS.forEach(b2 => {
-      WORK_STATIONS.forEach(s => {
-        (sched[di][b2.id]?.[s.id] || []).forEach(slot => {
-          if (slot?.pid) workedToday.add(slot.pid);
-        });
-      });
     });
+
+    // Fill-to-min pass: prioritize people below minHrs
+    const workedToday=new Set();
+    BLOCKS.forEach(b2=>{ WORK_STATIONS.forEach(s=>{ (sched[di][b2.id]?.[s.id]||[]).forEach(slot=>{ if(slot?.pid) workedToday.add(slot.pid); }); }); });
 
     BLOCKS.filter(b=>!b.isLunch&&b.id!=='b8'&&b.id!=='b9').forEach(b=>{
       FIELD_STATIONS.forEach(s=>{
         const slots=sched[di][b.id]?.[s.id]||[];
         const nullSlots=slots.filter(x=>x.pid===null);
         if(!nullSlots.length) return;
-
-        const fillPool=employees
-          .filter(p=>isEligible(p,di,b,s,workedToday))
-          .sort((a,b2)=>{
-            const tA=wkHrs[a.id]<30?0:wkHrs[a.id]<35?1:2;
-            const tB=wkHrs[b2.id]<30?0:wkHrs[b2.id]<35?1:2;
-            if(tA!==tB) return tA-tB;
-            return wkHrs[a.id]-wkHrs[b2.id];
-          });
-
+        const fillPool=employees.filter(p=>!p.offWeek&&isEligible(p,di,b,s,workedToday)).sort((a,b2)=>{
+          // Below min hours gets highest priority
+          const aBelowMin = a.minHrs>0 && wkHrs[a.id]<a.minHrs;
+          const bBelowMin = b2.minHrs>0 && wkHrs[b2.id]<b2.minHrs;
+          if(aBelowMin!==bBelowMin) return aBelowMin?-1:1;
+          const tA=wkHrs[a.id]<30?0:wkHrs[a.id]<35?1:2;
+          const tB=wkHrs[b2.id]<30?0:wkHrs[b2.id]<35?1:2;
+          if(tA!==tB) return tA-tB;
+          return wkHrs[a.id]-wkHrs[b2.id];
+        });
         for(const p of fillPool){
           const ni=slots.findIndex(x=>x.pid===null);
           if(ni===-1) break;
@@ -1298,14 +1372,12 @@ function generateSchedule(startDay=-1){
           workedToday.add(p.id);
           if(di===5&&!satWorkedDay[p.id]){satWorked[p.id]++;satWorkedDay[p.id]=true;}
           if(di===6&&!sunWorkedDay[p.id]){sunWorked[p.id]++;sunWorkedDay[p.id]=true;}
-          log(`FILL40 ${p.name} d${di} ${b.id}/${s.id}`);
+          log(`FILL ${p.name} d${di} ${b.id}/${s.id}`);
         }
       });
     });
+  });
 
-  }); // end DAYS
-
-  // ── Render log ──
   const logEl=document.getElementById('sched-log');
   const logBody=document.getElementById('sched-log-body');
   const logCnt=document.getElementById('log-count');
@@ -1317,6 +1389,60 @@ function generateSchedule(startDay=-1){
   return sched;
 }
 
+// ── Fill Empties Only ──
+function fillEmpties(){
+  if(!Object.keys(state.schedule).length){ toast('Generate a schedule first'); return; }
+  pushUndo('Fill empties');
+  const wkHrs={}, dayHrs={};
+  state.people.forEach(p=>{ wkHrs[p.id]=0; dayHrs[p.id]=DAYS.map(()=>0); });
+  // Recount from existing schedule
+  DAYS.forEach((_,di)=>{
+    BLOCKS.forEach(b=>{
+      const dur=blockDur(b);
+      STATIONS.forEach(s=>{
+        const key=s.isLunch?'lunch':s.id;
+        (state.schedule[di]?.[b.id]?.[key]||[]).forEach(slot=>{
+          const pid=slot?.pid; if(!pid||wkHrs[pid]===undefined) return;
+          if(b.isLunch&&s.isLunch&&!state.settings?.lunchPaid) return;
+          wkHrs[pid]+=dur; dayHrs[pid][di]+=dur;
+        });
+      });
+    });
+  });
+  let filled=0;
+  DAYS.forEach((_,di)=>{
+    BLOCKS.filter(b=>!b.isLunch).forEach(b=>{
+      WORK_STATIONS.forEach(s=>{
+        const slots=state.schedule[di]?.[b.id]?.[s.id]||[];
+        slots.forEach((slot,si)=>{
+          if(slot?.pid||slot?.locked) return;
+          const eligible=state.people.filter(p=>{
+            if(p.offWeek) return false;
+            if(!blockCoveredByAvailability(b,p.availability?.[di]||[])) return false;
+            const roleKey=s.isField?'field':s.id;
+            if(!p.roles[roleKey]) return false;
+            if(p.type==='vol'&&s.isField) return false;
+            const dur=blockDur(b);
+            if(dayHrs[p.id][di]+dur>effectiveDailyCap(p)+0.01) return false;
+            if(!p.overrideOver40&&wkHrs[p.id]+dur>p.maxHrs+0.01) return false;
+            // No double-booking in same block
+            return !WORK_STATIONS.some(s2=>(state.schedule[di]?.[b.id]?.[s2.id]||[]).some(x=>x?.pid===p.id&&s2.id!==s.id));
+          }).sort((a,b2)=>wkHrs[a.id]-wkHrs[b2.id]);
+          if(eligible.length){
+            const p=eligible[0];
+            slots[si]={pid:p.id,locked:false};
+            const dur=blockDur(b);
+            wkHrs[p.id]+=dur; dayHrs[p.id][di]+=dur;
+            filled++;
+          }
+        });
+      });
+    });
+  });
+  save(); renderScheduleGrid(); renderHourSummary();
+  toast(`Filled ${filled} empty slot${filled!==1?'s':''}`);
+}
+
 // ══════════════════════════════════════════════
 //  SCHEDULE GRID
 // ══════════════════════════════════════════════
@@ -1325,24 +1451,31 @@ function personName(id){ if(!id)return'—'; const p=peopleById[id]; return p?es
 
 function buildOptions(selectedId){
   return `<option value="">— empty —</option>`+
-    state.people.map(p=>`<option value="${p.id}"${p.id===selectedId?' selected':''}>${esc(p.name)} (${p.type==='emp'?'E':'V'})</option>`).join('');
+    state.people.filter(p=>!p.offWeek).map(p=>`<option value="${p.id}"${p.id===selectedId?' selected':''}>${esc(p.name)} (${p.type==='emp'?'E':'V'})</option>`).join('');
+}
+
+function whoIsFree(di, bid, s){
+  const b=BLOCKS.find(x=>x.id===bid);
+  if(!b) return [];
+  return state.people.filter(p=>{
+    if(p.offWeek) return false;
+    if(!blockCoveredByAvailability(b,p.availability?.[di]||[])) return false;
+    const roleKey=s.isField?'field':s.isLunch?null:s.id;
+    if(roleKey&&!p.roles[roleKey]) return false;
+    if(s.isLunch&&p.type==='vol') return false;
+    if(p.type==='vol'&&s.isField) return false;
+    return true;
+  }).map(p=>p.name);
 }
 
 let swapMode=false, swapSource=null;
-
 function toggleSwapMode(){
   swapMode=!swapMode; swapSource=null;
   const btn=document.getElementById('swap-btn');
   const info=document.getElementById('swap-info');
   btn.classList.toggle('active',swapMode);
-  if(swapMode){
-    info.className='show';
-    info.textContent='Swap mode ON — click source slot, then target slot.';
-    document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight'));
-  } else {
-    info.className=''; info.textContent='';
-    document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight'));
-  }
+  if(swapMode){ info.className='show'; info.textContent='Swap mode ON — click source slot, then target slot.'; }
+  else { info.className=''; info.textContent=''; document.querySelectorAll('.slot-dd').forEach(el=>el.classList.remove('swap-source','swap-highlight')); }
 }
 
 function onSlotClick(el){
@@ -1358,7 +1491,8 @@ function onSlotClick(el){
   } else {
     const tSlot=getSlots(di,bid,sid)[si];
     if(tSlot?.locked){ toast('Target is locked'); return; }
-    const tv=el.value, se=swapSource.el, sv=swapSource.val;
+    pushUndo('Swap slots');
+    const tv=el.value,se=swapSource.el,sv=swapSource.val;
     setSlotValue(swapSource.di,swapSource.bid,swapSource.sid,swapSource.si,tv||null,false);
     setSlotValue(di,bid,sid,si,sv||null,false);
     se.value=tv; el.value=sv;
@@ -1375,7 +1509,7 @@ function setSlotValue(di,bid,sid,si,pid,locked){
   if(!state.schedule[di][bid]) state.schedule[di][bid]={};
   if(!state.schedule[di][bid][sid]) state.schedule[di][bid][sid]=[];
   const ex=state.schedule[di][bid][sid][si];
-  state.schedule[di][bid][sid][si]={pid:pid||null, locked:locked!==undefined?locked:(ex?.locked||false)};
+  state.schedule[di][bid][sid][si]={pid:pid||null,locked:locked!==undefined?locked:(ex?.locked||false)};
 }
 
 function toggleLock(di,bid,sid,si){
@@ -1390,51 +1524,96 @@ function toggleLock(di,bid,sid,si){
   if(dd){ dd.disabled=locked; dd.classList.toggle('locked',locked); }
 }
 
+function lockAllSlots(lockVal){
+  if(!Object.keys(state.schedule).length){ toast('No schedule to lock'); return; }
+  pushUndo(lockVal?'Lock all':'Unlock all');
+  DAYS.forEach((_,di)=>{
+    BLOCKS.forEach(b=>{
+      STATIONS.forEach(s=>{
+        const key=s.isLunch?'lunch':s.id;
+        (state.schedule[di]?.[b.id]?.[key]||[]).forEach(slot=>{ if(slot) slot.locked=lockVal; });
+      });
+    });
+  });
+  save(); renderScheduleGrid(); toast(lockVal?'All slots locked':'All slots unlocked');
+}
+
+function lockDaySlots(di, lockVal){
+  BLOCKS.forEach(b=>{
+    STATIONS.forEach(s=>{
+      const key=s.isLunch?'lunch':s.id;
+      (state.schedule[di]?.[b.id]?.[key]||[]).forEach(slot=>{ if(slot) slot.locked=lockVal; });
+    });
+  });
+  save(); renderScheduleGrid(); toast(`${DAYS[di]} slots ${lockVal?'locked':'unlocked'}`);
+}
+
+let lunchCollapsed = false;
+function toggleLunchCollapse(){
+  lunchCollapsed = document.getElementById('lunch-collapsed').checked;
+  document.querySelectorAll('.block-lunch-header,.lunch-section-row').forEach(el=>{
+    el.classList.toggle('collapsed-lunch', lunchCollapsed);
+  });
+}
+
 function renderScheduleGrid(){
   const wrap=document.getElementById('schedule-wrap');
   if(!state.schedule||!Object.keys(state.schedule).length){
     wrap.innerHTML='<div class="empty-state">Generate a schedule to see the output grid.</div>'; return;
   }
 
+  // Day totals data
+  const dayTotals=DAYS.map((_,di)=>{
+    let filled=0,required=0;
+    BLOCKS.forEach(b=>{
+      const stns=b.isLunch?[...COVERAGE_STATIONS,...FIELD_STATIONS]:WORK_STATIONS;
+      stns.forEach(s=>{
+        const dem=(state.demand[b.id]?.[s.id]?.[di])??0;
+        required+=dem;
+        filled+=(state.schedule[di]?.[b.id]?.[s.id]||[]).filter(x=>x?.pid).length;
+      });
+    });
+    return {filled,required};
+  });
+
   let html=`<table class="sched-table" id="sched-tbl">
     <thead><tr>
-      <th style="min-width:155px;">Station / Block</th>
-      ${DAYS.map(d=>`<th>${d}</th>`).join('')}
+      <th class="row-label" style="min-width:155px;cursor:pointer;" onclick="clearColHighlight()">Station / Block</th>
+      ${DAYS.map((d,di)=>`<th data-di="${di}" style="cursor:pointer;" onclick="highlightCol(${di})">${d}</th>`).join('')}
     </tr></thead><tbody>`;
 
   BLOCKS.forEach(b=>{
     const hdrCls=b.isLunch?'block-lunch-header':'block-group-header';
     const lunchNote=b.isLunch?' &nbsp;<span style="font-size:9px;opacity:0.7;">(coverage + break)</span>':'';
-    html+=`<tr class="${hdrCls}"><td colspan="${DAYS.length+1}">
-      ▸ ${b.label}${lunchNote} &nbsp;<span style="opacity:0.5;font-size:10px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span>
-    </td></tr>`;
+    const collapseClass=b.isLunch?'block-lunch-header':'block-group-header';
+    html+=`<tr class="${collapseClass}${b.isLunch?' lunch-section-row':''}"><td class="row-label" colspan="1">▸ ${b.label}${lunchNote} &nbsp;<span style="opacity:0.5;font-size:10px;">${b.start}–${b.end} · ${blockDur(b).toFixed(1)}h</span></td><td colspan="${DAYS.length}"></td></tr>`;
 
-    const stationRows = b.isLunch
-      ? [...COVERAGE_STATIONS, ...FIELD_STATIONS, STATIONS.find(s=>s.isLunch)]
-      : WORK_STATIONS;
-
+    const stationRows=b.isLunch?[...COVERAGE_STATIONS,...FIELD_STATIONS,STATIONS.find(s=>s.isLunch)]:WORK_STATIONS;
     stationRows.forEach(s=>{
-      html+=`<tr><td class="row-label ${s.cls}">
-        <div class="row-label-name">${s.label}${s.isLunch?' 🍽':''}
-        </div>
+      const rowCls=b.isLunch?'lunch-section-row':'';
+      html+=`<tr class="${rowCls}"><td class="row-label ${s.cls}">
+        <div class="row-label-name">${s.label}${s.isLunch?' 🍽':''}</div>
         <div class="row-label-time">${b.start}–${b.end}</div>
       </td>`;
       DAYS.forEach((_,di)=>{
         const demand=state.demand[b.id]?.[s.id]?.[di]??0;
         const slots=getSlots(di,b.id,s.id);
-        html+=`<td class="${s.cls}">`;
+        const freeList=whoIsFree(di,b.id,s);
+        html+=`<td class="${s.cls}" data-di="${di}">`;
         const count=Math.max(demand,slots.length);
         if(count===0){
           html+=`<span style="font-size:10px;color:var(--text3);">—</span>`;
         } else {
           for(let si=0;si<count;si++){
             const slot=slots[si]||{pid:null,locked:false};
-            const pid=slot.pid||null, locked=slot.locked||false;
+            const pid=slot.pid||null,locked=slot.locked||false;
+            const tooltipHtml=freeList.length?`<div class="wf-tooltip">🟢 Free: ${freeList.slice(0,8).map(n=>esc(n)).join(', ')}${freeList.length>8?` +${freeList.length-8} more`:''}</div>`:'';
             html+=`<div class="slot-wrap">
               <select class="slot-dd${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
                 onchange="onSlotChange(this)" onclick="onSlotClick(this)" ${locked?'disabled':''}>${buildOptions(pid)}</select>
               <button class="lock-btn${locked?' locked':''}" data-di="${di}" data-bid="${b.id}" data-sid="${s.id}" data-si="${si}"
                 onclick="toggleLock(${di},'${b.id}','${s.id}',${si})" title="${locked?'Unlock':'Lock'}">${locked?'🔒':'🔓'}</button>
+              ${tooltipHtml}
             </div>`;
           }
         }
@@ -1444,17 +1623,39 @@ function renderScheduleGrid(){
     });
   });
 
+  // Day totals row
+  html+=`<tr class="day-totals-row"><td class="row-label">📊 Filled / Req</td>`;
+  dayTotals.forEach(t=>{
+    const cls=t.filled===0&&t.required>0?'total-err':t.filled<t.required?'total-warn':'total-ok';
+    html+=`<td><span class="${cls}">${t.filled}/${t.required}</span></td>`;
+  });
+  html+=`</tr>`;
+
   html+='</tbody></table>';
   wrap.innerHTML=html;
   setupContextMenu();
   validateAndHighlight();
+  if(lunchCollapsed){
+    document.querySelectorAll('.block-lunch-header,.lunch-section-row').forEach(el=>el.classList.add('collapsed-lunch'));
+  }
+}
+
+function highlightCol(di){
+  clearColHighlight();
+  document.querySelectorAll(`td[data-di="${di}"]`).forEach(el=>el.classList.add('col-highlight'));
+  document.querySelectorAll(`th[data-di="${di}"]`).forEach(el=>el.classList.add('col-highlight'));
+}
+function clearColHighlight(){
+  document.querySelectorAll('.col-highlight').forEach(el=>el.classList.remove('col-highlight'));
 }
 
 function onSlotChange(sel){
   if(sel.disabled) return;
+  pushUndo('Edit slot');
   const di=+sel.dataset.di,bid=sel.dataset.bid,sid=sel.dataset.sid,si=+sel.dataset.si;
   setSlotValue(di,bid,sid,si,sel.value||null);
   save(); validateAndHighlight(); renderHourSummary();
+  renderRoster(); // refresh mini progress bars
 }
 
 // ── Context Menu ──
@@ -1478,6 +1679,7 @@ function setupContextMenu(){
 document.getElementById('ctx-lock').onclick=()=>{
   if(!ctxTarget) return;
   const {di,bid,sid,si}=ctxTarget.dataset;
+  pushUndo('Lock slot');
   setSlotValue(+di,bid,sid,+si,ctxTarget.value||null,true);
   save(); renderScheduleGrid(); validateAndHighlight();
 };
@@ -1491,9 +1693,19 @@ document.getElementById('ctx-clear').onclick=()=>{
   if(!ctxTarget) return;
   const {di,bid,sid,si}=ctxTarget.dataset;
   if(getSlots(+di,bid,sid)[+si]?.locked){ toast('Unlock first'); return; }
+  pushUndo('Clear slot');
   setSlotValue(+di,bid,sid,+si,null,false);
   ctxTarget.value='';
   save(); validateAndHighlight(); renderHourSummary();
+};
+document.getElementById('ctx-lock-day').onclick=()=>{
+  if(!ctxTarget) return;
+  pushUndo('Lock day');
+  lockDaySlots(+ctxTarget.dataset.di,true);
+};
+document.getElementById('ctx-unlock-day').onclick=()=>{
+  if(!ctxTarget) return;
+  lockDaySlots(+ctxTarget.dataset.di,false);
 };
 
 // ══════════════════════════════════════════════
@@ -1508,21 +1720,11 @@ function computeWeeklyHours(){
       const dur=blockDur(b);
       if(b.isLunch){
         [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{
-          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
-          });
+          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur; });
         });
-        if(lunchPaid){
-          (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
-          });
-        }
+        if(lunchPaid){ (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur; }); }
       } else {
-        WORK_STATIONS.forEach(s=>{
-          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur;
-          });
-        });
+        WORK_STATIONS.forEach(s=>{ (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&wh[pid]!==undefined) wh[pid]+=dur; }); });
       }
     });
   });
@@ -1537,22 +1739,10 @@ function computeDailyHours(){
     BLOCKS.forEach(b=>{
       const dur=blockDur(b);
       if(b.isLunch){
-        [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{
-          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
-          });
-        });
-        if(lunchPaid){
-          (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
-          });
-        }
+        [...COVERAGE_STATIONS,...FIELD_STATIONS].forEach(s=>{ (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur; }); });
+        if(lunchPaid){ (state.schedule[di]?.[b.id]?.['lunch']||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur; }); }
       } else {
-        WORK_STATIONS.forEach(s=>{
-          (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-            const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur;
-          });
-        });
+        WORK_STATIONS.forEach(s=>{ (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{ const pid=slot?.pid; if(pid&&dh[pid]) dh[pid][di]+=dur; }); });
       }
     });
   });
@@ -1569,101 +1759,56 @@ function validateAndHighlight(){
   const errors=[];
 
   const pib={};
-  DAYS.forEach((_,di)=>{
-    BLOCKS.forEach(b=>{
-      WORK_STATIONS.forEach(s=>{
-        (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{
-          const pid=slot?.pid; if(!pid) return;
-          const k=`${pid}_${di}_${b.id}`;
-          if(!pib[k]) pib[k]=[];
-          pib[k].push(s.id);
-        });
-      });
-    });
-  });
+  DAYS.forEach((_,di)=>{ BLOCKS.forEach(b=>{ WORK_STATIONS.forEach(s=>{ (state.schedule[di]?.[b.id]?.[s.id]||[]).forEach(slot=>{ const pid=slot?.pid; if(!pid) return; const k=`${pid}_${di}_${b.id}`; if(!pib[k]) pib[k]=[]; pib[k].push(s.id); }); }); }); });
 
   BLOCKS.filter(b=>!b.isLunch&&b.id!=='b9').forEach(b=>{
     DAYS.forEach((_,di)=>{
       const demand=state.demand[b.id]?.['gate']?.[di]??1;
       if(demand===0) return;
       const filled=(state.schedule[di]?.[b.id]?.['gate']||[]).filter(s=>s?.pid).length;
-      if(filled===0){
-        errors.push(`⚠ Gate UNSTAFFED on ${DAYS[di]} ${b.label} — minimum 1 required`);
-      }
+      if(filled===0) errors.push(`⚠ Gate UNSTAFFED on ${DAYS[di]} ${b.label}`);
     });
   });
 
   document.querySelectorAll('.slot-dd').forEach(sel=>{
     const pid=sel.value; if(!pid) return;
     const p=peopleById[pid]; if(!p) return;
-    const di=+sel.dataset.di, bid=sel.dataset.bid, sid=sel.dataset.sid;
+    const di=+sel.dataset.di,bid=sel.dataset.bid,sid=sel.dataset.sid;
     const dayTotal=dh[pid]?.[di]||0;
     const cap=effectiveDailyCap(p);
-
-    if(dayTotal>=p.dailyCap&&dayTotal<cap){
-      sel.classList.add('warn-daily-soft');
-    }
-    if(dayTotal>cap+0.01){
-      sel.classList.add('warn-daily-hard');
-      errors.push(`${p.name} over daily cap on ${DAYS[di]} (${dayTotal.toFixed(1)}h > ${cap}h)`);
-    }
-
-    if(!p.overrideOver40&&p.type==='emp'&&wh[pid]>p.maxHrs+0.01){
-      sel.classList.add('error');
-      errors.push(`${p.name} over weekly cap (${wh[pid].toFixed(1)}/${p.maxHrs}h)`);
-    }
-
+    if(dayTotal>=p.dailyCap&&dayTotal<cap) sel.classList.add('warn-daily-soft');
+    if(dayTotal>cap+0.01){ sel.classList.add('warn-daily-hard'); errors.push(`${p.name} over daily cap on ${DAYS[di]} (${dayTotal.toFixed(1)}h > ${cap}h)`); }
+    if(!p.overrideOver40&&p.type==='emp'&&wh[pid]>p.maxHrs+0.01){ sel.classList.add('error'); errors.push(`${p.name} over weekly cap (${wh[pid].toFixed(1)}/${p.maxHrs}h)`); }
     const k=`${pid}_${di}_${bid}`;
-    if(pib[k]&&pib[k].filter(x=>x!==sid).length>0){
-      if(!sel.classList.contains('error')) sel.classList.add('warn');
-      errors.push(`${p.name} double-booked ${DAYS[di]} ${bid}`);
-    }
-
-    // FIX #2: Check ALL stations in b8 (not just same sid) to determine if
-    // someone qualifies for the closing shift b9. Previously this only looked
-    // at the same station, incorrectly flagging e.g. Gate-b9 if person worked
-    // Podium-b8.
+    if(pib[k]&&pib[k].filter(x=>x!==sid).length>0){ if(!sel.classList.contains('error')) sel.classList.add('warn'); errors.push(`${p.name} double-booked ${DAYS[di]} ${bid}`); }
     if(bid==='b9'){
-      const b8pids = WORK_STATIONS.flatMap(s =>
-        (state.schedule[di]?.['b8']?.[s.id] || []).map(sl => sl?.pid)
-      ).filter(Boolean);
-      if(!b8pids.includes(pid)){
-        sel.classList.add('error');
-        errors.push(`${p.name} in Closing (b9) but not in Evening 1 (b8) on ${DAYS[di]}`);
-      }
+      const b8pids=WORK_STATIONS.flatMap(s=>(state.schedule[di]?.['b8']?.[s.id]||[]).map(sl=>sl?.pid)).filter(Boolean);
+      if(!b8pids.includes(pid)){ sel.classList.add('error'); errors.push(`${p.name} in Closing (b9) but not in Evening 1 (b8) on ${DAYS[di]}`); }
     }
-
     if(!p.overrideIgnoreTurnaround&&di>0&&bid==='b1'){
       const prevB8=Object.values(state.schedule[di-1]?.['b8']||{}).flatMap(a=>a.map(s=>s?.pid));
       const prevB9=Object.values(state.schedule[di-1]?.['b9']||{}).flatMap(a=>a.map(s=>s?.pid));
-      if(prevB8.includes(pid)||prevB9.includes(pid)){
-        sel.classList.add('error');
-        errors.push(`${p.name} clopen: ${DAYS[di-1]} evening + ${DAYS[di]} opening`);
-      }
+      if(prevB8.includes(pid)||prevB9.includes(pid)){ sel.classList.add('error'); errors.push(`${p.name} clopen: ${DAYS[di-1]} evening + ${DAYS[di]} opening`); }
     }
-
     if(!p.allowExtendedDay&&!p.overrideIgnoreTurnaround){
-      const blocksToday=BLOCKS.filter(b2=>!b2.isLunch).filter(b2=>{
-        return WORK_STATIONS.some(s=>(state.schedule[di]?.[b2.id]?.[s.id]||[]).some(sl=>sl?.pid===pid));
-      }).sort((a,b2)=>toMin(a.start)-toMin(b2.start));
+      const blocksToday=BLOCKS.filter(b2=>!b2.isLunch).filter(b2=>WORK_STATIONS.some(s=>(state.schedule[di]?.[b2.id]?.[s.id]||[]).some(sl=>sl?.pid===pid))).sort((a,b2)=>toMin(a.start)-toMin(b2.start));
       for(let i=1;i<blocksToday.length;i++){
         const gap=(toMin(blocksToday[i].start)-toMin(blocksToday[i-1].end))/60;
-        if(gap>MAX_SHIFT_GAP_HOURS){
-          if(!sel.classList.contains('error')) sel.classList.add('warn');
-          errors.push(`${p.name} split shift ${DAYS[di]}: ${gap.toFixed(1)}h gap`);
-          break;
-        }
+        if(gap>MAX_SHIFT_GAP_HOURS){ if(!sel.classList.contains('error')) sel.classList.add('warn'); errors.push(`${p.name} split shift ${DAYS[di]}: ${gap.toFixed(1)}h gap`); break; }
       }
     }
+  });
+
+  // Min hours warnings
+  const wh2=computeWeeklyHours();
+  state.people.filter(p=>p.type==='emp'&&!p.offWeek&&p.minHrs>0).forEach(p=>{
+    if((wh2[p.id]||0)<p.minHrs) errors.push(`${p.name} below min hrs (${(wh2[p.id]||0).toFixed(1)}/${p.minHrs}h)`);
   });
 
   const errdiv=document.getElementById('sched-errors');
   if(errors.length){
     const unique=[...new Set(errors)];
-    errdiv.innerHTML=`<div class="alert-box alert-err">
-      <strong>⚠ ${unique.length} issue(s):</strong>
-      ${unique.map(e=>`<div style="margin-top:3px;font-size:11px;">• ${esc(e)}</div>`).join('')}
-    </div>`;
+    errdiv.innerHTML=`<div class="alert-box alert-err"><strong>⚠ ${unique.length} issue(s):</strong>${unique.map(e=>`<div style="margin-top:3px;font-size:11px;">• ${esc(e)}</div>`).join('')}</div>`;
   } else {
     errdiv.innerHTML=`<div class="alert-box alert-ok">✓ No constraint violations detected</div>`;
   }
@@ -1683,35 +1828,33 @@ function renderHourSummary(){
   if(!people.length){ wrap.innerHTML='<div class="empty-state">No employees under weekly cap.</div>'; return; }
 
   let html=`<table class="hour-table"><thead><tr>
-    <th>Name</th><th>Type</th>
-    ${DAYS.map(d => `<th>${d}</th>`).join('')}
-    <th>Total</th><th>Cap</th><th>Avail/Wk</th><th>Progress</th>
+    <th>Name</th><th>Type</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}
+    <th>Total</th><th>Min</th><th>Cap</th><th>Avail/Wk</th><th>Progress</th>
   </tr></thead><tbody>`;
 
   people.forEach(p=>{
-    const total=wh[p.id]||0, cap=p.maxHrs;
+    const total=wh[p.id]||0,cap=p.maxHrs,min=p.minHrs||0;
     const pct=Math.min(100,(total/Math.max(cap,0.1))*100);
     const barCls=total>cap?'over':total>cap*0.88?'near':'';
-    const totalColor=total>cap?'color:var(--accent3);':total>cap*0.88?'color:var(--accent);':'color:var(--green);';
+    const totalColor=total>cap?'color:var(--accent3);':total<min&&min>0?'color:var(--accent);':'color:var(--green);';
     const hasOverride=p.overrideOver40||p.overrideOver9hr||p.allowExtendedDay;
-
-    html+=`<tr>
-      <td class="bold">${esc(p.name)}${hasOverride?'<span class="override-flag" title="Overrides"> ★</span>':''}</td>
+    html+=`<tr${p.offWeek?' style="opacity:0.5;"':''}>
+      <td class="bold">${esc(p.name)}${hasOverride?'<span class="override-flag"> ★</span>':''}${p.offWeek?'<span style="font-size:10px;color:var(--accent3);margin-left:3px;">🏖</span>':''}</td>
       <td><span class="type-badge ${p.type}">${p.type==='emp'?'Emp':'Vol'}</span></td>
       ${dh[p.id].map((h,di)=>{
         const cls=h>=10?'day-cell-hard':h>=(p.dailyCap??8)?'day-cell-warn':'';
         return `<td class="${cls}" style="text-align:center;font-size:11px;">${h>0?h.toFixed(1):''}</td>`;
       }).join('')}
       <td style="font-size:12px;${totalColor}">${total.toFixed(1)}h</td>
+      <td class="text2" style="font-size:11px;">${min>0?min+'h':'—'}</td>
       <td class="text2">${cap}h</td>
-      <td class="text2" style="font-size:11px;" title="Schedulable block hours available this week">
-        ${totalAvailableHours(p).toFixed(1)}h
-      </td>
+      <td class="text2" style="font-size:11px;">${totalAvailableHours(p).toFixed(1)}h</td>
       <td style="min-width:130px;padding:7px 10px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="bar-bg"><div class="bar-fill ${barCls}" style="width:${pct.toFixed(1)}%;"></div></div>
-          <span style="font-size:10px;min-width:32px;${barCls==='over'?'color:var(--accent3);':barCls==='near'?'color:var(--accent);':''}">${pct.toFixed(0)}%</span>
+          <span style="font-size:10px;min-width:32px;">${pct.toFixed(0)}%</span>
         </div>
+        ${min>0&&total<min?`<div style="font-size:9px;color:var(--accent);margin-top:2px;">⚠ Below min (${min}h)</div>`:''}
       </td>
     </tr>`;
   });
@@ -1720,10 +1863,59 @@ function renderHourSummary(){
 }
 
 // ══════════════════════════════════════════════
+//  PRINT SCHEDULE CARDS
+// ══════════════════════════════════════════════
+function printScheduleCards(){
+  if(!Object.keys(state.schedule).length){ toast('Generate a schedule first'); return; }
+  const container=document.getElementById('print-cards');
+  container.innerHTML='';
+
+  state.people.forEach(p=>{
+    if(p.offWeek) return;
+    const card=document.createElement('div');
+    card.className='person-card';
+    let rows='';
+    DAYS.forEach((day,di)=>{
+      const assignments=[];
+      BLOCKS.forEach(b=>{
+        STATIONS.forEach(s=>{
+          const key=s.isLunch?'lunch':s.id;
+          const slots=state.schedule[di]?.[b.id]?.[key]||[];
+          if(slots.some(sl=>sl?.pid===p.id)){
+            assignments.push(`${b.start}–${b.end} ${s.label}`);
+          }
+        });
+      });
+      if(assignments.length) rows+=`<tr><td style="padding:3px 8px;border:1px solid #ccc;font-weight:700;">${day}</td><td style="padding:3px 8px;border:1px solid #ccc;">${assignments.join(' · ')}</td></tr>`;
+    });
+    card.innerHTML=`
+      <h2 style="font-family:serif;font-size:18px;margin-bottom:4px;">${esc(p.name)}</h2>
+      <div style="font-size:12px;color:#666;margin-bottom:10px;">${p.type==='emp'?'Employee':'Volunteer'} · Week Schedule</div>
+      ${rows?`<table style="border-collapse:collapse;width:100%;font-size:12px;">${rows}</table>`:'<div style="color:#999;">No assignments this week.</div>'}
+    `;
+    container.appendChild(card);
+  });
+
+  // Trigger print with cards visible
+  const style=document.createElement('style');
+  style.id='print-card-style';
+  style.textContent=`
+    @media print {
+      body > * { display: none !important; }
+      #print-cards { display: block !important; }
+      .person-card { page-break-after: always; padding: 24px; }
+    }
+  `;
+  document.head.appendChild(style);
+  window.print();
+  setTimeout(()=>{ document.getElementById('print-card-style')?.remove(); container.innerHTML=''; },1000);
+}
+
+// ══════════════════════════════════════════════
 //  EXPORT / IMPORT
 // ══════════════════════════════════════════════
 function exportTemplate(){
-  const data={people:state.people,demand:state.demand,settings:state.settings,nextId:state.nextId,exported:new Date().toISOString(),version:5};
+  const data={people:state.people,demand:state.demand,settings:state.settings,nextId:state.nextId,exported:new Date().toISOString(),version:6};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='workforce-template-'+new Date().toISOString().slice(0,10)+'.json';
@@ -1737,41 +1929,20 @@ function importTemplate(evt){
     try {
       const data=JSON.parse(e.target.result);
       if(!data.people) throw new Error('Invalid file');
-      if(data.version&&data.version<5) toast('Note: older template format — some fields may default');
+      pushUndo('Import template');
       state.people=data.people||[];
       state.demand=data.demand||{};
       state.settings=data.settings||{};
       state.nextId=data.nextId||state.people.length+1;
-      // FIX #3: Clear the schedule on import so the stale grid doesn't remain
-      // visible with old data while the new roster is active.
       state.schedule={};
-      if(!state.settings) state.settings={};
-      // Migrate availability on import
-      (state.people || []).forEach(p => {
-        if (p.off && !p.availability) {
-          p.availability = p.off.map(isOff =>
-            isOff ? [] : [{ from: '06:00', to: '21:00' }]
-          );
-          delete p.off;
-        }
-        if (!p.availability) {
-          p.availability = DAYS.map(() => [{ from: '06:00', to: '21:00' }]);
-        }
-      });
-      initDemand();
-      rebuildPeopleMap();
+      migrateAllPeople(state.people);
+      initDemand(); rebuildPeopleMap();
       const lp=document.getElementById('lunch-paid');
       if(lp) lp.checked=!!state.settings?.lunchPaid;
-      save();
-      renderRoster();
-      renderDemandGrid();
-      // Re-render schedule grid to show the cleared/empty state
-      renderScheduleGrid();
+      save(); renderRoster(); renderDemandGrid(); renderScheduleGrid();
       document.getElementById('sched-errors').innerHTML='';
       toast('Template imported!');
-    } catch(err) {
-      toast('Import failed: '+err.message);
-    }
+    } catch(err){ toast('Import failed: '+err.message); }
   };
   reader.readAsText(file);
   evt.target.value='';
@@ -1780,27 +1951,28 @@ function importTemplate(evt){
 // ══════════════════════════════════════════════
 //  UTILITIES
 // ══════════════════════════════════════════════
-function esc(s){ 
-  if(!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function toast(msg, dur=2200){
+function toast(msg,dur=2200){
   const el=document.getElementById('toast');
-  el.textContent=msg;
-  el.classList.add('show');
+  el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),dur);
 }
 
 function clearSchedule(){
   if(!confirm('Clear entire schedule? Locked slots will also be cleared.')) return;
+  pushUndo('Clear schedule');
   state.schedule={};
-  save();
-  renderScheduleGrid();
-  renderHourSummary();
+  save(); renderScheduleGrid(); renderHourSummary();
   document.getElementById('sched-errors').innerHTML='';
   toast('Schedule cleared');
 }
+
+// Modal keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-backdrop.show').forEach(m=>m.classList.remove('show'));
+  if(e.key==='Enter'&&document.getElementById('saveas-modal').classList.contains('show')) doSaveAs();
+});
 
 // ══════════════════════════════════════════════
 //  BOOT
@@ -1810,9 +1982,8 @@ function clearSchedule(){
   seedDefaults();
   renderRoster();
   renderDemandGrid();
-  if(Object.keys(state.schedule).length){
-    renderScheduleGrid();
-  }
+  if(Object.keys(state.schedule).length) renderScheduleGrid();
+  updateUndoRedoBtns();
 })();
 </script>
 </body>
